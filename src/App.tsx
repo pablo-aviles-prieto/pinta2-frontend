@@ -1,19 +1,47 @@
-import { useState } from 'react';
-import './App.css';
+import { useState, useEffect } from 'react';
+import { socket } from './socket';
+import { ConnectionState } from './components/ConnectionState';
+import { ConnectionManager } from './components/ConnectionManager';
+import { Events } from './components/Events';
+import { MyForm } from './components/MyForm';
 
-function App() {
-  const [count, setCount] = useState(0);
+const App = () => {
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [chatMsgs, setChatMsgs] = useState<string[]>([]);
+
+  useEffect(() => {
+    function onConnect() {
+      setIsConnected(true);
+    }
+
+    function onDisconnect() {
+      setIsConnected(false);
+    }
+
+    function onChatMsg(value: string) {
+      setChatMsgs((previous) => [...previous, value]);
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('chat msg', onChatMsg);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('chat msg', onChatMsg);
+    };
+  }, []);
 
   return (
-    <>
-      <h1>the chat</h1>
-      <div className='card'>
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
-    </>
+    <div>
+      Test
+      <ConnectionState isConnected={isConnected} />
+      <Events events={chatMsgs} />
+      <ConnectionManager />
+      <MyForm />
+    </div>
   );
-}
+};
 
 export default App;
