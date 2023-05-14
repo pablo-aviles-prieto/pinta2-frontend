@@ -6,7 +6,7 @@ import { MyForm } from '../components/MyForm';
 import { Board } from '../components/Board';
 import { useSocket } from '../hooks/useSocket';
 
-const Main = () => {
+const Homepage = () => {
   const socket = useSocket()
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [chatMsgs, setChatMsgs] = useState<string[]>([]);
@@ -47,4 +47,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Homepage;
