@@ -11,12 +11,11 @@ interface LinesI {
 export const Board = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
-  const [lineNumber, setLineNumber] = useState(0);
   const isDrawing = useRef(false);
   const socket = useSocket();
 
   useEffect(() => {
-    socket.on('new segment', (lineSegment: LinesI) => {
+    socket.on('new segment', (lineNumber: number, lineSegment: LinesI) => {
       setLines((lines) => {
         const updatedLines = [...lines];
         if (updatedLines[lineNumber]) {
@@ -30,16 +29,12 @@ export const Board = () => {
         return updatedLines;
       });
     });
-    socket.on('new line', () => {
-      setLineNumber((prevState) => prevState + 1);
-    });
     socket.on('clear board', () => {
       setLines([]);
     });
 
     return () => {
       socket.off('new segment');
-      socket.off('new line');
       socket.off('clear board');
     };
   }, []);
@@ -74,12 +69,11 @@ export const Board = () => {
     lines.splice(lines.length - 1, 1, lastLine);
     setLines([...lines]);
 
-    socket.emit('new segment', lastLine);
+    socket.emit('new segment', lines.length - 1, lastLine);
   };
 
   const handleMouseUp = () => {
     isDrawing.current = false;
-    socket.emit('new line');
   };
 
   const clearBoard = () => {
