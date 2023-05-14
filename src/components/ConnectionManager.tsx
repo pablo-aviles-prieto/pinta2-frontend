@@ -1,6 +1,8 @@
-import { socket } from '../socket';
+import { useSocket } from '../hooks/useSocket';
 
 export const ConnectionManager = () => {
+  const socket = useSocket()
+  
   function connect() {
     socket.connect();
   }

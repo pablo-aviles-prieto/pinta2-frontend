@@ -5,5 +5,5 @@ interface Props {
 }
 
 export const ConnectionState: FC<Props> = ({ isConnected }) => {
-  return <p>State: {'' + isConnected}</p>;
+  return <p>State: {isConnected ? 'Connected' : 'Disconnected'}</p>;
 };

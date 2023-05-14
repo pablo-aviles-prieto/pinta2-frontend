@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Line, Text } from 'react-konva';
 import Konva from 'konva';
-import { socket } from '../socket';
+import { useSocket } from '../hooks/useSocket';
 
 interface LinesI {
   tool: string;
@@ -11,18 +11,35 @@ interface LinesI {
 export const Board = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
+  const [lineNumber, setLineNumber] = useState(0);
   const isDrawing = useRef(false);
+  const socket = useSocket();
 
   useEffect(() => {
-    socket.on('new line segment', (lineSegment: LinesI) => {
-      setLines((lines) => [...lines, lineSegment]);
+    socket.on('new segment', (lineSegment: LinesI) => {
+      setLines((lines) => {
+        const updatedLines = [...lines];
+        if (updatedLines[lineNumber]) {
+          updatedLines[lineNumber].points = lineSegment.points;
+        } else {
+          updatedLines.push({
+            tool: lineSegment.tool,
+            points: lineSegment.points,
+          });
+        }
+        return updatedLines;
+      });
+    });
+    socket.on('new line', () => {
+      setLineNumber((prevState) => prevState + 1);
     });
     socket.on('clear board', () => {
       setLines([]);
     });
 
     return () => {
-      socket.off('new line segment');
+      socket.off('new segment');
+      socket.off('new line');
       socket.off('clear board');
     };
   }, []);
@@ -55,18 +72,18 @@ export const Board = () => {
 
     // replace last
     lines.splice(lines.length - 1, 1, lastLine);
-    setLines(lines.concat());
+    setLines([...lines]);
 
-    socket.emit('new line segment', lastLine);
+    socket.emit('new segment', lastLine);
   };
 
   const handleMouseUp = () => {
     isDrawing.current = false;
+    socket.emit('new line');
   };
 
   const clearBoard = () => {
     setLines([]);
-
     socket.emit('clear board');
   };
 
