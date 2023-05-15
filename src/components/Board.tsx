@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Stage, Layer, Line, Text } from 'react-konva';
+import { Stage, Layer, Line } from 'react-konva';
 import Konva from 'konva';
 import { useSocket } from '../hooks/useSocket';
 
@@ -8,11 +8,34 @@ interface LinesI {
   points: any[];
 }
 
+interface DivSizeI {
+  width: number;
+  height: number;
+}
+
 export const Board = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
+  const [divSize, setDivSize] = useState<DivSizeI>({ width: 0, height: 0 });
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
   const isDrawing = useRef(false);
   const socket = useSocket();
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (canvasContainerRef.current) {
+        setDivSize({
+          width: canvasContainerRef.current.offsetWidth,
+          height: canvasContainerRef.current.offsetHeight,
+        });
+      }
+    };
+
+    updateSize();
+    window.addEventListener('resize', updateSize);
+
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
 
   useEffect(() => {
     socket.on('new segment', (lineNumber: number, lineSegment: LinesI) => {
@@ -82,35 +105,7 @@ export const Board = () => {
   };
 
   return (
-    <div>
-      <button type='button' onClick={clearBoard}>
-        Clear board
-      </button>
-      <Stage
-        width={window.innerWidth}
-        height={window.innerHeight}
-        onMouseDown={handleMouseDown}
-        onMousemove={handleMouseMove}
-        onMouseup={handleMouseUp}
-      >
-        <Layer>
-          <Text text='Just start drawing' x={5} y={30} />
-          {lines.map((line, i) => (
-            <Line
-              key={i}
-              points={line.points}
-              stroke='#df4b26'
-              strokeWidth={5}
-              tension={0.5}
-              lineCap='round'
-              lineJoin='round'
-              globalCompositeOperation={
-                line.tool === 'eraser' ? 'destination-out' : 'source-over'
-              }
-            />
-          ))}
-        </Layer>
-      </Stage>
+    <>
       <select
         value={tool}
         onChange={(e) => {
@@ -120,6 +115,38 @@ export const Board = () => {
         <option value='pen'>Pen</option>
         <option value='eraser'>Eraser</option>
       </select>
-    </div>
+      <button type='button' onClick={clearBoard}>
+        Clear board
+      </button>
+      <div
+        className='mx-auto bg-white rounded-xl w-[90%] h-[600px] my-5 shadow-md'
+        ref={canvasContainerRef}
+      >
+        <Stage
+          width={divSize.width}
+          height={divSize.height}
+          onMouseDown={handleMouseDown}
+          onMousemove={handleMouseMove}
+          onMouseup={handleMouseUp}
+        >
+          <Layer>
+            {lines.map((line, i) => (
+              <Line
+                key={i}
+                points={line.points}
+                stroke='#df4b26'
+                strokeWidth={5}
+                tension={0.5}
+                lineCap='round'
+                lineJoin='round'
+                globalCompositeOperation={
+                  line.tool === 'eraser' ? 'destination-out' : 'source-over'
+                }
+              />
+            ))}
+          </Layer>
+        </Stage>
+      </div>
+    </>
   );
 };

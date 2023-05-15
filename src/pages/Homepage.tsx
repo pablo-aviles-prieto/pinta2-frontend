@@ -1,48 +1,39 @@
 import { useState, useEffect } from 'react';
-import { ConnectionState } from '../components/ConnectionState';
-import { ConnectionManager } from '../components/ConnectionManager';
-import { Events } from '../components/Events';
-import { MyForm } from '../components/MyForm';
-import { Board } from '../components/Board';
 import { useSocket } from '../hooks/useSocket';
+import { RegisterForm } from '../components/RegisterForm';
+import { BodyContainer } from '../components/BodyContainer';
 
 const Homepage = () => {
-  const socket = useSocket()
-  const [isConnected, setIsConnected] = useState(socket.connected);
-  const [chatMsgs, setChatMsgs] = useState<string[]>([]);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [username, setUsername] = useState('');
+  const socket = useSocket();
 
   useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
-    }
+    if (!isRegistered) return;
 
-    function onDisconnect() {
-      setIsConnected(false);
-    }
-
-    function onChatMsg(value: string) {
-      setChatMsgs((previous) => [...previous, value]);
-    }
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('chat msg', onChatMsg);
+    socket.on('disconnect', () => {
+      setIsRegistered(false);
+      setUsername('');
+    });
 
     return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('chat msg', onChatMsg);
+      if (isRegistered) {
+        socket.off('disconnect');
+      }
     };
-  }, []);
+  }, [isRegistered]);
 
   return (
     <div>
-      <ConnectionState isConnected={isConnected} />
-      <Events events={chatMsgs} />
-      <ConnectionManager />
-      <MyForm />
-      <hr />
-      <Board />
+      {!isRegistered ? (
+        <RegisterForm
+          username={username}
+          setIsRegistered={setIsRegistered}
+          setUsername={setUsername}
+        />
+      ) : (
+        <BodyContainer />
+      )}
     </div>
   );
 };
