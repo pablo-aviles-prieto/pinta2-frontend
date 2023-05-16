@@ -1,15 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useSocket } from '../hooks/useSocket';
+import { DefaultEventsMap } from '@socket.io/component-emitter';
+
 import { RegisterForm } from '../components/RegisterForm';
 import { BodyContainer } from '../components/BodyContainer';
+import { Socket } from 'socket.io-client';
+import { SocketContext } from '../hooks/useSocket';
 
 const Homepage = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [username, setUsername] = useState('');
-  const socket = useSocket();
+  const [socket, setSocket] = useState<Socket<
+    DefaultEventsMap,
+    DefaultEventsMap
+  > | null>(null);
 
   useEffect(() => {
-    if (!isRegistered) return;
+    if (!isRegistered || !socket) return;
 
     socket.on('disconnect', () => {
       setIsRegistered(false);
@@ -21,20 +27,23 @@ const Homepage = () => {
         socket.off('disconnect');
       }
     };
-  }, [isRegistered]);
+  }, [isRegistered, socket]);
 
   return (
-    <div>
-      {!isRegistered ? (
-        <RegisterForm
-          username={username}
-          setIsRegistered={setIsRegistered}
-          setUsername={setUsername}
-        />
-      ) : (
-        <BodyContainer />
-      )}
-    </div>
+    <SocketContext.Provider value={{ socket, socketUser: username }}>
+      <div>
+        {!isRegistered ? (
+          <RegisterForm
+            username={username}
+            setIsRegistered={setIsRegistered}
+            setUsername={setUsername}
+            setSocket={setSocket}
+          />
+        ) : (
+          <BodyContainer />
+        )}
+      </div>
+    </SocketContext.Provider>
   );
 };
 

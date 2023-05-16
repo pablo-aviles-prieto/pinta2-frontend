@@ -1,20 +1,16 @@
 import { useSocket } from '../hooks/useSocket';
 
 export const ConnectionManager = () => {
-  const socket = useSocket()
-  
-  function connect() {
-    socket.connect();
-  }
+  const { socket, socketUser } = useSocket();
 
   function disconnect() {
-    socket.disconnect();
+    socket?.disconnect();
   }
 
   return (
-    <>
-      <button onClick={connect}>Connect</button>
+    <div className='flex items-center py-4'>
+      <p>Connected as {socketUser}</p>
       <button onClick={disconnect}>Disconnect</button>
-    </>
+    </div>
   );
 };

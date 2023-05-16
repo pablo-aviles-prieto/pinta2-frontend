@@ -13,13 +13,15 @@ interface DivSizeI {
   height: number;
 }
 
+const MAX_POINTS_IN_SINGLE_ARRAY = 2500;
+
 export const Board = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
   const [divSize, setDivSize] = useState<DivSizeI>({ width: 0, height: 0 });
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const isDrawing = useRef(false);
-  const socket = useSocket();
+  const { socket } = useSocket();
 
   useEffect(() => {
     const updateSize = () => {
@@ -38,6 +40,8 @@ export const Board = () => {
   }, []);
 
   useEffect(() => {
+    if (!socket) return;
+
     socket.on('new segment', (lineNumber: number, lineSegment: LinesI) => {
       setLines((lines) => {
         const updatedLines = [...lines];
@@ -74,26 +78,59 @@ export const Board = () => {
   };
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
-    if (!e.target) {
-      return;
-    }
     // no drawing - skipping
-    if (!isDrawing.current) {
+    if (!e.target || !isDrawing.current) {
       return;
     }
+
     const stage = e.target.getStage();
     const point = stage?.getPointerPosition();
     if (!point) return;
-    const lastLine = lines[lines.length - 1];
-    // add point
-    lastLine.points = lastLine.points.concat([point.x, point.y]);
 
-    // replace last
-    lines.splice(lines.length - 1, 1, lastLine);
-    setLines([...lines]);
+    const newLines = [...lines];
+    const lastLine = newLines[newLines.length - 1];
 
-    socket.emit('new segment', lines.length - 1, lastLine);
+    // If lastLine has reached the limit, start a new line
+    if (lastLine.points.length >= MAX_POINTS_IN_SINGLE_ARRAY) {
+      const newLine = {
+        ...lastLine,
+        // Add the last point of the old line as the first point of the new line to avoid a gap
+        points: [...lastLine.points.slice(-2), point.x, point.y],
+      };
+      newLines.push(newLine);
+      socket?.emit('new segment', newLines.length - 1, newLine);
+    } else {
+      // add point to the existing line
+      lastLine.points = lastLine.points.concat([point.x, point.y]);
+      // replace the last line in newLines with the updated lastLine
+      newLines[newLines.length - 1] = lastLine;
+      socket?.emit('new segment', newLines.length - 1, lastLine);
+    }
+
+    setLines(newLines);
   };
+
+  // const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  //   if (!e.target) {
+  //     return;
+  //   }
+  //   // no drawing - skipping
+  //   if (!isDrawing.current) {
+  //     return;
+  //   }
+  //   const stage = e.target.getStage();
+  //   const point = stage?.getPointerPosition();
+  //   if (!point) return;
+  //   const lastLine = lines[lines.length - 1];
+  //   // add point
+  //   lastLine.points = lastLine.points.concat([point.x, point.y]);
+
+  //   // replace last
+  //   lines.splice(lines.length - 1, 1, lastLine);
+  //   setLines([...lines]);
+
+  //   socket?.emit('new segment', lines.length - 1, lastLine);
+  // };
 
   const handleMouseUp = () => {
     isDrawing.current = false;
@@ -101,7 +138,7 @@ export const Board = () => {
 
   const clearBoard = () => {
     setLines([]);
-    socket.emit('clear board');
+    socket?.emit('clear board');
   };
 
   return (
