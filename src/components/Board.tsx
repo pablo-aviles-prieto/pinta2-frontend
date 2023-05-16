@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Line } from 'react-konva';
 import Konva from 'konva';
 import { useSocket } from '../hooks/useSocket';
+import { Chat } from './Chat';
 
 interface LinesI {
   tool: string;
@@ -23,6 +24,7 @@ export const Board = () => {
   const isDrawing = useRef(false);
   const { socket } = useSocket();
 
+  // TODO: Unnecessary if using a fixed width for the div
   useEffect(() => {
     const updateSize = () => {
       if (canvasContainerRef.current) {
@@ -110,28 +112,6 @@ export const Board = () => {
     setLines(newLines);
   };
 
-  // const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
-  //   if (!e.target) {
-  //     return;
-  //   }
-  //   // no drawing - skipping
-  //   if (!isDrawing.current) {
-  //     return;
-  //   }
-  //   const stage = e.target.getStage();
-  //   const point = stage?.getPointerPosition();
-  //   if (!point) return;
-  //   const lastLine = lines[lines.length - 1];
-  //   // add point
-  //   lastLine.points = lastLine.points.concat([point.x, point.y]);
-
-  //   // replace last
-  //   lines.splice(lines.length - 1, 1, lastLine);
-  //   setLines([...lines]);
-
-  //   socket?.emit('new segment', lines.length - 1, lastLine);
-  // };
-
   const handleMouseUp = () => {
     isDrawing.current = false;
   };
@@ -155,34 +135,40 @@ export const Board = () => {
       <button type='button' onClick={clearBoard}>
         Clear board
       </button>
-      <div
-        className='mx-auto bg-white rounded-xl w-[90%] h-[600px] my-5 shadow-md'
-        ref={canvasContainerRef}
-      >
-        <Stage
-          width={divSize.width}
-          height={divSize.height}
-          onMouseDown={handleMouseDown}
-          onMousemove={handleMouseMove}
-          onMouseup={handleMouseUp}
+      <div className='py-5 bg-gray-300'>
+        <div
+          className='mx-auto flex gap-5 w-[1100px] h-[600px]'
+          ref={canvasContainerRef}
         >
-          <Layer>
-            {lines.map((line, i) => (
-              <Line
-                key={i}
-                points={line.points}
-                stroke='#df4b26'
-                strokeWidth={5}
-                tension={0.5}
-                lineCap='round'
-                lineJoin='round'
-                globalCompositeOperation={
-                  line.tool === 'eraser' ? 'destination-out' : 'source-over'
-                }
-              />
-            ))}
-          </Layer>
-        </Stage>
+          <Stage
+            width={(divSize.width * 70) / 100}
+            height={(divSize.height * 70) / 100}
+            onMouseDown={handleMouseDown}
+            onMousemove={handleMouseMove}
+            onMouseup={handleMouseUp}
+            className='bg-white rounded-lg shadow-md'
+          >
+            <Layer>
+              {lines.map((line, i) => (
+                <Line
+                  key={i}
+                  points={line.points}
+                  stroke='#df4b26'
+                  strokeWidth={5}
+                  tension={0.5}
+                  lineCap='round'
+                  lineJoin='round'
+                  globalCompositeOperation={
+                    line.tool === 'eraser' ? 'destination-out' : 'source-over'
+                  }
+                />
+              ))}
+            </Layer>
+          </Stage>
+          <div className='w-[278px] h-full bg-white rounded-lg shadow-md'>
+            <Chat />
+          </div>
+        </div>
       </div>
     </>
   );
