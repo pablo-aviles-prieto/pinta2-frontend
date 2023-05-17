@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { ChatMsgsI } from '../interfaces';
-import { Send } from './icons';
+import { Send } from './Icons';
 
 export const Chat = () => {
   const [message, setMessage] = useState('');
