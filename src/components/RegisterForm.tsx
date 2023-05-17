@@ -37,17 +37,25 @@ export const RegisterForm: FC<PropsI> = ({
   };
 
   return (
-    <form onSubmit={registerUser}>
-      <label htmlFor='username'>Nickname</label>
-      <input
-        type='text'
-        onChange={(e) => setUsername(e.target.value)}
-        value={username}
-        id='username'
-        name='username'
-        placeholder='Enter a user name'
-      />
-      <button type='submit'>Join</button>
+    <form className='w-full max-w-sm' onSubmit={registerUser}>
+      <div className='flex items-center py-2 border-b border-teal-500'>
+        <input
+          className='w-full px-2 py-1 mr-3 leading-tight text-gray-700 bg-transparent border-none appearance-none focus:outline-none'
+          type='text'
+          id='username'
+          name='username'
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder='Enter a user name'
+          aria-label='User name'
+        />
+        <button
+          className='flex-shrink-0 px-2 py-1 text-sm text-white bg-teal-500 border-4 border-teal-500 rounded hover:bg-teal-700 hover:border-teal-700'
+          type='submit'
+        >
+          Join
+        </button>
+      </div>
     </form>
   );
 };

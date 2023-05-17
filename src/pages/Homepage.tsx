@@ -5,10 +5,12 @@ import { RegisterForm } from '../components/RegisterForm';
 import { BodyContainer } from '../components/BodyContainer';
 import { Socket } from 'socket.io-client';
 import { SocketContext } from '../hooks/useSocket';
+import { SelectRoomForm } from '../components/SelectRoomForm';
 
 const Homepage = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [username, setUsername] = useState('');
+  const [joinedRooms, setJoinedRooms] = useState<string[]>([]);
   const [socket, setSocket] = useState<Socket<
     DefaultEventsMap,
     DefaultEventsMap
@@ -39,6 +41,8 @@ const Homepage = () => {
             setUsername={setUsername}
             setSocket={setSocket}
           />
+        ) : joinedRooms.length === 0 ? (
+          <SelectRoomForm />
         ) : (
           <BodyContainer />
         )}
