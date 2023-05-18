@@ -10,6 +10,7 @@ import { SelectRoomForm } from '../components/SelectRoomForm';
 const Homepage = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [username, setUsername] = useState('');
+  // TODO: Create a useDataSocket or smth to store the room and more like users on the room, etc
   const [joinedRooms, setJoinedRooms] = useState<string[]>([]);
   const [socket, setSocket] = useState<Socket<
     DefaultEventsMap,
