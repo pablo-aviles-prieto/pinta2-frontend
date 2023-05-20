@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Line } from 'react-konva';
 import Konva from 'konva';
-import { useSocket } from '../hooks/useSocket';
-import { Chat } from './Chat';
+import { useSocket } from '../../hooks/useSocket';
+import { Chat } from '../Chat';
 
 interface LinesI {
   tool: string;

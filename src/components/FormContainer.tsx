@@ -1,12 +1,12 @@
 import type { FC, ReactNode } from 'react';
 import { textSize } from '../utils/const';
-import type { ICssSizes } from '../interfaces';
+import { maxWidthClasses } from '../utils/const';
 
 type IProps = {
   children: ReactNode;
   title: string;
   onSubmit: (e: React.FormEvent) => void;
-  containerWidth?: 'full' | 'none' | Exclude<ICssSizes, '8xl' | '9xl'>;
+  containerWidth?: keyof typeof maxWidthClasses;
   titleSize?: keyof typeof textSize;
 };
 
@@ -19,7 +19,7 @@ export const FormContainer: FC<IProps> = ({
   onSubmit,
 }) => {
   return (
-    <div className={`w-full  max-w-${containerWidth || 'sm'}`}>
+    <div className={`w-full ${maxWidthClasses[containerWidth || 'sm']}`}>
       <form
         onSubmit={onSubmit}
         className='px-8 pt-6 pb-8 mb-4 rounded shadow-md bg-gradient-to-tl from-emerald-400 to-cyan-400'

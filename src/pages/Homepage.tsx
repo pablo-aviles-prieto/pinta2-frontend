@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
 
 import { RegisterForm } from '../components/RegisterForm';
-import { BodyContainer } from '../components/BodyContainer';
+import { BodyContainer } from '../components/CanvasBoard/BodyContainer';
 import { Socket } from 'socket.io-client';
 import { SocketContext } from '../hooks/useSocket';
 import { SelectRoomForm } from '../components/SelectRoomForm';
