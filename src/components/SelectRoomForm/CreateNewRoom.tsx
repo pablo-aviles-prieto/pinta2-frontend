@@ -142,7 +142,7 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
           <ButtonBorderContainer>
             <button
               className={`${copyBtnStyles} w-full mx-auto text-lg
-                rounded-[8px] bg-teal-400 py-2 transition flex items-center justify-evenly 
+                rounded-md bg-teal-400 py-2 transition flex items-center justify-evenly 
                 hover:text-white hover:bg-teal-600`}
               type='button'
               onClick={copyToClipboard}
@@ -158,8 +158,7 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
           <ButtonBorderContainer>
             <button
               type='submit'
-              className='w-full py-2 overflow-hidden text-lg text-white bg-teal-600 
-              hover:bg-teal-400 hover:text-black rounded-[8px]'
+              className='w-full py-2 overflow-hidden text-lg text-white bg-teal-600 rounded-md hover:bg-teal-400 hover:text-black'
             >
               Go to room
             </button>
