@@ -1,9 +1,15 @@
-import { FC, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { FormContainer } from '../FormContainer';
 import { Copy, CopyOk, Eye, EyeOff } from '../Icons';
 import { ButtonBorderContainer } from '../Styles/ButtonBorderContainer';
+import { useSocket } from '../../hooks/useSocket';
 
 type OptionsI = 'create' | 'join' | undefined;
+
+interface CreateRoomResponse {
+  success: boolean;
+  message: string;
+}
 
 interface PropsI {
   setSelectedOption: React.Dispatch<React.SetStateAction<OptionsI>>;
@@ -18,6 +24,28 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
   const [copied, setCopied] = useState(false);
   const digitsInputRef = useRef<(HTMLInputElement | null)[]>([]);
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleCreateRoomResponse = (response: CreateRoomResponse) => {
+      if (response.success) {
+        console.log(response.message);
+        // TODO: Clean the digit inputs, roomPassword input and showPassword state
+        // TODO: Store in the front the roomNumber
+        // TODO: Redirect to the url of the room (room/[roomId])
+      } else {
+        console.log(response.message);
+        // TODO: Send a toast with the response.message
+      }
+    };
+    socket.on('create room response', handleCreateRoomResponse);
+
+    return () => {
+      socket.off('create room response', handleCreateRoomResponse);
+    };
+  }, [socket]);
 
   const handleInputChange =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,15 +71,16 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Check that i have 4 digits in the array, and it has a password of at least 1 character?
     if (
       !roomPassword.trim() ||
-      roomDigits.some((digit) => (digit === '' || isNaN(digit)))
+      roomDigits.some((digit) => digit === '' || isNaN(digit))
     )
       return;
     const roomNumber = +roomDigits.join('');
-    console.log('roomPassword', roomPassword);
-    console.log('roomNumber', roomNumber);
+
+    if (socket) {
+      socket.emit('create room', { roomNumber, roomPassword });
+    }
   };
 
   const copyToClipboard = async () => {
@@ -73,7 +102,6 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
   const copyBtnStyles = copied ? 'bg-gray-500 text-white' : '';
 
   return (
-    // TODO: Style back button and reuse input and button in separated components
     // TODO: Create button to auto generate the room number
     // maybe remove the title of form container ?
     <>

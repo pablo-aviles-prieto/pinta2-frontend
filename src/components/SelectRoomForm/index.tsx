@@ -4,14 +4,8 @@ import { CreateNewRoom } from './CreateNewRoom';
 type OptionsI = 'create' | 'join' | undefined;
 
 export const SelectRoomForm: FC = () => {
-  // const [roomPassword, setRoomPassword] = useState<string>('');
-  // const [showPassword, setShowPassword] = useState(false);
   const [selectedOption, setSelectedOption] = useState<OptionsI>(undefined);
-  // const [roomDigits, setRoomDigits] = useState<(number | '')[]>(
-  //   Array(4).fill('')
-  // );
-  // const [copied, setCopied] = useState(false);
-  // const digitsInputRef = useRef<(HTMLInputElement | null)[]>([]);
+
   return (
     <>
       {!selectedOption ? (
