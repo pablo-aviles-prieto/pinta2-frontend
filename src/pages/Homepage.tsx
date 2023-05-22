@@ -1,21 +1,13 @@
 import { useState, useEffect } from 'react';
-import { DefaultEventsMap } from '@socket.io/component-emitter';
-
-import { RegisterForm } from '../components/RegisterForm';
+import { RegisterUserForm } from '../components/RegisterUserForm';
 import { BodyContainer } from '../components/CanvasBoard/BodyContainer';
-import { Socket } from 'socket.io-client';
-import { SocketContext } from '../hooks/useSocket';
+import { SocketProvider, useSocket } from '../hooks/useSocket';
 import { SelectRoomForm } from '../components/SelectRoomForm';
 
 const Homepage = () => {
   const [isRegistered, setIsRegistered] = useState(false);
-  const [username, setUsername] = useState('');
-  // TODO: Create a useDataSocket or smth to store the room and more like users on the room, etc
-  const [joinedRooms, setJoinedRooms] = useState<string[]>([]);
-  const [socket, setSocket] = useState<Socket<
-    DefaultEventsMap,
-    DefaultEventsMap
-  > | null>(null);
+  const { socket, setUsername, joinedRoom } = useSocket();
+  console.log('joinedRoom', joinedRoom)
 
   useEffect(() => {
     if (!isRegistered || !socket) return;
@@ -33,23 +25,20 @@ const Homepage = () => {
   }, [isRegistered, socket]);
 
   return (
-    <SocketContext.Provider value={{ socket, socketUser: username }}>
-      <div>
-        {!isRegistered ? (
-          <RegisterForm
-            username={username}
-            setIsRegistered={setIsRegistered}
-            setUsername={setUsername}
-            setSocket={setSocket}
-          />
-        ) : joinedRooms.length === 0 ? (
-          <SelectRoomForm />
-        ) : (
-          <BodyContainer />
-        )}
-      </div>
-    </SocketContext.Provider>
+    <div>
+      {!isRegistered ? (
+        <RegisterUserForm setIsRegistered={setIsRegistered} />
+      ) : !joinedRoom ? (
+        <SelectRoomForm />
+      ) : (
+        <BodyContainer />
+      )}
+    </div>
   );
 };
 
-export default Homepage;
+export default () => (
+  <SocketProvider>
+    <Homepage />
+  </SocketProvider>
+);

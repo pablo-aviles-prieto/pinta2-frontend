@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import { CreateNewRoom } from './CreateNewRoom';
+import { JoinRoom } from './JoinRoom';
 
 type OptionsI = 'create' | 'join' | undefined;
 
@@ -20,12 +21,7 @@ export const SelectRoomForm: FC = () => {
       ) : selectedOption === 'create' ? (
         <CreateNewRoom setSelectedOption={setSelectedOption} />
       ) : (
-        <>
-          <h1>Still to do</h1>
-          <button type='button' onClick={() => setSelectedOption(undefined)}>
-            Go back
-          </button>
-        </>
+        <JoinRoom setSelectedOption={setSelectedOption} />
       )}
     </>
   );

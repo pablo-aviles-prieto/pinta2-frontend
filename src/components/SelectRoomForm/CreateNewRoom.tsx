@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react';
-import { FormContainer } from '../FormContainer';
+import { FormContainer } from '../Styles/FormContainer';
 import { Copy, CopyOk, Eye, EyeOff } from '../Icons';
 import { ButtonBorderContainer } from '../Styles/ButtonBorderContainer';
 import { useSocket } from '../../hooks/useSocket';
@@ -9,6 +9,7 @@ type OptionsI = 'create' | 'join' | undefined;
 interface CreateRoomResponse {
   success: boolean;
   message: string;
+  room: number;
 }
 
 interface PropsI {
@@ -24,16 +25,17 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
   const [copied, setCopied] = useState(false);
   const digitsInputRef = useRef<(HTMLInputElement | null)[]>([]);
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
-  const { socket } = useSocket();
+  const { socket, setJoinedRoom } = useSocket();
 
   useEffect(() => {
     if (!socket) return;
 
     const handleCreateRoomResponse = (response: CreateRoomResponse) => {
       if (response.success) {
-        console.log(response.message);
-        // TODO: Clean the digit inputs, roomPassword input and showPassword state
-        // TODO: Store in the front the roomNumber
+        console.log('response', response);
+        setJoinedRoom(response.room);
+
+        // TODO: Clean inputs? (atm im using the roomDigits)
         // TODO: Redirect to the url of the room (room/[roomId])
       } else {
         console.log(response.message);
@@ -75,7 +77,7 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
       !roomPassword.trim() ||
       roomDigits.some((digit) => digit === '' || isNaN(digit))
     )
-      return;
+      return; // TODO: Send a toast to give some feedback
     const roomNumber = +roomDigits.join('');
 
     if (socket) {

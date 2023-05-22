@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Line } from 'react-konva';
 import Konva from 'konva';
 import { useSocket } from '../../hooks/useSocket';
@@ -16,15 +16,15 @@ interface DivSizeI {
 
 const MAX_POINTS_IN_SINGLE_ARRAY = 2500;
 
-export const Board = () => {
+export const Board: FC = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
   const [divSize, setDivSize] = useState<DivSizeI>({ width: 0, height: 0 });
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const isDrawing = useRef(false);
-  const { socket } = useSocket();
+  const { socket, joinedRoom } = useSocket();
 
-  // TODO: Unnecessary if using a fixed width for the div
+  // TODO: Unnecessary if using a fixed width/height for the div
   useEffect(() => {
     const updateSize = () => {
       if (canvasContainerRef.current) {
@@ -100,13 +100,21 @@ export const Board = () => {
         points: [...lastLine.points.slice(-2), point.x, point.y],
       };
       newLines.push(newLine);
-      socket?.emit('new segment', newLines.length - 1, newLine);
+      socket?.emit('new segment', {
+        lineLength: newLines.length - 1,
+        lineSegment: newLine,
+        roomNumber: joinedRoom,
+      });
     } else {
       // add point to the existing line
       lastLine.points = lastLine.points.concat([point.x, point.y]);
       // replace the last line in newLines with the updated lastLine
       newLines[newLines.length - 1] = lastLine;
-      socket?.emit('new segment', newLines.length - 1, lastLine);
+      socket?.emit('new segment', {
+        lineLength: newLines.length - 1,
+        lineSegment: lastLine,
+        roomNumber: joinedRoom,
+      });
     }
 
     setLines(newLines);
@@ -118,7 +126,7 @@ export const Board = () => {
 
   const clearBoard = () => {
     setLines([]);
-    socket?.emit('clear board');
+    socket?.emit('clear board', { roomNumber: joinedRoom });
   };
 
   return (
@@ -140,9 +148,10 @@ export const Board = () => {
           className='mx-auto flex gap-5 w-[1100px] h-[600px]'
           ref={canvasContainerRef}
         >
+          {/* TODO: Set a fixed width and height for the canvas */}
           <Stage
             width={(divSize.width * 70) / 100}
-            height={(divSize.height * 70) / 100}
+            height={divSize.height}
             onMouseDown={handleMouseDown}
             onMousemove={handleMouseMove}
             onMouseup={handleMouseUp}
@@ -166,7 +175,7 @@ export const Board = () => {
             </Layer>
           </Stage>
           <div className='w-[278px] h-full bg-white rounded-lg shadow-md'>
-            <Chat />
+            <Chat joinedRoom={joinedRoom} />
           </div>
         </div>
       </div>

@@ -1,24 +1,13 @@
 import { FC } from 'react';
-import { DefaultEventsMap } from '@socket.io/component-emitter';
 import { useSocket } from '../hooks/useSocket';
-import { Socket, io } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 interface PropsI {
-  username: string;
-  setUsername: React.Dispatch<React.SetStateAction<string>>;
   setIsRegistered: React.Dispatch<React.SetStateAction<boolean>>;
-  setSocket: React.Dispatch<
-    React.SetStateAction<Socket<DefaultEventsMap, DefaultEventsMap> | null>
-  >;
 }
 
-export const RegisterForm: FC<PropsI> = ({
-  username,
-  setUsername,
-  setIsRegistered,
-  setSocket,
-}) => {
-  const { socket } = useSocket();
+export const RegisterUserForm: FC<PropsI> = ({ setIsRegistered }) => {
+  const { socket, username, setUsername, setSocket } = useSocket();
 
   const registerUser = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,6 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import { textSize } from '../utils/const';
-import { maxWidthClasses } from '../utils/const';
+import { textSize, maxWidthClasses } from '../../utils/const';
 
 type IProps = {
   children: ReactNode;
@@ -10,7 +9,6 @@ type IProps = {
   titleSize?: keyof typeof textSize;
 };
 
-// TODO: Pass a onSubmit function for the form
 export const FormContainer: FC<IProps> = ({
   children,
   title,

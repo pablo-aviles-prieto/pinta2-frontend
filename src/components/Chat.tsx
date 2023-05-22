@@ -1,9 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { ChatMsgsI } from '../interfaces';
 import { Send } from './Icons';
 
-export const Chat = () => {
+interface PropsI {
+  joinedRoom: number | undefined;
+}
+
+export const Chat: FC<PropsI> = ({ joinedRoom }) => {
   const [message, setMessage] = useState('');
   const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
   const lastMsgRef = useRef<HTMLLIElement | null>(null);
@@ -12,8 +16,8 @@ export const Chat = () => {
   useEffect(() => {
     if (!socket) return;
 
-    function onChatMsg(value: ChatMsgsI) {
-      setChatMsgs((previous) => [...previous, value]);
+    function onChatMsg(msgContent: ChatMsgsI) {
+      setChatMsgs((previous) => [...previous, msgContent]);
     }
 
     socket?.on('chat msg', onChatMsg);
@@ -31,7 +35,7 @@ export const Chat = () => {
     e.preventDefault();
     if (!message.trim()) return;
 
-    socket?.emit('chat msg', message.trim());
+    socket?.emit('chat msg', { msg: message.trim(), roomNumber: joinedRoom });
     setMessage('');
   }
 
