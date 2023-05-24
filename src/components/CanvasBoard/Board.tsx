@@ -5,6 +5,7 @@ import { useSocket } from '../../hooks/useSocket';
 import { Chat } from '../Chat';
 import { useModal } from '../../hooks/useModal';
 import { useGameData } from '../../hooks/useGameData';
+import { UserRoomI } from '../../interfaces';
 
 interface LinesI {
   tool: string;
@@ -20,7 +21,16 @@ export const Board: FC = () => {
   const isDrawing = useRef(false);
   const { socket, joinedRoom } = useSocket();
   const { RenderModal, closeModal, openModal } = useModal();
-  const { userList, categorySelected, setCategorySelected } = useGameData();
+  const {
+    gameState,
+    userList,
+    categorySelected,
+    setUserList,
+    setCategorySelected,
+  } = useGameData();
+
+  console.log('gameState', gameState);
+  console.log('userList', userList);
 
   useEffect(() => {
     if (!socket) return;
@@ -49,10 +59,15 @@ export const Board: FC = () => {
       openModal();
     });
 
+    socket.on('update user list', ({ newUsers }: { newUsers: UserRoomI[] }) => {
+      setUserList(newUsers);
+    });
+
     return () => {
       socket.off('new segment');
       socket.off('clear board');
       socket.off('pre game');
+      socket.off('update user list');
     };
   }, []);
 
@@ -122,18 +137,8 @@ export const Board: FC = () => {
     socket?.emit('clear board', { roomNumber: joinedRoom });
   };
 
-  console.log('userList', userList)
-
   return (
     <>
-      <div className='mb-4'>
-        User list:
-        <ul>
-          {userList.map((user) => (
-            <li key={user.id}>{user.name}</li>
-          ))}
-        </ul>
-      </div>
       <select
         value={tool}
         onChange={(e) => {

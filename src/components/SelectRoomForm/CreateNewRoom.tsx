@@ -3,6 +3,8 @@ import { FormContainer } from '../Styles/FormContainer';
 import { Copy, CopyOk, Eye, EyeOff } from '../Icons';
 import { ButtonBorderContainer } from '../Styles/ButtonBorderContainer';
 import { useSocket } from '../../hooks/useSocket';
+import type { UserRoomI } from '../../interfaces';
+import { useGameData } from '../../hooks/useGameData';
 
 type OptionsI = 'create' | 'join' | undefined;
 
@@ -10,6 +12,7 @@ interface CreateRoomResponse {
   success: boolean;
   message: string;
   room: number;
+  roomUsers: UserRoomI[];
 }
 
 interface PropsI {
@@ -26,6 +29,7 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
   const digitsInputRef = useRef<(HTMLInputElement | null)[]>([]);
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const { socket, setJoinedRoom } = useSocket();
+  const { setUserList } = useGameData();
 
   useEffect(() => {
     if (!socket) return;
@@ -34,6 +38,7 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
       if (response.success) {
         console.log('response', response);
         setJoinedRoom(response.room);
+        setUserList(response.roomUsers);
 
         // TODO: Clean inputs? (atm im using the roomDigits)
         // TODO: Redirect to the url of the room (room/[roomId])

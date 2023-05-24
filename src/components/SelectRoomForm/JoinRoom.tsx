@@ -1,5 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useSocket } from '../../hooks/useSocket';
+import type { UserRoomI } from '../../interfaces';
+import { useGameData } from '../../hooks/useGameData';
 
 type OptionsI = 'create' | 'join' | undefined;
 
@@ -12,12 +14,14 @@ interface JoinRoomResponse {
   success: boolean;
   message: string;
   room: number;
+  newUsers: UserRoomI[];
 }
 
 export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
   const [roomNumber, setRoomNumber] = useState('');
   const [roomPassword, setRoomPassword] = useState('');
   const { socket, setJoinedRoom } = useSocket();
+  const { setUserList } = useGameData();
 
   useEffect(() => {
     if (!socket) return;
@@ -25,6 +29,7 @@ export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
     const handleJoinRoomResponse = (response: JoinRoomResponse) => {
       if (response.success) {
         console.log('response', response);
+        setUserList(response.newUsers);
         setJoinedRoom(response.room);
 
         // TODO: Clean inputs?
@@ -44,8 +49,6 @@ export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
   const joinRoom = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Check that inputs are correctly filled
-    console.log('roomNumber', +roomNumber);
-    console.log('roomPassword', roomPassword.trim());
     if (
       !roomPassword.trim()
       // roomDigits.some((digit) => digit === '' || isNaN(digit))
