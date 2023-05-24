@@ -4,6 +4,7 @@ import Konva from 'konva';
 import { useSocket } from '../../hooks/useSocket';
 import { Chat } from '../Chat';
 import { useModal } from '../../hooks/useModal';
+import { useGameData } from '../../hooks/useGameData';
 
 interface LinesI {
   tool: string;
@@ -15,9 +16,11 @@ const MAX_POINTS_IN_SINGLE_ARRAY = 2500;
 export const Board: FC = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
+  const [possibleCategories, setPossibleCategories] = useState<string[]>([]);
   const isDrawing = useRef(false);
   const { socket, joinedRoom } = useSocket();
   const { RenderModal, closeModal, openModal } = useModal();
+  const { userList, categorySelected, setCategorySelected } = useGameData();
 
   useEffect(() => {
     if (!socket) return;
@@ -41,19 +44,22 @@ export const Board: FC = () => {
       setLines([]);
     });
 
-    socket.on('start game', ({ numberOfUsers }: { numberOfUsers: number }) => {
-      console.log('start game event', socket.id);
-      console.log('numberOfUsers', numberOfUsers);
-      // pass some info to the Modal with the help of another function in useModal??
+    socket.on('pre game', ({ categories }: { categories: string[] }) => {
+      setPossibleCategories(categories);
       openModal();
     });
 
     return () => {
       socket.off('new segment');
       socket.off('clear board');
-      socket.off('start game');
+      socket.off('pre game');
     };
   }, []);
+
+  const handleCategoryChoice = (category: string) => {
+    setCategorySelected(category);
+    socket?.emit('set room category', { category, roomNumber: joinedRoom });
+  };
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
     if (!e.target) {
@@ -116,8 +122,18 @@ export const Board: FC = () => {
     socket?.emit('clear board', { roomNumber: joinedRoom });
   };
 
+  console.log('userList', userList)
+
   return (
     <>
+      <div className='mb-4'>
+        User list:
+        <ul>
+          {userList.map((user) => (
+            <li key={user.id}>{user.name}</li>
+          ))}
+        </ul>
+      </div>
       <select
         value={tool}
         onChange={(e) => {
@@ -164,8 +180,43 @@ export const Board: FC = () => {
       </div>
       <RenderModal>
         <>
-          <h1>Modal Content test</h1>
-          <button onClick={closeModal}>Close Modal</button>
+          <h1 className='text-xl font-bold text-center text-teal-800'>
+            Wanna start the game?
+          </h1>
+          <div className='my-4'>
+            <h3 className='text-lg'>
+              Selecciona una categoría. La categoría seleccionada actualmente
+              es:{' '}
+              <span className='text-teal-600'>
+                {categorySelected ?? 'Ninguna'}
+              </span>
+            </h3>
+            <div className='flex gap-2'>
+              {possibleCategories.map((cat) => (
+                <p
+                  key={cat}
+                  className={`border-teal-600 border-2 px-2 py-1 ${
+                    categorySelected === cat && 'bg-teal-200'
+                  }`}
+                  onClick={() => handleCategoryChoice(cat)}
+                >
+                  {cat}
+                </p>
+              ))}
+            </div>
+          </div>
+          <div className='my-4'>
+            <h3 className='text-lg'>Connected users:</h3>
+            <ul>
+              {userList.map((user) => (
+                <li key={user.id}>{user.name}</li>
+              ))}
+            </ul>
+          </div>
+          <div className='flex items-center justify-between'>
+            <button onClick={closeModal}>Wait for more players</button>
+            <button onClick={closeModal}>Start the game</button>
+          </div>
         </>
       </RenderModal>
     </>

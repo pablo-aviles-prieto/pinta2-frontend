@@ -19,7 +19,10 @@ const Modal: FC<ModalI> = ({ isOpen, children, onClose }) => {
       onClick={onClose}
       className='fixed inset-0 flex items-center justify-center bg-black backdrop-blur-[2px] bg-opacity-70'
     >
-      <div className='relative w-[600px] bg-white p-5 rounded-lg'>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className='relative w-[600px] bg-white p-5 rounded-lg'
+      >
         {children}
         <button onClick={onClose} className='absolute top-2 right-2'>
           <CloseSquare
