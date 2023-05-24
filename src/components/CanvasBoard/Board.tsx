@@ -3,6 +3,7 @@ import { Stage, Layer, Line } from 'react-konva';
 import Konva from 'konva';
 import { useSocket } from '../../hooks/useSocket';
 import { Chat } from '../Chat';
+import { useModal } from '../../hooks/useModal';
 
 interface LinesI {
   tool: string;
@@ -23,6 +24,7 @@ export const Board: FC = () => {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const isDrawing = useRef(false);
   const { socket, joinedRoom } = useSocket();
+  const { RenderModal, closeModal, openModal } = useModal();
 
   // TODO: Unnecessary if using a fixed width/height for the div
   useEffect(() => {
@@ -58,8 +60,16 @@ export const Board: FC = () => {
         return updatedLines;
       });
     });
+
     socket.on('clear board', () => {
       setLines([]);
+    });
+
+    socket.on('start game', ({ numberOfUsers }: { numberOfUsers: number }) => {
+      console.log('start game event', socket.id);
+      console.log('numberOfUsers', numberOfUsers);
+      // pass some info to the Modal with the help of another function in useModal?
+      openModal();
     });
 
     return () => {
@@ -179,6 +189,12 @@ export const Board: FC = () => {
           </div>
         </div>
       </div>
+      <RenderModal>
+        <>
+          <h1>Modal Content test</h1>
+          <button onClick={closeModal}>Close Modal</button>
+        </>
+      </RenderModal>
     </>
   );
 };

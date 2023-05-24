@@ -1,12 +1,13 @@
 import { useSocket } from '../hooks/useSocket';
 
 export const ConnectionManager = () => {
-  const { socket, username } = useSocket();
+  const { socket, username, setJoinedRoom } = useSocket();
 
   // TODO: Disconnect from the socket and remove the user from the room (handle a
   // remove room event in the backend)
   function disconnect() {
     socket?.disconnect();
+    setJoinedRoom(undefined);
   }
 
   return (

@@ -105,6 +105,7 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
 
   return (
     // TODO: Create button to auto generate the room number
+    // TODO: Set autofocus on the first input when this form is rendered
     // maybe remove the title of form container ?
     <>
       <FormContainer
