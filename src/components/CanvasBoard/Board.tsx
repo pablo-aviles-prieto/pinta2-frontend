@@ -137,6 +137,18 @@ export const Board: FC = () => {
     socket?.emit('clear board', { roomNumber: joinedRoom });
   };
 
+  const handleStartGame = () => {
+    if (!categorySelected || userList.length < 3) return; // TODO: Use a toast to provide feedback
+
+    socket?.emit('init game', { roomNumber: joinedRoom });
+    closeModal();
+  };
+
+  const handleAwaitMorePlayers = () => {
+    socket?.emit('await more players', { roomNumber: joinedRoom });
+    closeModal()
+  };
+
   return (
     <>
       <select
@@ -190,17 +202,20 @@ export const Board: FC = () => {
           </h1>
           <div className='my-4'>
             <h3 className='text-lg'>
-              Selecciona una categoría. La categoría seleccionada actualmente
-              es:{' '}
-              <span className='text-teal-600'>
-                {categorySelected ?? 'Ninguna'}
-              </span>
+              {!categorySelected ? (
+                <p>Selecciona una de las categorías:</p>
+              ) : (
+                <p>
+                  Categoría seleccionada:{' '}
+                  <span className='text-teal-600'>{categorySelected}</span>
+                </p>
+              )}
             </h3>
             <div className='flex gap-2'>
               {possibleCategories.map((cat) => (
                 <p
                   key={cat}
-                  className={`border-teal-600 border-2 px-2 py-1 ${
+                  className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
                     categorySelected === cat && 'bg-teal-200'
                   }`}
                   onClick={() => handleCategoryChoice(cat)}
@@ -219,8 +234,8 @@ export const Board: FC = () => {
             </ul>
           </div>
           <div className='flex items-center justify-between'>
-            <button onClick={closeModal}>Wait for more players</button>
-            <button onClick={closeModal}>Start the game</button>
+            <button onClick={handleAwaitMorePlayers}>Wait for more players</button>
+            <button onClick={handleStartGame}>Start the game</button>
           </div>
         </>
       </RenderModal>
