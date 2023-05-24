@@ -97,7 +97,7 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
         setCopied(false);
       }, 1500);
     } catch (e) {
-      console.error('failed to copy', e);
+      console.error('failed to copy data', e);
     }
   };
 
@@ -105,7 +105,6 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
 
   return (
     // TODO: Create button to auto generate the room number
-    // TODO: Set autofocus on the first input when this form is rendered
     // maybe remove the title of form container ?
     <>
       <FormContainer
@@ -128,6 +127,7 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
                   type='text'
                   pattern='\d*'
                   name='roomNumber'
+                  autoFocus={index === 0}
                   maxLength={1}
                   value={digit}
                   onChange={handleInputChange(index)}
