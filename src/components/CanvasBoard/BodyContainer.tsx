@@ -9,7 +9,7 @@ export const BodyContainer: FC = () => {
     undefined
   );
   const { socket, joinedRoom } = useSocket();
-  const { userList } = useGameData();
+  const { userList, gameState } = useGameData();
 
   useEffect(() => {
     if (!socket) return;
@@ -38,7 +38,7 @@ export const BodyContainer: FC = () => {
           ))}
         </ul>
       </div>
-      {awaitPlayersMsg && (
+      {awaitPlayersMsg && !gameState.started && (
         <div className='my-4 text-xl font-bold'>{awaitPlayersMsg}</div>
       )}
       <ConnectionManager />

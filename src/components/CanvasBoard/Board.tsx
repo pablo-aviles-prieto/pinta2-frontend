@@ -5,7 +5,7 @@ import { useSocket } from '../../hooks/useSocket';
 import { Chat } from '../Chat';
 import { useModal } from '../../hooks/useModal';
 import { useGameData } from '../../hooks/useGameData';
-import { UserRoomI } from '../../interfaces';
+import type { GameStateI, UserRoomI } from '../../interfaces';
 
 interface LinesI {
   tool: string;
@@ -63,11 +63,19 @@ export const Board: FC = () => {
       setUserList(newUsers);
     });
 
+    socket.on(
+      'game initialized',
+      ({ gameState }: { gameState: GameStateI }) => {
+        console.log('gameState', gameState);
+      }
+    );
+
     return () => {
       socket.off('new segment');
       socket.off('clear board');
       socket.off('pre game');
       socket.off('update user list');
+      socket.off('game initialized');
     };
   }, []);
 
@@ -146,7 +154,7 @@ export const Board: FC = () => {
 
   const handleAwaitMorePlayers = () => {
     socket?.emit('await more players', { roomNumber: joinedRoom });
-    closeModal()
+    closeModal();
   };
 
   return (
@@ -234,7 +242,9 @@ export const Board: FC = () => {
             </ul>
           </div>
           <div className='flex items-center justify-between'>
-            <button onClick={handleAwaitMorePlayers}>Wait for more players</button>
+            <button onClick={handleAwaitMorePlayers}>
+              Wait for more players
+            </button>
             <button onClick={handleStartGame}>Start the game</button>
           </div>
         </>

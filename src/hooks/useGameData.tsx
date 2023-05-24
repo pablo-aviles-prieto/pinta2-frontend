@@ -1,18 +1,5 @@
-import type { UserRoomI } from '../interfaces';
 import { create } from 'zustand';
-
-interface GameStateI {
-  started: boolean;
-  category?: string;
-  currentWord?: string | undefined;
-  drawer?: string | undefined;
-  round?: number; // the current round number (initialize in 1)
-  turn?: number; // the current drawing turn (initialize in 0)
-  scores?: {
-    // storing as key the socket.id of the users
-    [key: string]: number;
-  };
-}
+import type { UserRoomI, GameStateI } from '../interfaces';
 
 interface GameDataStore {
   userList: UserRoomI[];
