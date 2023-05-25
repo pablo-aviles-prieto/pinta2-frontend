@@ -30,7 +30,7 @@ export const BodyContainer: FC = () => {
     <>
       {/* TODO: Separate into a component ? */}
       <p>Room: {joinedRoom}</p>
-      <div className='my-4'>
+      <div className='mt-4'>
         Users list:
         <ul>
           {userList.map((user) => (

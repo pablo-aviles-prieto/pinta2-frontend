@@ -4,10 +4,11 @@ import { CloseSquare } from '../components/Icons';
 interface ModalI {
   isOpen: boolean;
   onClose: () => void;
-  children: JSX.Element;
+  children?: JSX.Element;
+  content?: JSX.Element;
 }
 
-const Modal: FC<ModalI> = ({ isOpen, children, onClose }) => {
+const Modal: FC<ModalI> = ({ isOpen, children, onClose, content }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   if (!isOpen) {
@@ -23,7 +24,10 @@ const Modal: FC<ModalI> = ({ isOpen, children, onClose }) => {
         onClick={(e) => e.stopPropagation()}
         className='relative w-[600px] bg-white p-5 rounded-lg'
       >
-        {children}
+        <>
+          {content && content}
+          {children}
+        </>
         <button onClick={onClose} className='absolute top-2 right-2'>
           <CloseSquare
             onMouseEnter={() => setIsHovered(true)}
@@ -42,15 +46,16 @@ const Modal: FC<ModalI> = ({ isOpen, children, onClose }) => {
 // Create another function that handles the JSX and set as children ??
 export function useModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [content, setContent] = useState<JSX.Element | undefined>(undefined);
 
   const openModal = useCallback(() => setIsOpen(true), []);
   const closeModal = useCallback(() => setIsOpen(false), []);
 
-  const RenderModal = ({ children }: { children: JSX.Element }) => (
-    <Modal isOpen={isOpen} onClose={closeModal}>
-      {children}
+  const RenderModal = ({ children }: { children?: JSX.Element }) => (
+    <Modal isOpen={isOpen} onClose={closeModal} content={content}>
+      {children && children}
     </Modal>
   );
 
-  return { openModal, closeModal, RenderModal };
+  return { openModal, closeModal, RenderModal, setContent };
 }

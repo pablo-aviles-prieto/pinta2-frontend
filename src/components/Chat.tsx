@@ -35,6 +35,7 @@ export const Chat: FC<PropsI> = ({ joinedRoom }) => {
     e.preventDefault();
     if (!message.trim()) return;
 
+    // TODO: send the minute of the current turn aswell
     socket?.emit('chat msg', { msg: message.trim(), roomNumber: joinedRoom });
     setMessage('');
   }

@@ -20,7 +20,17 @@ export const Board: FC = () => {
   const [possibleCategories, setPossibleCategories] = useState<string[]>([]);
   const isDrawing = useRef(false);
   const { socket, joinedRoom } = useSocket();
-  const { RenderModal, closeModal, openModal } = useModal();
+  const {
+    RenderModal: ModalOwnerCategories,
+    closeModal: closeModalOwner,
+    openModal: openModalOWner,
+  } = useModal();
+  const {
+    RenderModal: SelectWordsModal,
+    closeModal: closeWordsModal,
+    openModal: openWordsModal,
+    setContent: setWordsContent,
+  } = useModal();
   const {
     gameState,
     userList,
@@ -56,7 +66,7 @@ export const Board: FC = () => {
 
     socket.on('pre game', ({ categories }: { categories: string[] }) => {
       setPossibleCategories(categories);
-      openModal();
+      openModalOWner();
     });
 
     socket.on('update user list', ({ newUsers }: { newUsers: UserRoomI[] }) => {
@@ -68,14 +78,53 @@ export const Board: FC = () => {
       ({ gameState }: { gameState: GameStateI }) => {
         console.log('gameState', gameState);
       }
+      // TODO: Set the gameState, But before this, i should receive from
+      // the backend a 'pre round start' event when the drawer select between
+      // 3 different words
     );
 
+    socket.on(
+      'pre turn drawer',
+      ({ possibleWords }: { possibleWords: string[] }) => {
+        console.log('possibleWords', possibleWords);
+        const wordsContent = (
+          <div>
+            Selecciona una palabra:{' '}
+            <div className='flex gap-2'>
+              {possibleWords.map((word) => (
+                <p
+                  key={word}
+                  className={`border-teal-600 border-2 cursor-pointer px-2 py-1 hover:bg-teal-200`}
+                  // TODO: send the selected word and pass to all users
+                  // al drawer enviarsela sin encriptar, al resto encriptada
+                  // use the closeWordModal!
+                  onClick={() => console.log('selected word', word)}
+                >
+                  {word}
+                </p>
+              ))}
+            </div>
+          </div>
+        );
+        setWordsContent(wordsContent);
+        openWordsModal();
+      }
+    );
+
+    socket.on('pre turn no drawer', ({ message }: { message: string }) => {
+      // TODO: Print the message somewhere in the UI for the no drawers
+      console.log('message no drawer', message);
+    });
+
+    // TODO: when turn finish, clean
     return () => {
       socket.off('new segment');
       socket.off('clear board');
       socket.off('pre game');
       socket.off('update user list');
       socket.off('game initialized');
+      socket.off('pre turn drawer');
+      socket.off('pre turn no drawer');
     };
   }, []);
 
@@ -149,12 +198,12 @@ export const Board: FC = () => {
     if (!categorySelected || userList.length < 3) return; // TODO: Use a toast to provide feedback
 
     socket?.emit('init game', { roomNumber: joinedRoom });
-    closeModal();
+    closeModalOwner();
   };
 
   const handleAwaitMorePlayers = () => {
     socket?.emit('await more players', { roomNumber: joinedRoom });
-    closeModal();
+    closeModalOwner();
   };
 
   return (
@@ -203,7 +252,7 @@ export const Board: FC = () => {
           </div>
         </div>
       </div>
-      <RenderModal>
+      <ModalOwnerCategories>
         <>
           <h1 className='text-xl font-bold text-center text-teal-800'>
             Wanna start the game?
@@ -248,7 +297,8 @@ export const Board: FC = () => {
             <button onClick={handleStartGame}>Start the game</button>
           </div>
         </>
-      </RenderModal>
+      </ModalOwnerCategories>
+      <SelectWordsModal />
     </>
   );
 };
