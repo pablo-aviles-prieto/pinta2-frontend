@@ -18,12 +18,15 @@ export const Board: FC = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
   const [possibleCategories, setPossibleCategories] = useState<string[]>([]);
+  const [possibleTurnDuration, setPosibleTurnDuration] = useState<
+    Record<string, number>
+  >({});
   const isDrawing = useRef(false);
   const { socket, joinedRoom } = useSocket();
   const {
     RenderModal: ModalOwnerCategories,
     closeModal: closeModalOwner,
-    openModal: openModalOWner,
+    openModal: openModalOwner,
   } = useModal();
   const {
     RenderModal: SelectWordsModal,
@@ -35,8 +38,11 @@ export const Board: FC = () => {
     gameState,
     userList,
     categorySelected,
+    turnDuration,
     setUserList,
     setCategorySelected,
+    setGameState,
+    setTurnDuration,
   } = useGameData();
 
   console.log('gameState', gameState);
@@ -64,10 +70,21 @@ export const Board: FC = () => {
       setLines([]);
     });
 
-    socket.on('pre game', ({ categories }: { categories: string[] }) => {
-      setPossibleCategories(categories);
-      openModalOWner();
-    });
+    socket.on(
+      'pre game owner',
+      ({
+        categories,
+        possibleTurnDurations,
+      }: {
+        categories: string[];
+        possibleTurnDurations: Record<string, number>;
+        userList: UserRoomI[];
+      }) => {
+        setPossibleCategories(categories);
+        setPosibleTurnDuration(possibleTurnDurations);
+        openModalOwner();
+      }
+    );
 
     socket.on('update user list', ({ newUsers }: { newUsers: UserRoomI[] }) => {
       setUserList(newUsers);
@@ -76,11 +93,8 @@ export const Board: FC = () => {
     socket.on(
       'game initialized',
       ({ gameState }: { gameState: GameStateI }) => {
-        console.log('gameState', gameState);
+        setGameState(gameState);
       }
-      // TODO: Set the gameState, But before this, i should receive from
-      // the backend a 'pre round start' event when the drawer select between
-      // 3 different words
     );
 
     socket.on(
@@ -97,7 +111,7 @@ export const Board: FC = () => {
                   className={`border-teal-600 border-2 cursor-pointer px-2 py-1 hover:bg-teal-200`}
                   // TODO: send the selected word and pass to all users
                   // al drawer enviarsela sin encriptar, al resto encriptada
-                  // use the closeWordModal!
+                  // use the closeWordModal
                   onClick={() => console.log('selected word', word)}
                 >
                   {word}
@@ -127,6 +141,11 @@ export const Board: FC = () => {
       socket.off('pre turn no drawer');
     };
   }, []);
+
+  const handleTurnDuration = (turnDuration: number) => {
+    setTurnDuration(turnDuration / 1000); // parsing it to seconds
+    socket?.emit('set turn duration', { turnDuration, roomNumber: joinedRoom });
+  };
 
   const handleCategoryChoice = (category: string) => {
     setCategorySelected(category);
@@ -195,6 +214,7 @@ export const Board: FC = () => {
   };
 
   const handleStartGame = () => {
+    console.log('categorySelected', categorySelected);
     if (!categorySelected || userList.length < 3) return; // TODO: Use a toast to provide feedback
 
     socket?.emit('init game', { roomNumber: joinedRoom });
@@ -258,16 +278,7 @@ export const Board: FC = () => {
             Wanna start the game?
           </h1>
           <div className='my-4'>
-            <h3 className='text-lg'>
-              {!categorySelected ? (
-                <p>Selecciona una de las categorías:</p>
-              ) : (
-                <p>
-                  Categoría seleccionada:{' '}
-                  <span className='text-teal-600'>{categorySelected}</span>
-                </p>
-              )}
-            </h3>
+            <h3 className='text-lg'>Selecciona una categoría!</h3>
             <div className='flex gap-2'>
               {possibleCategories.map((cat) => (
                 <p
@@ -278,6 +289,24 @@ export const Board: FC = () => {
                   onClick={() => handleCategoryChoice(cat)}
                 >
                   {cat}
+                </p>
+              ))}
+            </div>
+          </div>
+          <div className='my-4'>
+            <h3 className='text-lg'>
+              Elige cuantos segundos tendreis por turno!
+            </h3>
+            <div className='flex gap-2'>
+              {Object.entries(possibleTurnDuration).map(([key, value]) => (
+                <p
+                  key={key}
+                  className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
+                    turnDuration === value / 1000 && 'bg-teal-200'
+                  }`}
+                  onClick={() => handleTurnDuration(value)}
+                >
+                  {value / 1000}s
                 </p>
               ))}
             </div>
