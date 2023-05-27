@@ -134,7 +134,7 @@ export const Board: FC = () => {
     return () => {
       socket.off('new segment');
       socket.off('clear board');
-      socket.off('pre game');
+      socket.off('pre game owner');
       socket.off('update user list');
       socket.off('game initialized');
       socket.off('pre turn drawer');
@@ -272,62 +272,66 @@ export const Board: FC = () => {
           </div>
         </div>
       </div>
-      <ModalOwnerCategories>
-        <>
-          <h1 className='text-xl font-bold text-center text-teal-800'>
-            Wanna start the game?
-          </h1>
-          <div className='my-4'>
-            <h3 className='text-lg'>Selecciona una categoría!</h3>
-            <div className='flex gap-2'>
-              {possibleCategories.map((cat) => (
-                <p
-                  key={cat}
-                  className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
-                    categorySelected === cat && 'bg-teal-200'
-                  }`}
-                  onClick={() => handleCategoryChoice(cat)}
-                >
-                  {cat}
-                </p>
-              ))}
+      {!gameState.started && (
+        <ModalOwnerCategories forbidClose>
+          <>
+            <h1 className='text-xl font-bold text-center text-teal-800'>
+              Wanna start the game?
+            </h1>
+            <div className='my-4'>
+              <h3 className='text-lg'>Selecciona una categoría!</h3>
+              <div className='flex gap-2'>
+                {possibleCategories.map((cat) => (
+                  <p
+                    key={cat}
+                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
+                      categorySelected === cat && 'bg-teal-200'
+                    }`}
+                    onClick={() => handleCategoryChoice(cat)}
+                  >
+                    {cat}
+                  </p>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className='my-4'>
-            <h3 className='text-lg'>
-              Elige cuantos segundos tendreis por turno!
-            </h3>
-            <div className='flex gap-2'>
-              {Object.entries(possibleTurnDuration).map(([key, value]) => (
-                <p
-                  key={key}
-                  className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
-                    turnDuration === value / 1000 && 'bg-teal-200'
-                  }`}
-                  onClick={() => handleTurnDuration(value)}
-                >
-                  {value / 1000}s
-                </p>
-              ))}
+            <div className='my-4'>
+              <h3 className='text-lg'>
+                Elige cuantos segundos tendreis por turno! (120s por defecto)
+              </h3>
+              <div className='flex gap-2'>
+                {Object.entries(possibleTurnDuration).map(([key, value]) => (
+                  <p
+                    key={key}
+                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
+                      turnDuration === value / 1000 && 'bg-teal-200'
+                    }`}
+                    onClick={() => handleTurnDuration(value)}
+                  >
+                    {value / 1000}s
+                  </p>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className='my-4'>
-            <h3 className='text-lg'>Connected users:</h3>
-            <ul>
-              {userList.map((user) => (
-                <li key={user.id}>{user.name}</li>
-              ))}
-            </ul>
-          </div>
-          <div className='flex items-center justify-between'>
-            <button onClick={handleAwaitMorePlayers}>
-              Wait for more players
-            </button>
-            <button onClick={handleStartGame}>Start the game</button>
-          </div>
-        </>
-      </ModalOwnerCategories>
-      <SelectWordsModal />
+            <div className='my-4'>
+              <h3 className='text-lg'>Connected users:</h3>
+              <ul>
+                {userList.map((user) => (
+                  <li key={user.id}>{user.name}</li>
+                ))}
+              </ul>
+            </div>
+            <div className='flex items-center justify-between'>
+              <button onClick={handleAwaitMorePlayers}>
+                Wait for more players
+              </button>
+              <button onClick={handleStartGame}>Start the game</button>
+            </div>
+          </>
+        </ModalOwnerCategories>
+      )}
+      {gameState.started && gameState.preTurn && (
+        <SelectWordsModal forbidClose />
+      )}
     </>
   );
 };

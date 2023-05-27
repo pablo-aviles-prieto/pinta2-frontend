@@ -29,3 +29,5 @@ export const maxWidthClasses = {
   full: 'w-full',
   none: 'w-0',
 };
+
+export const DEFAULT_TURN_DURATION = 120; // in miliseconds

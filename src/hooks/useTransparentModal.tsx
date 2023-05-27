@@ -9,52 +9,22 @@ interface ModalI {
   forbidClose?: boolean;
 }
 
-const Modal: FC<ModalI> = ({
-  isOpen,
-  children,
-  onClose,
-  content,
-  forbidClose = false,
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
+const Modal: FC<ModalI> = ({ isOpen, children, onClose, content }) => {
 
   if (!isOpen) {
     return null;
   }
 
   return (
-    <div
-      onClick={forbidClose ? undefined : onClose}
-      className='fixed inset-0 flex items-center justify-center bg-black backdrop-blur-[2px] bg-opacity-70'
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className='relative w-[600px] bg-white p-5 rounded-lg'
-      >
-        <>
-          {content && content}
-          {children}
-        </>
-        {!forbidClose && <button
-          onClick={onClose}
-          className='absolute top-2 right-2'
-        >
-          <CloseSquare
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            width={35}
-            height={35}
-            className='text-teal-800 hover:text-teal-600'
-            filled={isHovered}
-          />
-        </button>}
-      </div>
+    <div className='fixed inset-0 flex items-center justify-center bg-black backdrop-blur-[2px] bg-opacity-100'>
+      {content && content}
+      {children}
     </div>
   );
 };
 
 // Create another function that handles the JSX and set as children ??
-export function useModal() {
+export function useTransparentModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState<JSX.Element | undefined>(undefined);
 

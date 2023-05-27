@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { UserRoomI, GameStateI } from '../interfaces';
+import { DEFAULT_TURN_DURATION } from '../utils/const';
 
 interface GameDataStore {
   userList: UserRoomI[];
@@ -21,7 +22,7 @@ export const useGameData = create<GameDataStore>((set) => {
     userList: [],
     gameState: INIT_GAME_STATE,
     categorySelected: null,
-    turnDuration: null,
+    turnDuration: DEFAULT_TURN_DURATION,
     setUserList: (userList: UserRoomI[]) => set({ userList }),
     setGameState: (gameState: GameStateI) => set({ gameState }),
     setCategorySelected: (categorySelected: string | null) =>
