@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { io } from 'socket.io-client';
-import { CountDown } from './CountDown';
 
 interface PropsI {
   setIsRegistered: React.Dispatch<React.SetStateAction<boolean>>;

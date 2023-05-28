@@ -6,7 +6,8 @@ import { Chat } from '../Chat';
 import { useModal } from '../../hooks/useModal';
 import { useGameData } from '../../hooks/useGameData';
 import type { GameStateI, UserRoomI } from '../../interfaces';
-import { CountDown } from '../CountDown';
+import { PreTurnCountDown } from '../PreTurnCountDown';
+import { TurnCountDown } from '../TurnCountDown';
 
 interface LinesI {
   tool: string;
@@ -19,7 +20,8 @@ export const Board: FC = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
   const [possibleCategories, setPossibleCategories] = useState<string[]>([]);
-  const [showCountDown, setShowCountdown] = useState(false);
+  const [preTurnCountDown, setPreTurnCountDown] = useState(false);
+  const [turnCountDown, setTurnCountDown] = useState(false);
   const [possibleTurnDuration, setPosibleTurnDuration] = useState<
     Record<string, number>
   >({});
@@ -176,15 +178,21 @@ export const Board: FC = () => {
       }
     );
 
-    socket.on('countdown turn start', () => {
+    socket.on('countdown preDraw start', () => {
       const currentGameState = useGameData.getState().gameState;
       if (currentGameState.preTurn) {
         setGameState({ ...currentGameState, preTurn: false });
       }
-      setShowCountdown(true);
+      setPreTurnCountDown(true);
     });
 
-    // TODO: when turn finish, clean
+    socket.on('countdown turn', () => {
+      setTurnCountDown(true);
+      console.log('check countdown turn');
+    });
+
+    // TODO: when turn finish, clean the drawer, show and update scores, pass the turn
+
     return () => {
       socket.off('new segment');
       socket.off('clear board');
@@ -194,7 +202,8 @@ export const Board: FC = () => {
       socket.off('pre turn drawer');
       socket.off('pre turn no drawer');
       socket.off('update game state');
-      socket.off('countdown turn start');
+      socket.off('countdown preDraw start');
+      socket.off('countdown turn');
     };
   }, []);
 
@@ -209,7 +218,10 @@ export const Board: FC = () => {
   };
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
-    if (!e.target) {
+    if (
+      !e.target ||
+      (gameState.started && gameState.drawer?.id !== socket?.id)
+    ) {
       return;
     }
 
@@ -221,7 +233,11 @@ export const Board: FC = () => {
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
     // no drawing - skipping
-    if (!e.target || !isDrawing.current) {
+    if (
+      !e.target ||
+      !isDrawing.current ||
+      (gameState.started && gameState.drawer?.id !== socket?.id)
+    ) {
       return;
     }
 
@@ -283,6 +299,16 @@ export const Board: FC = () => {
 
   return (
     <>
+      {gameState.started && !gameState.preTurn && turnCountDown && (
+        <div className='my-8'>
+          <TurnCountDown
+            initialCount={
+              gameState.turnDuration ? gameState.turnDuration / 1000 : 120
+            }
+            onCountDownComplete={() => setTurnCountDown(false)}
+          />
+        </div>
+      )}
       <select
         value={tool}
         onChange={(e) => {
@@ -387,7 +413,9 @@ export const Board: FC = () => {
       {gameState.started && gameState.preTurn && (
         <SelectWordsModal forbidClose />
       )}
-      {showCountDown && !gameState.preTurn && <CountDown />}
+      {preTurnCountDown && !gameState.preTurn && (
+        <PreTurnCountDown setShowCountdown={setPreTurnCountDown} />
+      )}
     </>
   );
 };

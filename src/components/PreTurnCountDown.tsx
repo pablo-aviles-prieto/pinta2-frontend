@@ -1,7 +1,17 @@
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { Pencil } from './Icons';
+import { FC } from 'react';
+import { useSocket } from '../hooks/useSocket';
+import { useGameData } from '../hooks/useGameData';
 
-export const CountDown = () => {
+interface PropsI {
+  setShowCountdown: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const PreTurnCountDown: FC<PropsI> = ({ setShowCountdown }) => {
+  const { socket, joinedRoom } = useSocket();
+  const { gameState } = useGameData();
+
   return (
     <div className='fixed inset-0 flex items-center justify-center'>
       <CountdownCircleTimer
@@ -11,8 +21,11 @@ export const CountDown = () => {
         colors={['#ff7f51', '#ce4257', '#720026', '#4f000b']}
         colorsTime={[3, 2, 1, 0]}
         duration={3}
-        onComplete={(totalElapsedTime) => {
-          console.log('totalElapsedTime', totalElapsedTime);
+        onComplete={() => {
+          if (socket?.id === gameState.drawer?.id) {
+            socket?.emit('starting turn', { roomNumber: joinedRoom });
+          }
+          setShowCountdown(false);
         }}
       >
         {({ remainingTime, color }) => (
