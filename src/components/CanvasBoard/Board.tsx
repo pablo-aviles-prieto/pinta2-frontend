@@ -6,6 +6,7 @@ import { Chat } from '../Chat';
 import { useModal } from '../../hooks/useModal';
 import { useGameData } from '../../hooks/useGameData';
 import type { GameStateI, UserRoomI } from '../../interfaces';
+import { CountDown } from '../CountDown';
 
 interface LinesI {
   tool: string;
@@ -18,6 +19,7 @@ export const Board: FC = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
   const [possibleCategories, setPossibleCategories] = useState<string[]>([]);
+  const [showCountDown, setShowCountdown] = useState(false);
   const [possibleTurnDuration, setPosibleTurnDuration] = useState<
     Record<string, number>
   >({});
@@ -99,8 +101,13 @@ export const Board: FC = () => {
 
     socket.on(
       'pre turn drawer',
-      ({ possibleWords }: { possibleWords: string[] }) => {
-        console.log('possibleWords', possibleWords);
+      ({
+        possibleWords,
+        prevTurn,
+      }: {
+        possibleWords: string[];
+        prevTurn: undefined | number;
+      }) => {
         const wordsContent = (
           <div>
             Selecciona una palabra:{' '}
@@ -109,10 +116,42 @@ export const Board: FC = () => {
                 <p
                   key={word}
                   className={`border-teal-600 border-2 cursor-pointer px-2 py-1 hover:bg-teal-200`}
-                  // TODO: send the selected word and pass to all users
-                  // al drawer enviarsela sin encriptar, al resto encriptada
-                  // use the closeWordModal
-                  onClick={() => console.log('selected word', word)}
+                  onClick={() => {
+                    const currentGameState = useGameData.getState().gameState;
+                    const currentUserList = useGameData.getState().userList;
+
+                    const turn = !prevTurn
+                      ? 0
+                      : prevTurn >= currentUserList.length - 1
+                      ? 0
+                      : prevTurn + 1;
+                    const round = !prevTurn
+                      ? 1
+                      : prevTurn >= currentUserList.length - 1 &&
+                        currentGameState.round !== undefined
+                      ? currentGameState.round + 1
+                      : currentGameState.round ?? 0;
+                    const previousWords = currentGameState.previousWords
+                      ? currentGameState.previousWords + 3
+                      : 3;
+
+                    socket.emit('set drawer word', {
+                      roomNumber: joinedRoom,
+                      word,
+                      round,
+                      turn,
+                      previousWords,
+                    });
+                    setGameState({
+                      ...currentGameState,
+                      currentWord: word,
+                      previousWords,
+                      turn,
+                      round,
+                      preTurn: false,
+                    });
+                    closeWordsModal();
+                  }}
                 >
                   {word}
                 </p>
@@ -130,6 +169,21 @@ export const Board: FC = () => {
       console.log('message no drawer', message);
     });
 
+    socket.on(
+      'update game state',
+      ({ gameState }: { gameState: GameStateI }) => {
+        setGameState(gameState);
+      }
+    );
+
+    socket.on('countdown turn start', () => {
+      const currentGameState = useGameData.getState().gameState;
+      if (currentGameState.preTurn) {
+        setGameState({ ...currentGameState, preTurn: false });
+      }
+      setShowCountdown(true);
+    });
+
     // TODO: when turn finish, clean
     return () => {
       socket.off('new segment');
@@ -139,6 +193,8 @@ export const Board: FC = () => {
       socket.off('game initialized');
       socket.off('pre turn drawer');
       socket.off('pre turn no drawer');
+      socket.off('update game state');
+      socket.off('countdown turn start');
     };
   }, []);
 
@@ -214,7 +270,6 @@ export const Board: FC = () => {
   };
 
   const handleStartGame = () => {
-    console.log('categorySelected', categorySelected);
     if (!categorySelected || userList.length < 3) return; // TODO: Use a toast to provide feedback
 
     socket?.emit('init game', { roomNumber: joinedRoom });
@@ -332,6 +387,7 @@ export const Board: FC = () => {
       {gameState.started && gameState.preTurn && (
         <SelectWordsModal forbidClose />
       )}
+      {showCountDown && !gameState.preTurn && <CountDown />}
     </>
   );
 };

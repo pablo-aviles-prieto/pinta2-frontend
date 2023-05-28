@@ -4,3 +4,4 @@ export { EyeOff } from './EyeOff';
 export { Copy } from './Copy';
 export { CopyOk } from './CopyOk';
 export { CloseSquare } from './CloseSquare';
+export { Pencil } from './Pencil';
