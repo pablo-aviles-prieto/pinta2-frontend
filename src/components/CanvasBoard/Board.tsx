@@ -6,9 +6,9 @@ import { Chat } from '../Chat';
 import { useModal } from '../../hooks/useModal';
 import { useGameData } from '../../hooks/useGameData';
 import type { GameStateI, UserRoomI } from '../../interfaces';
-import { PreTurnCountDown } from '../PreTurnCountDown';
 import { useTurnCounter } from '../../hooks/useTurnCounter';
-import { CountdownCircleTimer } from 'react-countdown-circle-timer';
+import { useGenericTimer } from '../../hooks/useGenericTimer';
+import { PreTurnCountDown } from '../PreTurnCountDown';
 
 interface LinesI {
   tool: string;
@@ -21,9 +21,6 @@ export const Board: FC = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
   const [possibleCategories, setPossibleCategories] = useState<string[]>([]);
-  const [preTurnCountDown, setPreTurnCountDown] = useState(false);
-  const [counterTime, setCounterTime] = useState<number | undefined>(undefined);
-  // const [turnCountDown, setTurnCountDown] = useState(false);
   const [possibleTurnDuration, setPosibleTurnDuration] = useState<
     Record<string, number>
   >({});
@@ -50,12 +47,27 @@ export const Board: FC = () => {
     setGameState,
     setTurnDuration,
   } = useGameData();
-  const { count, startCounter, setStartCounter, handleCounterState } =
-    useTurnCounter({});
+  const {
+    count: turnCount,
+    startCounter: startTurnCounter,
+    setStartCounter: setTurnStartCounter,
+    handleCounterState: handleTurnCounterState,
+  } = useTurnCounter({});
+  const {
+    count: preTurnCount,
+    startCounter: preTurnStartCounter,
+    handleCounterState: handlePreTurnCounter,
+  } = useGenericTimer({
+    initTimerValue: 3,
+    onCountDownComplete: () => {
+      if (socket?.id === gameState.drawer?.id) {
+        socket?.emit('starting turn', { roomNumber: joinedRoom });
+      }
+    },
+  });
 
   console.log('gameState', gameState);
   console.log('userList', userList);
-  console.log('counterTime', counterTime);
 
   useEffect(() => {
     if (!socket) return;
@@ -188,11 +200,11 @@ export const Board: FC = () => {
       if (currentGameState.preTurn) {
         setGameState({ ...currentGameState, preTurn: false });
       }
-      setPreTurnCountDown(true);
+      handlePreTurnCounter(true);
     });
 
     socket.on('countdown turn', () => {
-      setStartCounter(true);
+      setTurnStartCounter(true);
       console.log('countdown turn event set the counter to true');
     });
 
@@ -314,41 +326,14 @@ export const Board: FC = () => {
 
   return (
     <>
-      {/* {gameState.started && !gameState.preTurn && startCounter && (
-        <div className='my-8'>
-          <CountdownCircleTimer
-            isPlaying
-            size={100}
-            strokeWidth={10}
-            colors={['#ff7f51', '#ce4257', '#720026', '#4f000b']}
-            colorsTime={[120, 90, 45, 0]}
-            duration={turnDuration || 120}
-            onComplete={() => {
-              //   if (socket?.id === gameState.drawer?.id) {
-              //     socket?.emit('starting turn', { roomNumber: joinedRoom });
-              //   }
-              //   setShowCountdown(false);
-              console.log('Finished Turn', new Date().toTimeString());
-              setStartCounter(false)
-            }}
-          >
-            {({ remainingTime, color }) => {
-              setCounterTime(remainingTime);
-              return (
-                <span
-                  style={{ color, fontFamily: 'Finger Paint' }}
-                  className='text-lg'
-                >
-                  {remainingTime}
-                </span>
-              );
-            }}
-          </CountdownCircleTimer>
-        </div>
-      )} */}
-      {gameState.started && !gameState.preTurn && startCounter && (
-        <div className='my-8'>{count}</div>
+      {gameState.started && !gameState.preTurn && startTurnCounter && (
+        <div className='my-8'>{turnCount}</div>
       )}
+      <div className='my-4'>
+        <button onClick={() => handleTurnCounterState(true)}>
+          Restart timer
+        </button>
+      </div>
       <select
         value={tool}
         onChange={(e) => {
@@ -389,7 +374,7 @@ export const Board: FC = () => {
             </Layer>
           </Stage>
           <div className='w-[278px] h-full bg-white rounded-lg shadow-md'>
-            <Chat joinedRoom={joinedRoom} />
+            <Chat joinedRoom={joinedRoom} turnCount={turnCount} />
           </div>
         </div>
       </div>
@@ -453,8 +438,8 @@ export const Board: FC = () => {
       {gameState.started && gameState.preTurn && (
         <SelectWordsModal forbidClose />
       )}
-      {preTurnCountDown && !gameState.preTurn && (
-        <PreTurnCountDown setShowCountdown={setPreTurnCountDown} />
+      {preTurnStartCounter && !gameState.preTurn && (
+        <PreTurnCountDown preTurnCount={preTurnCount} />
       )}
     </>
   );

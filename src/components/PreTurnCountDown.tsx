@@ -1,48 +1,26 @@
-import { CountdownCircleTimer } from 'react-countdown-circle-timer';
-import { Pencil } from './Icons';
 import { FC } from 'react';
-import { useSocket } from '../hooks/useSocket';
-import { useGameData } from '../hooks/useGameData';
 
 interface PropsI {
-  setShowCountdown: React.Dispatch<React.SetStateAction<boolean>>;
+  preTurnCount: number | undefined;
 }
 
-export const PreTurnCountDown: FC<PropsI> = ({ setShowCountdown }) => {
-  const { socket, joinedRoom } = useSocket();
-  const { gameState } = useGameData();
-
+export const PreTurnCountDown: FC<PropsI> = ({ preTurnCount }) => {
   return (
     <div className='fixed inset-0 flex items-center justify-center'>
-      <CountdownCircleTimer
-        isPlaying
-        size={300}
-        strokeWidth={35}
-        colors={['#ff7f51', '#ce4257', '#720026', '#4f000b']}
-        colorsTime={[3, 2, 1, 0]}
-        duration={3}
-        onComplete={() => {
-          if (socket?.id === gameState.drawer?.id) {
-            socket?.emit('starting turn', { roomNumber: joinedRoom });
-          }
-          setShowCountdown(false);
-        }}
+      <span
+        style={{ fontFamily: 'Finger Paint' }}
+        className={`${
+          preTurnCount === 3
+            ? 'text-orange-800'
+            : preTurnCount === 2
+            ? 'text-yellow-700'
+            : preTurnCount === 1
+            ? 'text-yellow-400'
+            : ''
+        } text-[350px]`}
       >
-        {({ remainingTime, color }) => (
-          <span
-            style={{ color, fontFamily: 'Finger Paint' }}
-            className={
-              remainingTime === 0 ? 'text-9xl' : 'text-[190px] h-[315px]'
-            }
-          >
-            {remainingTime === 0 ? (
-              <Pencil width={150} height={150} />
-            ) : (
-              remainingTime
-            )}
-          </span>
-        )}
-      </CountdownCircleTimer>
+        {preTurnCount}
+      </span>
     </div>
   );
 };

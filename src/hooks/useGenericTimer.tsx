@@ -1,24 +1,24 @@
 import { useEffect, useState } from 'react';
-import { useGameData } from './useGameData';
 
 interface PropsI {
+  initTimerValue?: number;
   onCountDownComplete?: () => void;
 }
 
-export const useTurnCounter = ({ onCountDownComplete }: PropsI) => {
+export const useGenericTimer = ({
+  onCountDownComplete,
+  initTimerValue,
+}: PropsI) => {
   const [count, setCount] = useState<number | undefined>(undefined);
+  const [timerValue, setTimerValue] = useState<number | undefined>(
+    initTimerValue
+  );
   const [startCounter, setStartCounter] = useState(false);
-  const { turnDuration } = useGameData();
 
   const handleCounterState = (boolean: boolean) => {
     setStartCounter(boolean);
-    setCount(turnDuration || 120); // turnDuration is already in seconds
+    setCount(timerValue || 120); // turnDuration is already in seconds
   };
-
-  useEffect(() => {
-    if (!turnDuration) return;
-    setCount(turnDuration);
-  }, [turnDuration]);
 
   useEffect(() => {
     let worker: Worker;
@@ -49,5 +49,11 @@ export const useTurnCounter = ({ onCountDownComplete }: PropsI) => {
     };
   }, [count, startCounter]);
 
-  return { count, startCounter, setStartCounter, handleCounterState };
+  return {
+    count,
+    startCounter,
+    setTimerValue,
+    setStartCounter,
+    handleCounterState,
+  };
 };

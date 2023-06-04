@@ -5,9 +5,10 @@ import { Send } from './Icons';
 
 interface PropsI {
   joinedRoom: number | undefined;
+  turnCount: number | undefined;
 }
 
-export const Chat: FC<PropsI> = ({ joinedRoom }) => {
+export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
   const [message, setMessage] = useState('');
   const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
   const lastMsgRef = useRef<HTMLLIElement | null>(null);
@@ -36,7 +37,11 @@ export const Chat: FC<PropsI> = ({ joinedRoom }) => {
     if (!message.trim()) return;
 
     // TODO: send the minute of the current turn aswell
-    socket?.emit('chat msg', { msg: message.trim(), roomNumber: joinedRoom });
+    socket?.emit('chat msg', {
+      msg: message.trim(),
+      roomNumber: joinedRoom,
+      turnCount,
+    });
     setMessage('');
   }
 
