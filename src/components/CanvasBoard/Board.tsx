@@ -17,6 +17,8 @@ interface LinesI {
 
 const MAX_POINTS_IN_SINGLE_ARRAY = 2500;
 
+// TODO: Create a useState to handle an array of objects with the userId and the points
+// they are getting in that round. Reset it between rounds
 export const Board: FC = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
@@ -42,10 +44,12 @@ export const Board: FC = () => {
     userList,
     categorySelected,
     turnDuration,
+    isDrawer,
     setUserList,
     setCategorySelected,
     setGameState,
     setTurnDuration,
+    setIsDrawer,
   } = useGameData();
   const {
     count: turnCount,
@@ -60,7 +64,7 @@ export const Board: FC = () => {
   } = useGenericTimer({
     initTimerValue: 3,
     onCountDownComplete: () => {
-      if (socket?.id === gameState.drawer?.id) {
+      if (isDrawer) {
         socket?.emit('starting turn', { roomNumber: joinedRoom });
       }
     },
@@ -68,6 +72,10 @@ export const Board: FC = () => {
 
   console.log('gameState', gameState);
   console.log('userList', userList);
+
+  useEffect(() => {
+    setIsDrawer(socket?.id === gameState.drawer?.id);
+  }, [socket?.id, gameState.drawer?.id]);
 
   useEffect(() => {
     if (!socket) return;
@@ -161,14 +169,14 @@ export const Board: FC = () => {
                       turn,
                       previousWords,
                     });
-                    setGameState({
-                      ...currentGameState,
-                      currentWord: word,
-                      previousWords,
-                      turn,
-                      round,
-                      preTurn: false,
-                    });
+                    // setGameState({
+                    //   ...currentGameState,
+                    //   currentWord: word,
+                    //   previousWords,
+                    //   turn,
+                    //   round,
+                    //   preTurn: false,
+                    // });
                     closeWordsModal();
                   }}
                 >
@@ -205,7 +213,6 @@ export const Board: FC = () => {
 
     socket.on('countdown turn', () => {
       setTurnStartCounter(true);
-      console.log('countdown turn event set the counter to true');
     });
 
     // Set the turn duration to all users in the room except for the leader
@@ -213,9 +220,14 @@ export const Board: FC = () => {
       'set new turn duration',
       ({ turnDuration }: { turnDuration: number }) => {
         setTurnDuration(turnDuration / 1000);
-        console.log('countdown turn event EXCEPT FOR LEADER');
       }
     );
+
+    socket.on('guessed word', ({ msg }: { id: string; msg: string }) => {
+      // TODO: Set the new scores in the gameState
+      // TODO: change the turn score state, to display the points that a user is getting in the current round
+      console.log('guessed word', msg);
+    });
 
     // TODO: when turn finish, clean the drawer, show and update scores, pass the turn
 
@@ -231,6 +243,7 @@ export const Board: FC = () => {
       socket.off('countdown preDraw start');
       socket.off('countdown turn');
       socket.off('set new turn duration');
+      socket.off('guessed word');
     };
   }, []);
 
@@ -327,7 +340,12 @@ export const Board: FC = () => {
   return (
     <>
       {gameState.started && !gameState.preTurn && startTurnCounter && (
-        <div className='my-8'>{turnCount}</div>
+        <div className='my-8'>
+          <p>{turnCount}</p>
+          {gameState.currentWord && (
+            <p>{isDrawer ? gameState.currentWord : gameState.cryptedWord}</p>
+          )}
+        </div>
       )}
       <div className='my-4'>
         <button onClick={() => handleTurnCounterState(true)}>

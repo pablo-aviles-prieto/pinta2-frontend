@@ -7,10 +7,12 @@ interface GameDataStore {
   gameState: GameStateI;
   categorySelected: string | null;
   turnDuration: number | null; // stored in seconds
+  isDrawer: boolean;
   setUserList: (userList: UserRoomI[]) => void;
   setGameState: (gameState: GameStateI) => void;
   setCategorySelected: (categorySelected: string | null) => void;
   setTurnDuration: (turnDuration: number | null) => void;
+  setIsDrawer: (condition: boolean) => void;
 }
 
 const INIT_GAME_STATE = {
@@ -23,10 +25,12 @@ export const useGameData = create<GameDataStore>((set) => {
     gameState: INIT_GAME_STATE,
     categorySelected: null,
     turnDuration: DEFAULT_TURN_DURATION,
+    isDrawer: false,
     setUserList: (userList: UserRoomI[]) => set({ userList }),
     setGameState: (gameState: GameStateI) => set({ gameState }),
     setCategorySelected: (categorySelected: string | null) =>
       set({ categorySelected }),
     setTurnDuration: (turnDuration: number | null) => set({ turnDuration }),
+    setIsDrawer: (condition: boolean) => set({ isDrawer: condition }),
   };
 });

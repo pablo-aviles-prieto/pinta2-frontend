@@ -8,6 +8,7 @@ interface PropsI {
   turnCount: number | undefined;
 }
 
+// TODO: Si se esta en partida y en turno y el usuario ya acertó, deshabilitar el input para enviar
 export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
   const [message, setMessage] = useState('');
   const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
