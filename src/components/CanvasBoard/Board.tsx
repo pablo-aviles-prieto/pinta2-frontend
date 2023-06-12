@@ -70,7 +70,7 @@ export const Board: FC = () => {
     },
   });
 
-  // console.log('gameState', gameState);
+  console.log('gameState', gameState);
   // console.log('userList', userList);
 
   useEffect(() => {
@@ -203,15 +203,18 @@ export const Board: FC = () => {
       handlePreTurnCounter(true);
     });
 
-    socket.on('countdown turn', ({ usersInRoom }: { usersInRoom: number }) => {
-      const currentGameState = useGameData.getState().gameState;
-      // update the usersInTurn
-      setGameState({
-        ...currentGameState,
-        usersInTurn: usersInRoom,
-      });
-      setTurnStartCounter(true);
-    });
+    socket.on(
+      'countdown turn',
+      ({ usersGuessing }: { usersGuessing: number }) => {
+        const currentGameState = useGameData.getState().gameState;
+        // update the usersGuessing
+        setGameState({
+          ...currentGameState,
+          usersGuessing,
+        });
+        setTurnStartCounter(true);
+      }
+    );
 
     // Set the turn duration to all users in the room except for the leader
     socket.on(
@@ -221,11 +224,36 @@ export const Board: FC = () => {
       }
     );
 
-    socket.on('guessed word', ({ msg }: { id: string; msg: string }) => {
-      // TODO: Set the new scores in the gameState
-      // TODO: change the turn score state, to display the points that a user is getting in the current round!
-      console.log('guessed word', msg);
-    });
+    socket.on(
+      'guessed word',
+      ({
+        msg,
+        totalScores,
+        turnScores,
+      }: {
+        id: string;
+        msg: string;
+        totalScores: {
+          [key: string]: {
+            name: string;
+            value: number;
+          };
+        };
+        turnScores: {
+          [key: string]: {
+            name: string;
+            value: number;
+          };
+        };
+      }) => {
+        // TODO: Set the new scores in the gameState
+        // TODO: change the turn score state, to display the points that a user is getting in the current turn!
+        // PRint in the chat the message received in msg
+        console.log('guessed word', msg);
+        const currentGameState = useGameData.getState().gameState;
+        setGameState({ ...currentGameState, totalScores, turnScores });
+      }
+    );
 
     // TODO: when turn finish, clean the drawer, show and update scores, pass the turn
 
