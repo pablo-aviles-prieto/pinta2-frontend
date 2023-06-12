@@ -70,8 +70,8 @@ export const Board: FC = () => {
     },
   });
 
-  console.log('gameState', gameState);
-  console.log('userList', userList);
+  // console.log('gameState', gameState);
+  // console.log('userList', userList);
 
   useEffect(() => {
     setIsDrawer(socket?.id === gameState.drawer?.id);
@@ -169,14 +169,6 @@ export const Board: FC = () => {
                       turn,
                       previousWords,
                     });
-                    // setGameState({
-                    //   ...currentGameState,
-                    //   currentWord: word,
-                    //   previousWords,
-                    //   turn,
-                    //   round,
-                    //   preTurn: false,
-                    // });
                     closeWordsModal();
                   }}
                 >
@@ -211,7 +203,13 @@ export const Board: FC = () => {
       handlePreTurnCounter(true);
     });
 
-    socket.on('countdown turn', () => {
+    socket.on('countdown turn', ({ usersInRoom }: { usersInRoom: number }) => {
+      const currentGameState = useGameData.getState().gameState;
+      // update the usersInTurn
+      setGameState({
+        ...currentGameState,
+        usersInTurn: usersInRoom,
+      });
       setTurnStartCounter(true);
     });
 
@@ -225,7 +223,7 @@ export const Board: FC = () => {
 
     socket.on('guessed word', ({ msg }: { id: string; msg: string }) => {
       // TODO: Set the new scores in the gameState
-      // TODO: change the turn score state, to display the points that a user is getting in the current round
+      // TODO: change the turn score state, to display the points that a user is getting in the current round!
       console.log('guessed word', msg);
     });
 

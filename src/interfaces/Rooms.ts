@@ -15,6 +15,7 @@ export interface GameStateI {
   turn?: number; // the current drawing turn (initialize in 0)
   preTurn?: boolean;
   turnDuration?: number; // number in ms
+  usersInTurn?: number; // tracks how many users are playing the round (in case user joins in the middle of a round)
   totalScores?: {
     // storing as key the socket.id of the users
     [key: string]: { name: string; value: number };
