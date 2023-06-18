@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGameData } from './useGameData';
 
 interface PropsI {
@@ -8,46 +8,73 @@ interface PropsI {
 export const useTurnCounter = ({ onCountDownComplete }: PropsI) => {
   const [count, setCount] = useState<number | undefined>(undefined);
   const [startCounter, setStartCounter] = useState(false);
+  const [newCount, setNewCount] = useState<number | undefined>(undefined);
   const { turnDuration } = useGameData();
-
-  const handleCounterState = (boolean: boolean) => {
-    setStartCounter(boolean);
-    setCount(turnDuration || 120); // turnDuration is already in seconds
-  };
-
+  const workerRef = useRef<Worker>();
   useEffect(() => {
     if (!turnDuration) return;
     setCount(turnDuration);
   }, [turnDuration]);
 
   useEffect(() => {
-    let worker: Worker;
-
     if (startCounter && count !== undefined) {
-      // Initialize the worker with the current count
-      worker = new Worker('timer-worker.js');
-      worker.postMessage({ startCounter, count });
-
-      worker.onmessage = (e) => {
-        const remainingTime = e.data;
-
-        if (remainingTime <= 0) {
-          // Countdown has completed
-          onCountDownComplete && onCountDownComplete();
-          setStartCounter(false);
-        }
-
-        setCount(remainingTime);
-      };
+      initializeWorker(count);
     }
 
     return () => {
       // Clean up the worker when the component is unmounted
-      if (worker) {
-        worker.terminate();
+      if (workerRef.current) {
+        workerRef.current.terminate();
       }
     };
-  }, [count, startCounter]);
+  }, [startCounter]);
 
-  return { count, startCounter, setStartCounter, handleCounterState };
+  useEffect(() => {
+    if (newCount !== undefined) {
+      setCount(newCount);
+      initializeWorker(newCount);
+      setTimeout(() => setNewCount(undefined), 1000);
+    }
+  }, [newCount]);
+
+  const initializeWorker = (count: number) => {
+    if (workerRef.current) {
+      workerRef.current.terminate();
+    }
+    // Initialize the worker with the current count
+    workerRef.current = new Worker('timer-worker.js');
+    workerRef.current.postMessage({ startCounter, count });
+
+    workerRef.current.onmessage = (e) => {
+      const remainingTime = e.data;
+
+      if (remainingTime <= 0) {
+        // Countdown has completed
+        onCountDownComplete && onCountDownComplete();
+        setStartCounter(false);
+      }
+
+      setCount(remainingTime);
+    };
+  };
+
+  const handleCounterState = (boolean: boolean) => {
+    setStartCounter(boolean);
+    if (boolean && turnDuration !== undefined) {
+      setCount(turnDuration || 120);
+      initializeWorker(turnDuration || 120);
+    }
+  };
+
+  const resetCounterState = (newCount: number) => {
+    setNewCount(newCount);
+  };
+
+  return {
+    count,
+    startCounter,
+    setStartCounter,
+    handleCounterState,
+    resetCounterState,
+  };
 };

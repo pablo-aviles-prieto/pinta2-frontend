@@ -8,7 +8,7 @@ interface PropsI {
   turnCount: number | undefined;
 }
 
-// TODO: Si se esta en partida y en turno y el usuario ya acertó, deshabilitar el input para enviar
+// TODO: Si se esta en partida y en turno y el usuario ya acertó, deshabilitar el input para enviar msg
 export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
   const [message, setMessage] = useState('');
   const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
@@ -37,7 +37,6 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
     e.preventDefault();
     if (!message.trim()) return;
 
-    // TODO: send the minute of the current turn aswell
     socket?.emit('chat msg', {
       msg: message.trim(),
       roomNumber: joinedRoom,
@@ -56,6 +55,7 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
               className='break-words'
               ref={index === chatMsgs.length - 1 ? lastMsgRef : null}
             >
+              {/* TODO: If its a msg from system, display differently in the chat */}
               <span className='font-bold'>{event.user}</span>: {event.msg}
             </li>
           ))}

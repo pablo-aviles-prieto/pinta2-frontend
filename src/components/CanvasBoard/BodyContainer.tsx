@@ -28,13 +28,23 @@ export const BodyContainer: FC = () => {
 
   return (
     <>
-      {/* TODO: Separate into a component ? */}
+      {/* TODO: Separate into a userList component */}
       <p>Room: {joinedRoom}</p>
       <div className='mt-4'>
         Users list:
         <ul>
           {userList.map((user) => (
-            <li key={user.id}>{user.name}</li>
+            <li key={user.id}>
+              {user.name}{' '}
+              {gameState.started && gameState.drawer && !gameState.preTurn && (
+                <span>
+                  -{' '}
+                  {gameState.turnScores
+                    ? gameState.turnScores[user.id]?.value ?? 0
+                    : 0}
+                </span>
+              )}
+            </li>
           ))}
         </ul>
       </div>

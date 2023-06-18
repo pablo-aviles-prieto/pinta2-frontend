@@ -55,7 +55,8 @@ export const Board: FC = () => {
     count: turnCount,
     startCounter: startTurnCounter,
     setStartCounter: setTurnStartCounter,
-    handleCounterState: handleTurnCounterState,
+    handleCounterState: handleTurnCounter,
+    resetCounterState: resetTurnCounter,
   } = useTurnCounter({});
   const {
     count: preTurnCount,
@@ -70,7 +71,7 @@ export const Board: FC = () => {
     },
   });
 
-  console.log('gameState', gameState);
+  // console.log('gameState', gameState);
   // console.log('userList', userList);
 
   useEffect(() => {
@@ -230,30 +231,25 @@ export const Board: FC = () => {
         msg,
         totalScores,
         turnScores,
+        updatedTime,
       }: {
         id: string;
         msg: string;
-        totalScores: {
-          [key: string]: {
-            name: string;
-            value: number;
-          };
-        };
-        turnScores: {
-          [key: string]: {
-            name: string;
-            value: number;
-          };
-        };
+        totalScores: GameStateI['totalScores'];
+        turnScores: GameStateI['turnScores'];
+        updatedTime: number;
       }) => {
-        // TODO: Set the new scores in the gameState
-        // TODO: change the turn score state, to display the points that a user is getting in the current turn!
-        // PRint in the chat the message received in msg
-        console.log('guessed word', msg);
+        // TODO: print in the chat the message received in msg.
+        // set the user as system and an ID so it displays differently the system msgs.
+        // store this system name in process.env
         const currentGameState = useGameData.getState().gameState;
+        console.log('guessed word', msg);
         setGameState({ ...currentGameState, totalScores, turnScores });
+        resetTurnCounter(updatedTime);
       }
     );
+    // TODO: Listen to a event for the concrete guesser, so it displays something in the middle of viewport
+    // showing he guessed the word, and how many points is getting
 
     // TODO: when turn finish, clean the drawer, show and update scores, pass the turn
 
@@ -374,9 +370,7 @@ export const Board: FC = () => {
         </div>
       )}
       <div className='my-4'>
-        <button onClick={() => handleTurnCounterState(true)}>
-          Restart timer
-        </button>
+        <button onClick={() => handleTurnCounter(true)}>Restart timer</button>
       </div>
       <select
         value={tool}
