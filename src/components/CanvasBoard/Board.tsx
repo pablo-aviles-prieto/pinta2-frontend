@@ -241,7 +241,7 @@ export const Board: FC = () => {
       }) => {
         // TODO: print in the chat the message received in msg.
         // set the user as system and an ID so it displays differently the system msgs.
-        // store this system name in process.env
+        // store this system name in process.env!
         const currentGameState = useGameData.getState().gameState;
         console.log('guessed word', msg);
         setGameState({ ...currentGameState, totalScores, turnScores });

@@ -28,24 +28,25 @@ export const BodyContainer: FC = () => {
 
   return (
     <>
-      {/* TODO: Separate into a userList component */}
-      <p>Room: {joinedRoom}</p>
+      {/* TODO: Separate into a userList component! */}
+      <p>Habitación: {joinedRoom}</p>
       <div className='mt-4'>
-        Users list:
+        Jugadores:
         <ul>
-          {userList.map((user) => (
-            <li key={user.id}>
-              {user.name}{' '}
-              {gameState.started && gameState.drawer && !gameState.preTurn && (
-                <span>
-                  -{' '}
-                  {gameState.turnScores
-                    ? gameState.turnScores[user.id]?.value ?? 0
-                    : 0}
-                </span>
-              )}
-            </li>
-          ))}
+          {gameState.started && gameState.drawer && gameState.totalScores
+            ? Object.entries(gameState.totalScores)
+                .sort(([, a], [, b]) => b.value - a.value)
+                .map(([key, val]) => {
+                  return (
+                    <li key={key}>
+                      {val.name} - Ronda:{val.value} / Total:
+                      {!gameState.turnScores
+                        ? 0
+                        : gameState.turnScores[key]?.value ?? 0}
+                    </li>
+                  );
+                })
+            : userList.map((user) => <li key={user.id}>{user.name}</li>)}
         </ul>
       </div>
       {awaitPlayersMsg && !gameState.started && (

@@ -55,7 +55,7 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
               className='break-words'
               ref={index === chatMsgs.length - 1 ? lastMsgRef : null}
             >
-              {/* TODO: If its a msg from system, display differently in the chat */}
+              {/* TODO: If its a msg from system, display differently in the chat! */}
               <span className='font-bold'>{event.user}</span>: {event.msg}
             </li>
           ))}
