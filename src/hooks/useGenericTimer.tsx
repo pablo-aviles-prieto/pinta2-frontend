@@ -17,7 +17,7 @@ export const useGenericTimer = ({
 
   const handleCounterState = (boolean: boolean) => {
     setStartCounter(boolean);
-    setCount(timerValue || 120); // turnDuration is already in seconds
+    setCount(timerValue ?? 120); // turnDuration is already in seconds
   };
 
   useEffect(() => {

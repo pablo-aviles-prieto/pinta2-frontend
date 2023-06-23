@@ -70,6 +70,16 @@ export const Board: FC = () => {
       }
     },
   });
+  const {
+    count: configGameCounter,
+    handleCounterState: handleConfigGameCounter,
+  } = useGenericTimer({
+    initTimerValue: 15,
+    onCountDownComplete: () => {
+      socket?.emit('init game', { roomNumber: joinedRoom });
+      closeModalOwner();
+    },
+  });
 
   // console.log('gameState', gameState);
   // console.log('userList', userList);
@@ -113,6 +123,7 @@ export const Board: FC = () => {
         setPossibleCategories(categories);
         setPosibleTurnDuration(possibleTurnDurations);
         openModalOwner();
+        handleConfigGameCounter(true);
       }
     );
 
@@ -158,7 +169,7 @@ export const Board: FC = () => {
                       : prevTurn >= currentUserList.length - 1 &&
                         currentGameState.round !== undefined
                       ? currentGameState.round + 1
-                      : currentGameState.round ?? 0;
+                      : currentGameState.round ?? 1;
                     const previousWords = currentGameState.previousWords
                       ? currentGameState.previousWords + 3
                       : 3;
@@ -202,6 +213,7 @@ export const Board: FC = () => {
         setGameState({ ...currentGameState, preTurn: false });
       }
       handlePreTurnCounter(true);
+      clearBoard();
     });
 
     socket.on(
@@ -360,6 +372,7 @@ export const Board: FC = () => {
   };
 
   return (
+    // TODO: Extract the drawing features into a component
     <>
       {gameState.started && !gameState.preTurn && startTurnCounter && (
         <div className='my-8'>
@@ -381,9 +394,11 @@ export const Board: FC = () => {
         <option value='pen'>Pen</option>
         <option value='eraser'>Eraser</option>
       </select>
-      <button type='button' onClick={clearBoard}>
-        Clear board
-      </button>
+      {(!gameState.started || gameState.drawer?.id === socket?.id) && (
+        <button type='button' onClick={clearBoard}>
+          Clear board
+        </button>
+      )}
       <div className='py-5 bg-gray-300'>
         <div className='mx-auto flex gap-5 w-[1100px] h-[600px]'>
           <Stage
@@ -419,8 +434,9 @@ export const Board: FC = () => {
       {!gameState.started && (
         <ModalOwnerCategories forbidClose>
           <>
+            <div className='absolute top-2 right-2'>{configGameCounter}</div>
             <h1 className='text-xl font-bold text-center text-teal-800'>
-              Wanna start the game?
+              Configura la partida!
             </h1>
             <div className='my-4'>
               <h3 className='text-lg'>Selecciona una categoría!</h3>
@@ -457,7 +473,7 @@ export const Board: FC = () => {
               </div>
             </div>
             <div className='my-4'>
-              <h3 className='text-lg'>Connected users:</h3>
+              <h3 className='text-lg'>Usuarios conectados:</h3>
               <ul>
                 {userList.map((user) => (
                   <li key={user.id}>{user.name}</li>
@@ -466,9 +482,9 @@ export const Board: FC = () => {
             </div>
             <div className='flex items-center justify-between'>
               <button onClick={handleAwaitMorePlayers}>
-                Wait for more players
+                Esperar + jugadores
               </button>
-              <button onClick={handleStartGame}>Start the game</button>
+              <button onClick={handleStartGame}>Empezar la partida</button>
             </div>
           </>
         </ModalOwnerCategories>

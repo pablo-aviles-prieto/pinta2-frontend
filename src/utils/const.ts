@@ -31,3 +31,5 @@ export const maxWidthClasses = {
 };
 
 export const DEFAULT_TURN_DURATION = 120; // in miliseconds
+
+export const DEFAULT_CATEGORY_SELECTED = 'Aleatorio';
