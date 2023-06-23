@@ -5,6 +5,7 @@ import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
+    {/* TODO: Create a header*/}
     <App />
   </React.StrictMode>
 );
