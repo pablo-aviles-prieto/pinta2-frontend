@@ -9,6 +9,7 @@ import type { GameStateI, UserRoomI } from '../../interfaces';
 import { useTurnCounter } from '../../hooks/useTurnCounter';
 import { useGenericTimer } from '../../hooks/useGenericTimer';
 import { PreTurnCountDown } from '../PreTurnCountDown';
+import { handleNextTurn } from '../../utils';
 
 interface LinesI {
   tool: string;
@@ -26,6 +27,7 @@ export const Board: FC = () => {
   const [possibleTurnDuration, setPosibleTurnDuration] = useState<
     Record<string, number>
   >({});
+  const [possibleWords, setPossibleWords] = useState<string[]>([]);
   const isDrawing = useRef(false);
   const { socket, joinedRoom } = useSocket();
   const {
@@ -74,10 +76,35 @@ export const Board: FC = () => {
     count: configGameCounter,
     handleCounterState: handleConfigGameCounter,
   } = useGenericTimer({
-    initTimerValue: 15,
+    initTimerValue: 15, // TODO: Change the number? for the config game modal
     onCountDownComplete: () => {
       socket?.emit('init game', { roomNumber: joinedRoom });
       closeModalOwner();
+    },
+  });
+  const {
+    count: selectWordCounter,
+    handleCounterState: handleSelectWordCount,
+  } = useGenericTimer({
+    initTimerValue: 10, // TODO: Change the number? for the words modal choice
+    onCountDownComplete: () => {
+      const randomIndex = Math.floor(Math.random() * 3); // random number [0-2]
+      const currentGameState = useGameData.getState().gameState;
+      const currentUserList = useGameData.getState().userList;
+      const prevTurn = currentGameState.turn;
+      const { turn, round, previousWords } = handleNextTurn({
+        currentGameState,
+        currentUserList,
+        prevTurn,
+      });
+      socket?.emit('set drawer word', {
+        roomNumber: joinedRoom,
+        word: possibleWords[randomIndex],
+        round,
+        turn,
+        previousWords,
+      });
+      closeWordsModal();
     },
   });
 
@@ -140,58 +167,10 @@ export const Board: FC = () => {
 
     socket.on(
       'pre turn drawer',
-      ({
-        possibleWords,
-        prevTurn,
-      }: {
-        possibleWords: string[];
-        prevTurn: undefined | number;
-      }) => {
-        const wordsContent = (
-          <div>
-            Selecciona una palabra:{' '}
-            <div className='flex gap-2'>
-              {possibleWords.map((word) => (
-                <p
-                  key={word}
-                  className={`border-teal-600 border-2 cursor-pointer px-2 py-1 hover:bg-teal-200`}
-                  onClick={() => {
-                    const currentGameState = useGameData.getState().gameState;
-                    const currentUserList = useGameData.getState().userList;
-
-                    const turn = !prevTurn
-                      ? 0
-                      : prevTurn >= currentUserList.length - 1
-                      ? 0
-                      : prevTurn + 1;
-                    const round = !prevTurn
-                      ? 1
-                      : prevTurn >= currentUserList.length - 1 &&
-                        currentGameState.round !== undefined
-                      ? currentGameState.round + 1
-                      : currentGameState.round ?? 1;
-                    const previousWords = currentGameState.previousWords
-                      ? currentGameState.previousWords + 3
-                      : 3;
-
-                    socket.emit('set drawer word', {
-                      roomNumber: joinedRoom,
-                      word,
-                      round,
-                      turn,
-                      previousWords,
-                    });
-                    closeWordsModal();
-                  }}
-                >
-                  {word}
-                </p>
-              ))}
-            </div>
-          </div>
-        );
-        setWordsContent(wordsContent);
+      ({ possibleWords }: { possibleWords: string[] }) => {
+        setPossibleWords(possibleWords);
         openWordsModal();
+        handleSelectWordCount(true);
       }
     );
 
@@ -364,6 +343,7 @@ export const Board: FC = () => {
 
     socket?.emit('init game', { roomNumber: joinedRoom });
     closeModalOwner();
+    handleConfigGameCounter(false);
   };
 
   const handleAwaitMorePlayers = () => {
@@ -372,7 +352,7 @@ export const Board: FC = () => {
   };
 
   return (
-    // TODO: Extract the drawing features into a component
+    // TODO: Extract the drawing tools into a component
     <>
       {gameState.started && !gameState.preTurn && startTurnCounter && (
         <div className='my-8'>
@@ -434,6 +414,7 @@ export const Board: FC = () => {
       {!gameState.started && (
         <ModalOwnerCategories forbidClose>
           <>
+            {/* TODO: Restyle the counter of config game */}
             <div className='absolute top-2 right-2'>{configGameCounter}</div>
             <h1 className='text-xl font-bold text-center text-teal-800'>
               Configura la partida!
@@ -490,7 +471,44 @@ export const Board: FC = () => {
         </ModalOwnerCategories>
       )}
       {gameState.started && gameState.preTurn && (
-        <SelectWordsModal forbidClose />
+        <SelectWordsModal forbidClose>
+          <div>
+            {/* TODO: Restyle the counter of words modal choice */}
+            <div className='absolute top-2 right-2'>{selectWordCounter}</div>
+            Selecciona una palabra:{' '}
+            <div className='flex gap-2'>
+              {possibleWords.map((word) => (
+                <p
+                  key={word}
+                  className={`border-teal-600 border-2 cursor-pointer px-2 py-1 hover:bg-teal-200`}
+                  onClick={() => {
+                    const currentGameState = useGameData.getState().gameState;
+                    const currentUserList = useGameData.getState().userList;
+                    const prevTurn = currentGameState.turn;
+
+                    const { turn, round, previousWords } = handleNextTurn({
+                      currentGameState,
+                      currentUserList,
+                      prevTurn,
+                    });
+
+                    socket?.emit('set drawer word', {
+                      roomNumber: joinedRoom,
+                      word,
+                      round,
+                      turn,
+                      previousWords,
+                    });
+                    closeWordsModal();
+                    handleSelectWordCount(false);
+                  }}
+                >
+                  {word}
+                </p>
+              ))}
+            </div>
+          </div>
+        </SelectWordsModal>
       )}
       {preTurnStartCounter && !gameState.preTurn && (
         <PreTurnCountDown preTurnCount={preTurnCount} />
