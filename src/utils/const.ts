@@ -30,6 +30,6 @@ export const maxWidthClasses = {
   none: 'w-0',
 };
 
+export const MAX_POINTS_IN_SINGLE_ARRAY = 2500;
 export const DEFAULT_TURN_DURATION = 120; // in miliseconds
-
 export const DEFAULT_CATEGORY_SELECTED = 'Aleatorio';

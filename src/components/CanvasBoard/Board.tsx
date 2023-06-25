@@ -9,16 +9,17 @@ import type { GameStateI, UserRoomI } from '../../interfaces';
 import { useTurnCounter } from '../../hooks/useTurnCounter';
 import { useGenericTimer } from '../../hooks/useGenericTimer';
 import { PreTurnCountDown } from '../PreTurnCountDown';
+import { UserList } from '../UserList/UserList';
+import {
+  DEFAULT_TURN_DURATION,
+  MAX_POINTS_IN_SINGLE_ARRAY,
+} from '../../utils/const';
 
 interface LinesI {
   tool: string;
   points: any[];
 }
 
-const MAX_POINTS_IN_SINGLE_ARRAY = 2500;
-
-// TODO: Create a useState to handle an array of objects with the userId and the points
-// they are getting in that round. Reset it between rounds
 export const Board: FC = () => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
@@ -90,7 +91,7 @@ export const Board: FC = () => {
     count: selectWordCounter,
     handleCounterState: handleSelectWordCount,
   } = useGenericTimer({
-    initTimerValue: 10, // TODO: Change the number? for the words modal choice
+    initTimerValue: 10,
     onCountDownComplete: () => {
       const randomIndex = Math.floor(Math.random() * 3); // random number [0-2]
       socket?.emit('set drawer word', {
@@ -98,6 +99,23 @@ export const Board: FC = () => {
         word: possibleWords[randomIndex],
       });
       closeWordsModal();
+    },
+  });
+  const {
+    RenderModal: ScoreBoardModal,
+    closeModal: closeScoreBoardModal,
+    openModal: openScoreBoardModal,
+  } = useModal();
+  const {
+    count: scoreBoardCounter,
+    handleCounterState: handleScoreBoardCount,
+  } = useGenericTimer({
+    initTimerValue: 5,
+    onCountDownComplete: () => {
+      if (isDrawer) {
+        socket?.emit('scoreboard finished', { roomNumber: joinedRoom });
+      }
+      closeScoreBoardModal();
     },
   });
 
@@ -169,7 +187,6 @@ export const Board: FC = () => {
       'update game state front',
       ({ gameState }: { gameState: GameStateI }) => {
         setGameState(gameState);
-        console.log('updatedState', gameState);
       }
     );
 
@@ -186,11 +203,13 @@ export const Board: FC = () => {
       'countdown turn',
       ({ usersGuessing }: { usersGuessing: number }) => {
         const currentGameState = useGameData.getState().gameState;
+        const currentTurnDuration = useGameData.getState().turnDuration;
         // update the usersGuessing
         setGameState({
           ...currentGameState,
           usersGuessing,
         });
+        resetTurnCounter(currentTurnDuration ?? DEFAULT_TURN_DURATION);
         setTurnStartCounter(true);
       }
     );
@@ -228,19 +247,14 @@ export const Board: FC = () => {
     );
 
     socket.on('show scoreboard', () => {
-      // TODO: stop the counter of the turn/game
       setTurnStartCounter(false);
-      console.log('Show scoreboard');
+      openScoreBoardModal();
+      handleScoreBoardCount(true);
     });
 
     // TODO: Listen to a event for the concrete guesser, so it displays something in the middle of viewport
     // showing he guessed the word, and how many points is getting
-    // TODO: Send an event in some concrete timers, so the backend gives back hints in the word
-
-    // TODO: recieve a event to show scoreboard when last guesser or time finished
-    // TODO: send the event when scoreboard finish (drawer already changed)
-    // TODO: Back will send the pre turn drawer and front will answer with set drawer word event
-    // and keep the cycle
+    // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
 
     return () => {
       socket.off('new segment');
@@ -497,6 +511,16 @@ export const Board: FC = () => {
       )}
       {preTurnStartCounter && !gameState.preTurn && (
         <PreTurnCountDown preTurnCount={preTurnCount} />
+      )}
+      {gameState.started && gameState.preTurn && (
+        <ScoreBoardModal forbidClose>
+          <div>
+            <div className='absolute top-2 right-2'>{scoreBoardCounter}</div>
+            <h1>Puntuaciones:</h1>
+            {/* TODO: Refactor UserList to not show Jugadores: */}
+            <UserList />
+          </div>
+        </ScoreBoardModal>
       )}
     </>
   );
