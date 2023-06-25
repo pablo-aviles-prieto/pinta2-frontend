@@ -1,5 +1,6 @@
 import { useGameData } from '../../hooks/useGameData';
 
+// TODO: Set another color for the user
 export const UserList = () => {
   const { userList, gameState } = useGameData();
 
@@ -13,7 +14,7 @@ export const UserList = () => {
               .map(([key, val]) => {
                 return (
                   <li key={key}>
-                    {val.name} - Ronda:{val.value} / Total:
+                    {val.name} - Total:{val.value} / Turno:
                     {!gameState.turnScores
                       ? 0
                       : gameState.turnScores[key]?.value ?? 0}

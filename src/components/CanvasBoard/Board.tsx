@@ -110,7 +110,7 @@ export const Board: FC = () => {
     count: scoreBoardCounter,
     handleCounterState: handleScoreBoardCount,
   } = useGenericTimer({
-    initTimerValue: 5,
+    initTimerValue: 10,
     onCountDownComplete: () => {
       if (isDrawer) {
         socket?.emit('scoreboard finished', { roomNumber: joinedRoom });
