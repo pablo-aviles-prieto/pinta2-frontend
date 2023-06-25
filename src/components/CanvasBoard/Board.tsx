@@ -9,7 +9,6 @@ import type { GameStateI, UserRoomI } from '../../interfaces';
 import { useTurnCounter } from '../../hooks/useTurnCounter';
 import { useGenericTimer } from '../../hooks/useGenericTimer';
 import { PreTurnCountDown } from '../PreTurnCountDown';
-import { handleNextTurn } from '../../utils';
 
 interface LinesI {
   tool: string;
@@ -39,7 +38,6 @@ export const Board: FC = () => {
     RenderModal: SelectWordsModal,
     closeModal: closeWordsModal,
     openModal: openWordsModal,
-    setContent: setWordsContent,
   } = useModal();
   const {
     gameState,
@@ -59,7 +57,13 @@ export const Board: FC = () => {
     setStartCounter: setTurnStartCounter,
     handleCounterState: handleTurnCounter,
     resetCounterState: resetTurnCounter,
-  } = useTurnCounter({});
+  } = useTurnCounter({
+    onCountDownComplete: () => {
+      if (isDrawer) {
+        socket?.emit('turn finished', { roomNumber: joinedRoom });
+      }
+    },
+  });
   const {
     count: preTurnCount,
     startCounter: preTurnStartCounter,
@@ -76,7 +80,7 @@ export const Board: FC = () => {
     count: configGameCounter,
     handleCounterState: handleConfigGameCounter,
   } = useGenericTimer({
-    initTimerValue: 15, // TODO: Change the number? for the config game modal
+    initTimerValue: 30, // TODO: Change the number? for the config game modal
     onCountDownComplete: () => {
       socket?.emit('init game', { roomNumber: joinedRoom });
       closeModalOwner();
@@ -89,20 +93,9 @@ export const Board: FC = () => {
     initTimerValue: 10, // TODO: Change the number? for the words modal choice
     onCountDownComplete: () => {
       const randomIndex = Math.floor(Math.random() * 3); // random number [0-2]
-      const currentGameState = useGameData.getState().gameState;
-      const currentUserList = useGameData.getState().userList;
-      const prevTurn = currentGameState.turn;
-      const { turn, round, previousWords } = handleNextTurn({
-        currentGameState,
-        currentUserList,
-        prevTurn,
-      });
       socket?.emit('set drawer word', {
         roomNumber: joinedRoom,
         word: possibleWords[randomIndex],
-        round,
-        turn,
-        previousWords,
       });
       closeWordsModal();
     },
@@ -159,13 +152,6 @@ export const Board: FC = () => {
     });
 
     socket.on(
-      'game initialized',
-      ({ gameState }: { gameState: GameStateI }) => {
-        setGameState(gameState);
-      }
-    );
-
-    socket.on(
       'pre turn drawer',
       ({ possibleWords }: { possibleWords: string[] }) => {
         setPossibleWords(possibleWords);
@@ -180,9 +166,10 @@ export const Board: FC = () => {
     });
 
     socket.on(
-      'update game state',
+      'update game state front',
       ({ gameState }: { gameState: GameStateI }) => {
         setGameState(gameState);
+        console.log('updatedState', gameState);
       }
     );
 
@@ -239,24 +226,35 @@ export const Board: FC = () => {
         resetTurnCounter(updatedTime);
       }
     );
+
+    socket.on('show scoreboard', () => {
+      // TODO: stop the counter of the turn/game
+      setTurnStartCounter(false);
+      console.log('Show scoreboard');
+    });
+
     // TODO: Listen to a event for the concrete guesser, so it displays something in the middle of viewport
     // showing he guessed the word, and how many points is getting
+    // TODO: Send an event in some concrete timers, so the backend gives back hints in the word
 
-    // TODO: when turn finish, clean the drawer, show and update scores, pass the turn
+    // TODO: recieve a event to show scoreboard when last guesser or time finished
+    // TODO: send the event when scoreboard finish (drawer already changed)
+    // TODO: Back will send the pre turn drawer and front will answer with set drawer word event
+    // and keep the cycle
 
     return () => {
       socket.off('new segment');
       socket.off('clear board');
       socket.off('pre game owner');
       socket.off('update user list');
-      socket.off('game initialized');
       socket.off('pre turn drawer');
       socket.off('pre turn no drawer');
-      socket.off('update game state');
+      socket.off('update game state front');
       socket.off('countdown preDraw start');
       socket.off('countdown turn');
       socket.off('set new turn duration');
       socket.off('guessed word');
+      socket.off('show scoreboard');
     };
   }, []);
 
@@ -482,22 +480,9 @@ export const Board: FC = () => {
                   key={word}
                   className={`border-teal-600 border-2 cursor-pointer px-2 py-1 hover:bg-teal-200`}
                   onClick={() => {
-                    const currentGameState = useGameData.getState().gameState;
-                    const currentUserList = useGameData.getState().userList;
-                    const prevTurn = currentGameState.turn;
-
-                    const { turn, round, previousWords } = handleNextTurn({
-                      currentGameState,
-                      currentUserList,
-                      prevTurn,
-                    });
-
                     socket?.emit('set drawer word', {
                       roomNumber: joinedRoom,
                       word,
-                      round,
-                      turn,
-                      previousWords,
                     });
                     closeWordsModal();
                     handleSelectWordCount(false);
