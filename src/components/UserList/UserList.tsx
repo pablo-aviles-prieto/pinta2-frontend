@@ -1,12 +1,12 @@
 import { useGameData } from '../../hooks/useGameData';
 
 // TODO: Set another color for the user
+// TODO: Refactor component to accept props to hide some total or turn score
 export const UserList = () => {
   const { userList, gameState } = useGameData();
 
   return (
-    <div className='mt-4'>
-      Jugadores:
+    <div className='mt-2'>
       <ul>
         {gameState.started && gameState.drawer && gameState.totalScores
           ? Object.entries(gameState.totalScores)

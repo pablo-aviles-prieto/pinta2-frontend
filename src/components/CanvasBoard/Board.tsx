@@ -83,6 +83,16 @@ export const Board: FC = () => {
   } = useGenericTimer({
     initTimerValue: 30, // TODO: Change the number? for the config game modal
     onCountDownComplete: () => {
+      socket?.emit('set turn duration', {
+        turnDuration: turnDuration
+          ? turnDuration * 1000
+          : DEFAULT_TURN_DURATION,
+        roomNumber: joinedRoom,
+      });
+      socket?.emit('set room category', {
+        category: categorySelected,
+        roomNumber: joinedRoom,
+      });
       socket?.emit('init game', { roomNumber: joinedRoom });
       closeModalOwner();
     },
@@ -118,8 +128,14 @@ export const Board: FC = () => {
       closeScoreBoardModal();
     },
   });
+  const {
+    RenderModal: EndGameModal,
+    closeModal: closeEndGameModal,
+    openModal: openEndGameModal,
+    setContent: setEndGameContent,
+  } = useModal();
 
-  // console.log('gameState', gameState);
+  console.log('gameState', gameState);
   // console.log('userList', userList);
 
   useEffect(() => {
@@ -156,8 +172,8 @@ export const Board: FC = () => {
       }: {
         categories: string[];
         possibleTurnDurations: Record<string, number>;
-        userList: UserRoomI[];
       }) => {
+        closeEndGameModal(); // in case it is opened from a restart game
         setPossibleCategories(categories);
         setPosibleTurnDuration(possibleTurnDurations);
         openModalOwner();
@@ -252,6 +268,36 @@ export const Board: FC = () => {
       handleScoreBoardCount(true);
     });
 
+    socket.on('game ended', ({ owner }: { owner: string }) => {
+      const TopMsg =
+        owner === socket.id ? (
+          <button
+            type='button'
+            onClick={() => {
+              socket?.emit('restart game', {
+                roomNumber: joinedRoom,
+              });
+            }}
+          >
+            Volver a jugar!
+          </button>
+        ) : (
+          <div>Esperando a que el lider decida...</div>
+        );
+      setTurnStartCounter(false);
+      setEndGameContent(TopMsg);
+      openEndGameModal();
+    });
+
+    socket.on('close endgame modal', () => {
+      closeEndGameModal();
+    });
+
+    // Set the category to all users in the room except for the leader
+    socket.on('update category front', ({ category }: { category: string }) => {
+      setCategorySelected(category);
+    });
+
     // TODO: Listen to a event for the concrete guesser, so it displays something in the middle of viewport
     // showing he guessed the word, and how many points is getting
     // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
@@ -269,6 +315,9 @@ export const Board: FC = () => {
       socket.off('set new turn duration');
       socket.off('guessed word');
       socket.off('show scoreboard');
+      socket.off('game ended');
+      socket.off('close endgame modal');
+      socket.off('update category front');
     };
   }, []);
 
@@ -365,6 +414,7 @@ export const Board: FC = () => {
 
   return (
     // TODO: Extract the drawing tools into a component
+    // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     <>
       {gameState.started && !gameState.preTurn && startTurnCounter && (
         <div className='my-8'>
@@ -521,6 +571,15 @@ export const Board: FC = () => {
             <UserList />
           </div>
         </ScoreBoardModal>
+      )}
+      {gameState.started && gameState.preTurn && (
+        <EndGameModal forbidClose>
+          <div>
+            <h1>Puntuación final:</h1>
+            {/* TODO: Refactor UserList to not show Jugadores: */}
+            <UserList />
+          </div>
+        </EndGameModal>
       )}
     </>
   );
