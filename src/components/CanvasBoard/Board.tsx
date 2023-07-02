@@ -410,6 +410,7 @@ export const Board: FC = () => {
   const handleAwaitMorePlayers = () => {
     socket?.emit('await more players', { roomNumber: joinedRoom });
     closeModalOwner();
+    handleConfigGameCounter(false);
   };
 
   return (
