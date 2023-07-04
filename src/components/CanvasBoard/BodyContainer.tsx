@@ -9,6 +9,9 @@ export const BodyContainer: FC = () => {
   const [awaitPlayersMsg, setAwaitPlayersMsg] = useState<string | undefined>(
     undefined
   );
+  const [gameCancelled, setGameCancelled] = useState<string | undefined>(
+    undefined
+  );
   const { socket, joinedRoom } = useSocket();
   const { gameState } = useGameData();
 
@@ -21,9 +24,13 @@ export const BodyContainer: FC = () => {
         setAwaitPlayersMsg(message);
       }
     );
+    socket.on('game cancelled', ({ msg }: { msg: string }) => {
+      setGameCancelled(msg);
+    });
 
     return () => {
       socket.off('await more players response');
+      socket.off('game cancelled');
     };
   }, []);
 
@@ -31,11 +38,17 @@ export const BodyContainer: FC = () => {
     <>
       <p>Habitación: {joinedRoom}</p>
       <UserList />
+      {gameCancelled && !gameState.started && (
+        <div className='my-4 text-xl font-bold'>{gameCancelled}</div>
+      )}
       {awaitPlayersMsg && !gameState.started && (
         <div className='my-4 text-xl font-bold'>{awaitPlayersMsg}</div>
       )}
       <ConnectionManager />
-      <Board />
+      <Board
+        setAwaitPlayersMsg={setAwaitPlayersMsg}
+        setGameCancelled={setGameCancelled}
+      />
     </>
   );
 };

@@ -17,6 +17,7 @@ export interface GameStateI {
   preTurn?: boolean;
   turnDuration?: number; // number in ms
   usersGuessing?: number; // tracks how many users are playing the round (in case user joins in the middle of a round)
+  endGame?: boolean; // tracks if the game is finishe
   totalScores?: {
     // storing as key the socket.id of the users
     [key: string]: { name: string; value: number };

@@ -20,7 +20,12 @@ interface LinesI {
   points: any[];
 }
 
-export const Board: FC = () => {
+interface Props {
+  setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setGameCancelled: React.Dispatch<React.SetStateAction<string | undefined>>;
+}
+
+export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
   const [possibleCategories, setPossibleCategories] = useState<string[]>([]);
@@ -95,6 +100,9 @@ export const Board: FC = () => {
       });
       socket?.emit('init game', { roomNumber: joinedRoom });
       closeModalOwner();
+      // removing possible messages when starting the game
+      setAwaitPlayersMsg(undefined);
+      setGameCancelled(undefined);
     },
   });
   const {
@@ -269,6 +277,7 @@ export const Board: FC = () => {
     });
 
     socket.on('game ended', ({ owner }: { owner: string }) => {
+      const currentGameState = useGameData.getState().gameState;
       const TopMsg =
         owner === socket.id ? (
           <button
@@ -284,6 +293,7 @@ export const Board: FC = () => {
         ) : (
           <div>Esperando a que el lider decida...</div>
         );
+      setGameState({ ...currentGameState, endGame: true });
       setTurnStartCounter(false);
       setEndGameContent(TopMsg);
       openEndGameModal();
@@ -296,6 +306,31 @@ export const Board: FC = () => {
     // Set the category to all users in the room except for the leader
     socket.on('update category front', ({ category }: { category: string }) => {
       setCategorySelected(category);
+    });
+
+    // Not using the msg property in this component, that comes from this event
+    socket.on('game cancelled', () => {
+      setTurnStartCounter(false);
+    });
+
+    // update the EndGameModal content if the owner left during endGame
+    socket.on('resend game ended', ({ owner }: { owner: string }) => {
+      const UpdateMsg =
+        owner === socket.id ? (
+          <button
+            type='button'
+            onClick={() => {
+              socket?.emit('restart game', {
+                roomNumber: joinedRoom,
+              });
+            }}
+          >
+            Volver a jugar!
+          </button>
+        ) : (
+          <div>Esperando a que el lider decida...</div>
+        );
+      setEndGameContent(UpdateMsg);
     });
 
     // TODO: Listen to a event for the concrete guesser, so it displays something in the middle of viewport
@@ -318,6 +353,8 @@ export const Board: FC = () => {
       socket.off('game ended');
       socket.off('close endgame modal');
       socket.off('update category front');
+      socket.off('game cancelled');
+      socket.off('resend game ended');
     };
   }, []);
 
@@ -405,6 +442,9 @@ export const Board: FC = () => {
     socket?.emit('init game', { roomNumber: joinedRoom });
     closeModalOwner();
     handleConfigGameCounter(false);
+    // removing possible messages when starting the game
+    setAwaitPlayersMsg(undefined);
+    setGameCancelled(undefined);
   };
 
   const handleAwaitMorePlayers = () => {
