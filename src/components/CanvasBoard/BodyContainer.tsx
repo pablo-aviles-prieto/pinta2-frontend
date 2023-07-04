@@ -38,7 +38,7 @@ export const BodyContainer: FC = () => {
     <>
       <p>Habitación: {joinedRoom}</p>
       <UserList />
-      {gameCancelled && !gameState.started && (
+      {!awaitPlayersMsg && gameCancelled && !gameState.started && (
         <div className='my-4 text-xl font-bold'>{gameCancelled}</div>
       )}
       {awaitPlayersMsg && !gameState.started && (

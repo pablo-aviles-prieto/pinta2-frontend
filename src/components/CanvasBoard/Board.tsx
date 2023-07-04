@@ -189,9 +189,26 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       }
     );
 
-    socket.on('update user list', ({ newUsers }: { newUsers: UserRoomI[] }) => {
-      setUserList(newUsers);
-    });
+    socket.on(
+      'update user list',
+      ({
+        newUsers,
+        action,
+        msg,
+      }: {
+        newUsers: UserRoomI[];
+        action: string;
+        msg: string;
+      }) => {
+        setUserList(newUsers);
+        // TODO: Toastify the msg
+        if (action === 'join') {
+          console.log('TOAST POSITIVO', msg);
+        } else {
+          console.log('TOAST NEGATIVO', msg);
+        }
+      }
+    );
 
     socket.on(
       'pre turn drawer',
