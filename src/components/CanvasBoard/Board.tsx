@@ -474,6 +474,14 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // TODO: Extract the drawing tools into a component
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     <>
+      {gameState.started &&
+        gameState.turn !== undefined &&
+        gameState.round !== undefined && (
+          <div className='my-4'>
+            <p>Turn: {gameState.turn}</p>
+            <p>Round: {gameState.round}</p>
+          </div>
+        )}
       {gameState.started && !gameState.preTurn && startTurnCounter && (
         <div className='my-8'>
           <p>{turnCount}</p>
