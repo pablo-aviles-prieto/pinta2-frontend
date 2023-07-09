@@ -88,17 +88,11 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   } = useGenericTimer({
     initTimerValue: 30, // TODO: Change the number? for the config game modal
     onCountDownComplete: () => {
-      socket?.emit('set turn duration', {
-        turnDuration: turnDuration
-          ? turnDuration * 1000
-          : DEFAULT_TURN_DURATION,
+      socket?.emit('init game', {
         roomNumber: joinedRoom,
+        turnDuration: (turnDuration ?? 120) * 1000,
+        categorySelected,
       });
-      socket?.emit('set room category', {
-        category: categorySelected,
-        roomNumber: joinedRoom,
-      });
-      socket?.emit('init game', { roomNumber: joinedRoom });
       closeModalOwner();
       // removing possible messages when starting the game
       setAwaitPlayersMsg(undefined);
@@ -377,12 +371,10 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
 
   const handleTurnDuration = (turnDuration: number) => {
     setTurnDuration(turnDuration / 1000); // parsing it to seconds
-    socket?.emit('set turn duration', { turnDuration, roomNumber: joinedRoom });
   };
 
   const handleCategoryChoice = (category: string) => {
     setCategorySelected(category);
-    socket?.emit('set room category', { category, roomNumber: joinedRoom });
   };
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -456,7 +448,11 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const handleStartGame = () => {
     if (!categorySelected || userList.length < 3) return; // TODO: Use a toast to provide feedback
 
-    socket?.emit('init game', { roomNumber: joinedRoom });
+    socket?.emit('init game', {
+      roomNumber: joinedRoom,
+      turnDuration: (turnDuration ?? 120) * 1000,
+      categorySelected,
+    });
     closeModalOwner();
     handleConfigGameCounter(false);
     // removing possible messages when starting the game
