@@ -51,11 +51,13 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     categorySelected,
     turnDuration,
     isDrawer,
+    isPlaying,
     setUserList,
     setCategorySelected,
     setGameState,
     setTurnDuration,
     setIsDrawer,
+    setIsPlaying,
   } = useGameData();
   const {
     count: turnCount,
@@ -147,6 +149,58 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   useEffect(() => {
     if (!socket) return;
 
+    socket.on(
+      'update user list',
+      ({
+        newUsers,
+        action,
+        msg,
+        newUser,
+        gameState: newGameState,
+      }: {
+        newUsers: UserRoomI[];
+        action: string;
+        msg: string;
+        newUser?: UserRoomI;
+        gameState?: GameStateI;
+      }) => {
+        setUserList(newUsers);
+
+        // TODO: Toastify the msg
+        if (action === 'join') {
+          if (newGameState) {
+            setGameState(newGameState);
+          }
+
+          const currentGameState =
+            newGameState ?? useGameData.getState().gameState;
+          if (
+            newUser &&
+            !currentGameState.preTurn &&
+            socket?.id === currentGameState.drawer?.id
+          ) {
+            socket.emit('hydrate new player', {
+              newUser,
+              turnCount,
+              draw: lines,
+            });
+          }
+
+          console.log('TOAST POSITIVO', msg);
+        } else {
+          console.log('TOAST NEGATIVO', msg);
+        }
+      }
+    );
+
+    return () => {
+      socket.off('update user list');
+    };
+  }, [turnCount, lines]);
+
+  useEffect(() => {
+    if (!socket) return;
+
     socket.on('new segment', (lineNumber: number, lineSegment: LinesI) => {
       setLines((lines) => {
         const updatedLines = [...lines];
@@ -184,27 +238,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     );
 
     socket.on(
-      'update user list',
-      ({
-        newUsers,
-        action,
-        msg,
-      }: {
-        newUsers: UserRoomI[];
-        action: string;
-        msg: string;
-      }) => {
-        setUserList(newUsers);
-        // TODO: Toastify the msg
-        if (action === 'join') {
-          console.log('TOAST POSITIVO', msg);
-        } else {
-          console.log('TOAST NEGATIVO', msg);
-        }
-      }
-    );
-
-    socket.on(
       'pre turn drawer',
       ({ possibleWords }: { possibleWords: string[] }) => {
         setPossibleWords(possibleWords);
@@ -229,6 +262,9 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       const currentGameState = useGameData.getState().gameState;
       if (currentGameState.preTurn) {
         setGameState({ ...currentGameState, preTurn: false });
+      }
+      if (isPlaying) {
+        setIsPlaying(false);
       }
       handlePreTurnCounter(true);
       clearBoard();
@@ -294,7 +330,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           <button
             type='button'
             onClick={() => {
-              socket?.emit('restart game', {
+              socket.emit('restart game', {
                 roomNumber: joinedRoom,
               });
             }}
@@ -331,7 +367,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           <button
             type='button'
             onClick={() => {
-              socket?.emit('restart game', {
+              socket.emit('restart game', {
                 roomNumber: joinedRoom,
               });
             }}
@@ -344,6 +380,24 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       setEndGameContent(UpdateMsg);
     });
 
+    // update the counter and the lines for a user who joined in the middle of the turn
+    socket.on(
+      'current game data',
+      ({
+        turnCount,
+        draw,
+      }: {
+        turnCount: number | undefined;
+        draw: LinesI[];
+      }) => {
+        if (turnCount) {
+          resetTurnCounter(turnCount);
+          setTurnStartCounter(true);
+        }
+        setLines(draw);
+      }
+    );
+
     // TODO: Listen to a event for the concrete guesser, so it displays something in the middle of viewport
     // showing he guessed the word, and how many points is getting
     // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
@@ -352,7 +406,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       socket.off('new segment');
       socket.off('clear board');
       socket.off('pre game owner');
-      socket.off('update user list');
       socket.off('pre turn drawer');
       socket.off('pre turn no drawer');
       socket.off('update game state front');
@@ -366,6 +419,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       socket.off('update category front');
       socket.off('game cancelled');
       socket.off('resend game ended');
+      socket.off('current game data');
     };
   }, []);
 

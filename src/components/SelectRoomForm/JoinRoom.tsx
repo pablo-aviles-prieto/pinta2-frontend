@@ -1,7 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import { useSocket } from '../../hooks/useSocket';
-import type { UserRoomI } from '../../interfaces';
+import type { GameStateI, UserRoomI } from '../../interfaces';
 import { useGameData } from '../../hooks/useGameData';
+import { DEFAULT_TURN_DURATION } from '../../utils/const';
 
 type OptionsI = 'create' | 'join' | undefined;
 
@@ -14,25 +15,37 @@ interface JoinRoomResponse {
   success: boolean;
   message: string;
   room: number;
-  newUsers: UserRoomI[];
+  newUsers?: UserRoomI[];
+  isPlaying?: boolean;
+  gameState?: GameStateI;
 }
 
 export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
   const [roomNumber, setRoomNumber] = useState('');
   const [roomPassword, setRoomPassword] = useState('');
   const { socket, setJoinedRoom } = useSocket();
-  const { setUserList } = useGameData();
+  const { setUserList, setGameState, setIsPlaying, setTurnDuration } =
+    useGameData();
 
   useEffect(() => {
     if (!socket) return;
 
     const handleJoinRoomResponse = (response: JoinRoomResponse) => {
       if (response.success) {
-        console.log('response', response);
-        setUserList(response.newUsers);
+        // if the game started, set the turnDuration for future turns
+        if (response.gameState && response.gameState.started) {
+          setTurnDuration(
+            response.gameState.turnDuration
+              ? response.gameState.turnDuration / 1000
+              : DEFAULT_TURN_DURATION
+          );
+        }
         setJoinedRoom(response.room);
+        response.newUsers && setUserList(response.newUsers);
+        response.gameState && setGameState(response.gameState);
+        response.isPlaying && setIsPlaying(response.isPlaying);
 
-        // TODO: Clean inputs?
+        // TODO: Clear inputs?
         // TODO: Redirect to the url of the room (room/[roomId])
       } else {
         console.log(response.message);

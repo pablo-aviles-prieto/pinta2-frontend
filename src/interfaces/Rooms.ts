@@ -1,3 +1,4 @@
+// TODO: Add color prop
 export interface UserRoomI {
   id: string;
   name: string;

@@ -2,6 +2,7 @@ import React, { FC, useEffect, useRef, useState } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { ChatMsgsI } from '../interfaces';
 import { Send } from './Icons';
+import { useGameData } from '../hooks/useGameData';
 
 interface PropsI {
   joinedRoom: number | undefined;
@@ -14,6 +15,7 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
   const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
   const lastMsgRef = useRef<HTMLLIElement | null>(null);
   const { socket } = useSocket();
+  const { isPlaying } = useGameData();
 
   useEffect(() => {
     if (!socket) return;
@@ -66,7 +68,9 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
         onSubmit={onSubmit}
         className='flex w-full py-1 border-t-2 border-gray-700'
       >
+        {/* TODO: Disable the input if isPlaying */}
         <input
+          disabled={isPlaying}
           placeholder='Type a message...'
           onChange={(e) => setMessage(e.target.value)}
           value={message}
