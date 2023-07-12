@@ -3,6 +3,7 @@ import { useSocket } from '../hooks/useSocket';
 import { ChatMsgsI } from '../interfaces';
 import { Send } from './Icons';
 import { useGameData } from '../hooks/useGameData';
+import { FALLBACK_USER_COLOR } from '../utils/const';
 
 interface PropsI {
   joinedRoom: number | undefined;
@@ -20,20 +21,32 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
   useEffect(() => {
     if (!socket) return;
 
-    function onChatMsg(msgContent: ChatMsgsI) {
-      setChatMsgs((previous) => [...previous, msgContent]);
-    }
-
     socket?.on('chat msg', onChatMsg);
+
+    socket.on('user guessed', ({ msg }: { msg: string }) => {
+      console.log('HAS ACERTADO', msg);
+    });
 
     return () => {
       socket?.off('chat msg', onChatMsg);
+      socket?.off('user guessed');
     };
   }, []);
 
   useEffect(() => {
     lastMsgRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMsgs]);
+
+  function onChatMsg(msgContent: Omit<ChatMsgsI, 'color'>) {
+    const currentUserList = useGameData.getState().userList;
+    const userColor =
+      currentUserList.find((user) => user.id === msgContent.id)?.color ??
+      FALLBACK_USER_COLOR;
+    setChatMsgs((previous) => [
+      ...previous,
+      { ...msgContent, color: userColor },
+    ]);
+  }
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -58,7 +71,10 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
               ref={index === chatMsgs.length - 1 ? lastMsgRef : null}
             >
               {/* TODO: If its a msg from system, display differently in the chat */}
-              <span className='font-bold'>{event.user}</span>: {event.msg}
+              <span style={{ color: event.color }} className='font-bold'>
+                {event.user}
+              </span>
+              : {event.msg}
             </li>
           ))}
         </ul>

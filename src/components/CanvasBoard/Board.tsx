@@ -88,7 +88,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     count: configGameCounter,
     handleCounterState: handleConfigGameCounter,
   } = useGenericTimer({
-    initTimerValue: 30, // TODO: Change the number? for the config game modal
+    initTimerValue: 30, // ?TODO: Change the number? for the config game modal
     onCountDownComplete: () => {
       socket?.emit('init game', {
         roomNumber: joinedRoom,
@@ -139,7 +139,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     setContent: setEndGameContent,
   } = useModal();
 
-  console.log('gameState', gameState);
+  // console.log('gameState', gameState);
   // console.log('userList', userList);
 
   useEffect(() => {

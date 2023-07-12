@@ -1,7 +1,7 @@
-// TODO: Add color prop
 export interface UserRoomI {
   id: string;
   name: string;
+  color: string;
 }
 
 export interface GameStateI {
