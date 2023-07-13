@@ -11,6 +11,7 @@ interface PropsI {
 }
 
 // TODO: Si se esta en partida y en turno y el usuario ya acertó, deshabilitar el input para enviar msg
+// TODO: Limpiar el chat al empezar una nueva partida (tras enviar la config del game i guess)
 export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
   const [message, setMessage] = useState('');
   const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
@@ -27,9 +28,23 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
       console.log('HAS ACERTADO', msg);
     });
 
+    socket.on('guessed word', ({ msg }: { msg: string }) => {
+      const {
+        VITE_USER_SYSTEM_NAME: userSystemName,
+        VITE_USER_SYSTEM_ID: userSystemID,
+        VITE_USER_SYSTEM_COLOR: userSystemColor,
+      } = import.meta.env;
+
+      setChatMsgs((prevMsgs) => [
+        ...prevMsgs,
+        { id: userSystemID, user: userSystemName, msg, color: userSystemColor },
+      ]);
+    });
+
     return () => {
       socket?.off('chat msg', onChatMsg);
       socket?.off('user guessed');
+      socket?.off('guessed word');
     };
   }, []);
 
@@ -70,11 +85,24 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
               className='break-words'
               ref={index === chatMsgs.length - 1 ? lastMsgRef : null}
             >
-              {/* TODO: If its a msg from system, display differently in the chat */}
-              <span style={{ color: event.color }} className='font-bold'>
-                {event.user}
-              </span>
-              : {event.msg}
+              {event.id === import.meta.env.VITE_USER_SYSTEM_ID ? (
+                <>
+                  🎉{' '}
+                  <span
+                    style={{ color: '#f87f50' }}
+                    className='italic font-bold'
+                  >
+                    {event.msg}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span style={{ color: event.color }} className='font-bold'>
+                    {event.user}
+                  </span>
+                  : {event.msg}
+                </>
+              )}
             </li>
           ))}
         </ul>
@@ -84,7 +112,6 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
         onSubmit={onSubmit}
         className='flex w-full py-1 border-t-2 border-gray-700'
       >
-        {/* TODO: Disable the input if isPlaying */}
         <input
           disabled={isPlaying}
           placeholder='Type a message...'

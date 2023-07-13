@@ -296,7 +296,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     socket.on(
       'guessed word',
       ({
-        msg,
         totalScores,
         turnScores,
         updatedTime,
@@ -307,11 +306,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
         turnScores: GameStateI['turnScores'];
         updatedTime: number;
       }) => {
-        // TODO: print in the chat the message received in msg.
-        // set the user as system and an ID so it displays differently the system msgs.
-        // store this system name in process.env
         const currentGameState = useGameData.getState().gameState;
-        console.log('guessed word', msg);
         setGameState({ ...currentGameState, totalScores, turnScores });
         resetTurnCounter(updatedTime);
       }
@@ -523,6 +518,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   return (
     // TODO: Extract the drawing tools into a component
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
+    // TODO: Disable the input when user is in turnScore ???
     <>
       {gameState.started &&
         gameState.turn !== undefined &&
