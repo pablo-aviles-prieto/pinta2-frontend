@@ -89,7 +89,7 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
                 <>
                   🎉{' '}
                   <span
-                    style={{ color: '#f87f50' }}
+                    style={{ color: event.color }}
                     className='italic font-bold'
                   >
                     {event.msg}
