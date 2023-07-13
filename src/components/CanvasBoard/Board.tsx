@@ -393,6 +393,11 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       }
     );
 
+    // display the msg in the middle of the screen
+    socket.on('user guessed', ({ msg }: { msg: string }) => {
+      console.log('HAS ACERTADO', msg);
+    });
+
     // TODO: Listen to a event for the concrete guesser, so it displays something in the middle of viewport
     // showing he guessed the word, and how many points is getting
     // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
@@ -415,6 +420,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       socket.off('game cancelled');
       socket.off('resend game ended');
       socket.off('current game data');
+      socket.off('user guessed');
     };
   }, []);
 

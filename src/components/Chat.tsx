@@ -24,10 +24,6 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
 
     socket?.on('chat msg', onChatMsg);
 
-    socket.on('user guessed', ({ msg }: { msg: string }) => {
-      console.log('HAS ACERTADO', msg);
-    });
-
     socket.on('guessed word', ({ msg }: { msg: string }) => {
       const {
         VITE_USER_SYSTEM_NAME: userSystemName,
@@ -43,7 +39,6 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
 
     return () => {
       socket?.off('chat msg', onChatMsg);
-      socket?.off('user guessed');
       socket?.off('guessed word');
     };
   }, []);
