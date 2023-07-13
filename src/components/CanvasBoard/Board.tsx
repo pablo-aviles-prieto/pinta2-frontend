@@ -14,6 +14,7 @@ import {
   DEFAULT_TURN_DURATION,
   MAX_POINTS_IN_SINGLE_ARRAY,
 } from '../../utils/const';
+import { useCustomToast } from '../../hooks/useCustomToast';
 
 interface LinesI {
   tool: string;
@@ -35,6 +36,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const [possibleWords, setPossibleWords] = useState<string[]>([]);
   const isDrawing = useRef(false);
   const { socket, joinedRoom } = useSocket();
+  const { showToast } = useCustomToast();
   const {
     RenderModal: ModalOwnerCategories,
     closeModal: closeModalOwner,
@@ -166,7 +168,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       }) => {
         setUserList(newUsers);
 
-        // TODO: Toastify the msg
         if (action === 'join') {
           if (newGameState) {
             setGameState(newGameState);
@@ -186,9 +187,9 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             });
           }
 
-          console.log('TOAST POSITIVO', msg);
+          showToast({ msg, options: { type: 'info' } });
         } else {
-          console.log('TOAST NEGATIVO', msg);
+          showToast({ msg, options: { type: 'warning' } });
         }
       }
     );

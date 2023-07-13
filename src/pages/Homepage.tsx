@@ -3,11 +3,12 @@ import { RegisterUserForm } from '../components/RegisterUserForm';
 import { BodyContainer } from '../components/CanvasBoard/BodyContainer';
 import { SocketProvider, useSocket } from '../hooks/useSocket';
 import { SelectRoomForm } from '../components/SelectRoomForm';
+import { ToastContainer } from 'react-toastify';
 
 const Homepage = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const { socket, setUsername, joinedRoom } = useSocket();
-  console.log('joinedRoom', joinedRoom)
+  console.log('joinedRoom', joinedRoom);
 
   useEffect(() => {
     if (!isRegistered || !socket) return;
@@ -39,6 +40,9 @@ const Homepage = () => {
 
 export default () => (
   <SocketProvider>
-    <Homepage />
+    <>
+      <Homepage />
+      <ToastContainer />
+    </>
   </SocketProvider>
 );
