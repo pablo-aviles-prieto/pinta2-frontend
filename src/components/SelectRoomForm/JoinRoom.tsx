@@ -3,6 +3,8 @@ import { useSocket } from '../../hooks/useSocket';
 import type { GameStateI, UserRoomI } from '../../interfaces';
 import { useGameData } from '../../hooks/useGameData';
 import { DEFAULT_TURN_DURATION } from '../../utils/const';
+import { useCustomToast } from '../../hooks/useCustomToast';
+import { Id } from 'react-toastify';
 
 type OptionsI = 'create' | 'join' | undefined;
 
@@ -10,7 +12,6 @@ interface PropsI {
   setSelectedOption: React.Dispatch<React.SetStateAction<OptionsI>>;
 }
 
-// TODO: Check if I can marge this interface iwht CreateRoomResponse interface in CreateNewRoom.tsx
 interface JoinRoomResponse {
   success: boolean;
   message: string;
@@ -23,7 +24,11 @@ interface JoinRoomResponse {
 export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
   const [roomNumber, setRoomNumber] = useState('');
   const [roomPassword, setRoomPassword] = useState('');
+  const [joinRoomToastId, setJoinRoomToastId] = useState<Id | undefined>(
+    undefined
+  );
   const { socket, setJoinedRoom } = useSocket();
+  const { showToast, showLoadingToast, updateToast } = useCustomToast();
   const { setUserList, setGameState, setIsPlaying, setTurnDuration } =
     useGameData();
 
@@ -45,11 +50,26 @@ export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
         response.gameState && setGameState(response.gameState);
         response.isPlaying && setIsPlaying(response.isPlaying);
 
+        if (joinRoomToastId) {
+          updateToast({
+            toastId: joinRoomToastId,
+            content: response.message,
+            type: 'success',
+          });
+          setJoinRoomToastId(undefined);
+        }
+
         // TODO: Clear inputs?
         // TODO: Redirect to the url of the room (room/[roomId])
       } else {
-        console.log(response.message);
-        // TODO: Send a toast with the response.message
+        if (joinRoomToastId) {
+          updateToast({
+            toastId: joinRoomToastId,
+            content: response.message,
+            type: 'error',
+          });
+          setJoinRoomToastId(undefined);
+        }
       }
     };
     socket.on('join room response', handleJoinRoomResponse);
@@ -57,7 +77,7 @@ export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
     return () => {
       socket.off('join room response', handleJoinRoomResponse);
     };
-  }, [socket]);
+  }, [socket, joinRoomToastId]);
 
   const joinRoom = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,10 +85,19 @@ export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
     if (
       !roomPassword.trim()
       // roomDigits.some((digit) => digit === '' || isNaN(digit))
-    )
-      return; // TODO: Send a toast to give some feedback
+    ) {
+      showToast({
+        msg: 'Por favor, rellene todos los datos',
+        options: { type: 'error' },
+      });
+      return;
+    }
 
     if (socket) {
+      const joinRoomToast = showLoadingToast({
+        msg: 'Accediendo a la sala...',
+      });
+      setJoinRoomToastId(joinRoomToast);
       socket.emit('join room', { roomNumber, roomPassword });
     }
   };

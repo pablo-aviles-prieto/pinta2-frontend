@@ -26,6 +26,8 @@ interface Props {
   setGameCancelled: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
+// TODO: Should be a page and not a component
+// TODO: Has to check for query params (room & pw), so user can access directly
 export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
@@ -396,11 +398,11 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
 
     // display the msg in the middle of the screen
     socket.on('user guessed', ({ msg }: { msg: string }) => {
+      // TODO: Displays msg in the middle of viewport
+      // Maybe add how many points is getting??
       console.log('HAS ACERTADO', msg);
     });
 
-    // TODO: Listen to a event for the concrete guesser, so it displays something in the middle of viewport
-    // showing he guessed the word, and how many points is getting
     // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
 
     return () => {

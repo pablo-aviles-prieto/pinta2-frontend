@@ -5,6 +5,8 @@ import { ButtonBorderContainer } from '../Styles/ButtonBorderContainer';
 import { useSocket } from '../../hooks/useSocket';
 import type { UserRoomI } from '../../interfaces';
 import { useGameData } from '../../hooks/useGameData';
+import { useCustomToast } from '../../hooks/useCustomToast';
+import { Id } from 'react-toastify';
 
 type OptionsI = 'create' | 'join' | undefined;
 
@@ -26,25 +28,42 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
     Array(4).fill('')
   );
   const [copied, setCopied] = useState(false);
+  const [createRoomToastId, setCreateRoomToastId] = useState<Id | undefined>(
+    undefined
+  );
   const digitsInputRef = useRef<(HTMLInputElement | null)[]>([]);
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const { socket, setJoinedRoom } = useSocket();
   const { setUserList } = useGameData();
+  const { showToast, showLoadingToast, updateToast } = useCustomToast();
 
   useEffect(() => {
     if (!socket) return;
 
     const handleCreateRoomResponse = (response: CreateRoomResponse) => {
       if (response.success) {
-        console.log('response', response);
         setJoinedRoom(response.room);
         setUserList(response.roomUsers);
+        if (createRoomToastId) {
+          updateToast({
+            toastId: createRoomToastId,
+            content: response.message,
+            type: 'success',
+          });
+          setCreateRoomToastId(undefined);
+        }
 
         // TODO: Clean inputs? (atm im using the roomDigits)
         // TODO: Redirect to the url of the room (room/[roomId])
       } else {
-        console.log(response.message);
-        // TODO: Send a toast with the response.message
+        if (createRoomToastId) {
+          updateToast({
+            toastId: createRoomToastId,
+            content: response.message,
+            type: 'error',
+          });
+          setCreateRoomToastId(undefined);
+        }
       }
     };
     socket.on('create room response', handleCreateRoomResponse);
@@ -52,7 +71,7 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
     return () => {
       socket.off('create room response', handleCreateRoomResponse);
     };
-  }, [socket]);
+  }, [socket, createRoomToastId]);
 
   const handleInputChange =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,11 +100,20 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
     if (
       !roomPassword.trim() ||
       roomDigits.some((digit) => digit === '' || isNaN(digit))
-    )
-      return; // TODO: Send a toast to give some feedback
+    ) {
+      showToast({
+        msg: 'Por favor, rellene todos los datos',
+        options: { type: 'error' },
+      });
+      return;
+    }
+
     const roomNumber = +roomDigits.join('');
 
     if (socket) {
+      const createRoomToast = showLoadingToast({ msg: 'Creando sala...' });
+      setCreateRoomToastId(createRoomToast);
+
       socket.emit('create room', { roomNumber, roomPassword });
     }
   };
