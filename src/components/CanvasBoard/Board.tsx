@@ -399,7 +399,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // display the msg in the middle of the screen
     socket.on('user guessed', ({ msg }: { msg: string }) => {
       // TODO: Displays msg in the middle of viewport
-      // Maybe add how many points is getting??
+      // Maybe add how many points is getting?? (in that case, change it on backend)
       console.log('HAS ACERTADO', msg);
     });
 
@@ -528,6 +528,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // TODO: Extract the drawing tools into a component
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     // TODO: Disable the input when user is in turnScore ???
+    // TODO: Add a restart game button for the owner (it should display a modal to confirm the action)
     <>
       {gameState.started &&
         gameState.turn !== undefined &&
