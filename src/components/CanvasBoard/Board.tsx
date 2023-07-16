@@ -15,6 +15,7 @@ import {
   MAX_POINTS_IN_SINGLE_ARRAY,
 } from '../../utils/const';
 import { useCustomToast } from '../../hooks/useCustomToast';
+import { GuessedWord } from '../GuessedWord';
 
 interface LinesI {
   tool: string;
@@ -36,6 +37,10 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     Record<string, number>
   >({});
   const [possibleWords, setPossibleWords] = useState<string[]>([]);
+  const [displayGuessedWord, setDisplayGuessedWord] = useState(false);
+  const [guessedMsgDisplayed, setGuessedMsgDisplayed] = useState<
+    string | undefined
+  >(undefined);
   const isDrawing = useRef(false);
   const { socket, joinedRoom } = useSocket();
   const { showToast } = useCustomToast();
@@ -142,6 +147,12 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     openModal: openEndGameModal,
     setContent: setEndGameContent,
   } = useModal();
+  const { handleCounterState: handleGuessedWordCounter } = useGenericTimer({
+    initTimerValue: 3,
+    onCountDownComplete: () => {
+      setDisplayGuessedWord(false);
+    },
+  });
 
   // console.log('gameState', gameState);
   // console.log('userList', userList);
@@ -396,14 +407,15 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       }
     );
 
-    // display the msg in the middle of the screen
+    // display the msg in the middle of the screen (msg used on GuessedWord component)
     socket.on('user guessed', ({ msg }: { msg: string }) => {
-      // TODO: Displays msg in the middle of viewport
-      // Maybe add how many points is getting?? (in that case, change it on backend)!
-      console.log('HAS ACERTADO', msg);
+      setGuessedMsgDisplayed(msg);
+      setDisplayGuessedWord(true);
+      handleGuessedWordCounter(true);
     });
 
-    // TODO: Create the routes to join directly to the room
+    // TODO: Create the routes to join directly to the room!
+    // TODO: Apply some sound for the preTurnCount (for each of the 3 seconds)
     // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
 
     return () => {
@@ -685,7 +697,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       {preTurnStartCounter && !gameState.preTurn && (
         <PreTurnCountDown preTurnCount={preTurnCount} />
       )}
-      {gameState.started && gameState.preTurn && (
+      {gameState.started && gameState.preTurn && !displayGuessedWord && (
         <ScoreBoardModal forbidClose>
           <div>
             <div className='absolute top-2 right-2'>{scoreBoardCounter}</div>
@@ -695,7 +707,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           </div>
         </ScoreBoardModal>
       )}
-      {gameState.started && gameState.preTurn && (
+      {gameState.started && gameState.preTurn && !displayGuessedWord && (
         <EndGameModal forbidClose>
           <div>
             <h1>Puntuación final:</h1>
@@ -704,6 +716,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           </div>
         </EndGameModal>
       )}
+      {displayGuessedWord && <GuessedWord msg={guessedMsgDisplayed} />}
     </>
   );
 };

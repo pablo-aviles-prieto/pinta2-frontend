@@ -33,3 +33,31 @@ input[type='number'] {
   max-width: 450px;
   width: auto;
 }
+
+/* Zoom in animation */
+@keyframes zoomInOut {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+  16% {
+    /* 0.5s out of 3s */
+    transform: scale(1);
+    opacity: 1;
+  }
+  83% {
+    /* 2.5s out of 3s, keep the scale at 1 and opacity at 1 */
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+}
+
+.zoomInOut {
+  animation-name: zoomInOut;
+  animation-duration: 3s; /* 3s in total, 0.5s to zoom in, 2s to stay, 0.5s to zoom out */
+  animation-fill-mode: both;
+}

@@ -1,8 +1,15 @@
 import { FC } from 'react';
 
-// TODO: Animate and display the msg from back
-export const GuessedWord: FC = () => {
+interface Props {
+  msg: string | undefined;
+}
+
+// TODO: Set a beautiful img with the message
+// TODO: Display a sound when displayed the message
+export const GuessedWord: FC<Props> = ({ msg }) => {
   return (
-    <div className='fixed inset-0 flex items-center justify-center'>...</div>
+    <div className='fixed inset-0 flex items-center justify-center zoomInOut'>
+      <p className='text-7xl'>{msg || `Felicidades, acertaste`}</p>
+    </div>
   );
 };
