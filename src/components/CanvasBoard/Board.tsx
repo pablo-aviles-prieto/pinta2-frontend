@@ -27,7 +27,7 @@ interface Props {
   setGameCancelled: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-// TODO: Should be a page and not a component
+// TODO: Should be a page and not a component!
 // TODO: Has to check for query params (room & pw), so user can access directly
 export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const [tool, setTool] = useState('pen');
