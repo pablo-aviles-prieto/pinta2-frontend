@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { RegisterUserForm } from '../components/RegisterUserForm';
 import { BodyContainer } from '../components/CanvasBoard/BodyContainer';
-import { SocketProvider, useSocket } from '../hooks/useSocket';
+import { useSocket } from '../hooks/useSocket';
 import { SelectRoomForm } from '../components/SelectRoomForm';
-import { ToastContainer } from 'react-toastify';
 
 const Homepage = () => {
   const [isRegistered, setIsRegistered] = useState(false);
@@ -38,11 +37,4 @@ const Homepage = () => {
   );
 };
 
-export default () => (
-  <SocketProvider>
-    <>
-      <Homepage />
-      <ToastContainer />
-    </>
-  </SocketProvider>
-);
+export default Homepage;
