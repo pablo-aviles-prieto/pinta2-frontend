@@ -76,20 +76,6 @@ const JoinRoom: FC = () => {
     };
   }, [socket, joinRoomToastId, joinedRoom]);
 
-  // useEffect(() => {
-  //   if (!socket) return;
-
-  //   socket.on('current game data', ({ turnCount, draw }: StartedTurnData) => {
-  //     console.log('turnCount JOIN ROOM', turnCount);
-  //     console.log('draw JOIN ROOM', draw);
-  //     navigate(`/room/${joinedRoom}`, {
-  //       state: {
-  //         startedTurnData: { turnCount, draw },
-  //       },
-  //     });
-  //   });
-  // }, [socket, joinedRoom]);
-
   const joinRoom = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Check that inputs are correctly filled
