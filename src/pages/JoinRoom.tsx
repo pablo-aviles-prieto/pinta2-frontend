@@ -1,16 +1,11 @@
 import { FC, useEffect, useState } from 'react';
-import { useSocket } from '../../hooks/useSocket';
-import type { GameStateI, UserRoomI } from '../../interfaces';
-import { useGameData } from '../../hooks/useGameData';
-import { DEFAULT_TURN_DURATION } from '../../utils/const';
-import { useCustomToast } from '../../hooks/useCustomToast';
+import { useSocket } from '../hooks/useSocket';
+import type { GameStateI, UserRoomI } from '../interfaces';
+import { useGameData } from '../hooks/useGameData';
+import { DEFAULT_TURN_DURATION } from '../utils/const';
+import { useCustomToast } from '../hooks/useCustomToast';
 import { Id } from 'react-toastify';
-
-type OptionsI = 'create' | 'join' | undefined;
-
-interface PropsI {
-  setSelectedOption: React.Dispatch<React.SetStateAction<OptionsI>>;
-}
+import { useNavigate } from 'react-router-dom';
 
 interface JoinRoomResponse {
   success: boolean;
@@ -21,16 +16,17 @@ interface JoinRoomResponse {
   gameState?: GameStateI;
 }
 
-export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
+const JoinRoom: FC = () => {
   const [roomNumber, setRoomNumber] = useState('');
   const [roomPassword, setRoomPassword] = useState('');
   const [joinRoomToastId, setJoinRoomToastId] = useState<Id | undefined>(
     undefined
   );
-  const { socket, setJoinedRoom } = useSocket();
+  const { socket, setJoinedRoom, joinedRoom } = useSocket();
   const { showToast, showLoadingToast, updateToast } = useCustomToast();
   const { setUserList, setGameState, setIsPlaying, setTurnDuration } =
     useGameData();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!socket) return;
@@ -59,8 +55,9 @@ export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
           setJoinRoomToastId(undefined);
         }
 
+        navigate(`/room/${response.room}`);
+
         // TODO: Clear inputs?
-        // TODO: Redirect to the url of the room (room/[roomId])
       } else {
         if (joinRoomToastId) {
           updateToast({
@@ -77,7 +74,21 @@ export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
     return () => {
       socket.off('join room response', handleJoinRoomResponse);
     };
-  }, [socket, joinRoomToastId]);
+  }, [socket, joinRoomToastId, joinedRoom]);
+
+  // useEffect(() => {
+  //   if (!socket) return;
+
+  //   socket.on('current game data', ({ turnCount, draw }: StartedTurnData) => {
+  //     console.log('turnCount JOIN ROOM', turnCount);
+  //     console.log('draw JOIN ROOM', draw);
+  //     navigate(`/room/${joinedRoom}`, {
+  //       state: {
+  //         startedTurnData: { turnCount, draw },
+  //       },
+  //     });
+  //   });
+  // }, [socket, joinedRoom]);
 
   const joinRoom = (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,13 +154,11 @@ export const JoinRoom: FC<PropsI> = ({ setSelectedOption }) => {
           </button>
         </div>
       </form>
-      <button
-        className='mt-6'
-        type='button'
-        onClick={() => setSelectedOption(undefined)}
-      >
+      <button className='mt-6' type='button' onClick={() => navigate('/home')}>
         Go back
       </button>
     </>
   );
 };
+
+export default JoinRoom;

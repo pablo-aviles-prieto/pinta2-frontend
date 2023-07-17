@@ -5,7 +5,7 @@ import { useSocket } from '../../hooks/useSocket';
 import { Chat } from '../Chat';
 import { useModal } from '../../hooks/useModal';
 import { useGameData } from '../../hooks/useGameData';
-import type { GameStateI, UserRoomI } from '../../interfaces';
+import type { GameStateI, UserRoomI, LinesI } from '../../interfaces';
 import { useTurnCounter } from '../../hooks/useTurnCounter';
 import { useGenericTimer } from '../../hooks/useGenericTimer';
 import { PreTurnCountDown } from '../PreTurnCountDown';
@@ -17,14 +17,16 @@ import {
 import { useCustomToast } from '../../hooks/useCustomToast';
 import { GuessedWord } from '../GuessedWord';
 
-interface LinesI {
-  tool: string;
-  points: any[];
-}
-
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
   setGameCancelled: React.Dispatch<React.SetStateAction<string | undefined>>;
+}
+
+interface JoinRoomDirectlyResponse {
+  success: boolean;
+  newUsers?: UserRoomI[];
+  isPlaying?: boolean;
+  gameState?: GameStateI;
 }
 
 // TODO: Should be a page and not a component!
@@ -42,7 +44,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     string | undefined
   >(undefined);
   const isDrawing = useRef(false);
-  const { socket, joinedRoom } = useSocket();
+  const { socket, joinedRoom, setIsRegistered, setUsername } = useSocket();
   const { showToast } = useCustomToast();
   const {
     RenderModal: ModalOwnerCategories,
@@ -154,7 +156,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     },
   });
 
-  // console.log('gameState', gameState);
+  console.log('gameState', gameState);
   // console.log('userList', userList);
 
   useEffect(() => {
@@ -215,6 +217,28 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   useEffect(() => {
     if (!socket) return;
 
+    // Separate the useEffect, to listen to isPlaying changes
+    socket.on('countdown preDraw start', () => {
+      console.log('CHECK isPlaying =>', isPlaying);
+      const currentGameState = useGameData.getState().gameState;
+      if (currentGameState.preTurn) {
+        setGameState({ ...currentGameState, preTurn: false });
+      }
+      if (isPlaying) {
+        setIsPlaying(false);
+      }
+      handlePreTurnCounter(true);
+      clearBoard();
+    });
+
+    return () => {
+      socket.off('countdown preDraw start');
+    };
+  }, [socket, isPlaying]);
+
+  useEffect(() => {
+    if (!socket) return;
+
     socket.on('new segment', (lineNumber: number, lineSegment: LinesI) => {
       setLines((lines) => {
         const updatedLines = [...lines];
@@ -271,18 +295,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
         setGameState(gameState);
       }
     );
-
-    socket.on('countdown preDraw start', () => {
-      const currentGameState = useGameData.getState().gameState;
-      if (currentGameState.preTurn) {
-        setGameState({ ...currentGameState, preTurn: false });
-      }
-      if (isPlaying) {
-        setIsPlaying(false);
-      }
-      handlePreTurnCounter(true);
-      clearBoard();
-    });
 
     socket.on(
       'countdown turn',
@@ -414,9 +426,43 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       handleGuessedWordCounter(true);
     });
 
+    // TODO: Maybe has to be moved in a parent/previous route
+    // probably not, since the disconnect option would be in the BoardContainer, and this
+    // component should be mounted
+    socket.on('disconnect', () => {
+      setIsRegistered(false);
+      setUsername('');
+      // TODO: navigate to path '/' with a state prop 'notRegistered' in the navigate
+    });
+
+    socket.on(
+      'join room directly response',
+      ({
+        success,
+        gameState,
+        isPlaying,
+        newUsers,
+      }: JoinRoomDirectlyResponse) => {
+        if (success) {
+          // if the game started, set the turnDuration for future turns
+          if (gameState && gameState.started) {
+            setTurnDuration(
+              gameState.turnDuration
+                ? gameState.turnDuration / 1000
+                : DEFAULT_TURN_DURATION
+            );
+          }
+          newUsers && setUserList(newUsers);
+          gameState && setGameState(gameState);
+          isPlaying && setIsPlaying(isPlaying);
+        }
+      }
+    );
+
     // TODO: Create the routes to join directly to the room!
     // TODO: Apply some sound for the preTurnCount (for each of the 3 seconds)
     // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
+    // TODO: Add a button to copy the link to a friend in the Board
 
     return () => {
       socket.off('new segment');
@@ -425,7 +471,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       socket.off('pre turn drawer');
       socket.off('pre turn no drawer');
       socket.off('update game state front');
-      socket.off('countdown preDraw start');
       socket.off('countdown turn');
       socket.off('set new turn duration');
       socket.off('guessed word');
@@ -437,6 +482,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       socket.off('resend game ended');
       socket.off('current game data');
       socket.off('user guessed');
+      socket.off('disconnect');
+      socket.off('join room directly response');
     };
   }, []);
 

@@ -1,14 +1,13 @@
 import { FC, useEffect, useRef, useState } from 'react';
-import { FormContainer } from '../Styles/FormContainer';
-import { Copy, CopyOk, Eye, EyeOff } from '../Icons';
-import { ButtonBorderContainer } from '../Styles/ButtonBorderContainer';
-import { useSocket } from '../../hooks/useSocket';
-import type { UserRoomI } from '../../interfaces';
-import { useGameData } from '../../hooks/useGameData';
-import { useCustomToast } from '../../hooks/useCustomToast';
+import { FormContainer } from '../components/Styles/FormContainer';
+import { Copy, CopyOk, Eye, EyeOff } from '../components/Icons';
+import { ButtonBorderContainer } from '../components/Styles/ButtonBorderContainer';
+import { useSocket } from '../hooks/useSocket';
+import type { UserRoomI } from '../interfaces';
+import { useGameData } from '../hooks/useGameData';
+import { useCustomToast } from '../hooks/useCustomToast';
 import { Id } from 'react-toastify';
-
-type OptionsI = 'create' | 'join' | undefined;
+import { useNavigate } from 'react-router-dom';
 
 interface CreateRoomResponse {
   success: boolean;
@@ -17,11 +16,7 @@ interface CreateRoomResponse {
   roomUsers: UserRoomI[];
 }
 
-interface PropsI {
-  setSelectedOption: React.Dispatch<React.SetStateAction<OptionsI>>;
-}
-
-export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
+const CreateNewRoom: FC = () => {
   const [roomPassword, setRoomPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [roomDigits, setRoomDigits] = useState<(number | '')[]>(
@@ -36,6 +31,7 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
   const { socket, setJoinedRoom } = useSocket();
   const { setUserList } = useGameData();
   const { showToast, showLoadingToast, updateToast } = useCustomToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!socket) return;
@@ -52,9 +48,8 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
           });
           setCreateRoomToastId(undefined);
         }
-
+        navigate(`/room/${response.room}`);
         // TODO: Clean inputs? (atm im using the roomDigits)
-        // TODO: Redirect to the url of the room (room/[roomId])
       } else {
         if (createRoomToastId) {
           updateToast({
@@ -122,8 +117,9 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
     if (copied) return;
     try {
       const roomNumber = +roomDigits.join('');
+      const URL_BASE = import.meta.env.VITE_APP_BASE_URL;
       navigator.clipboard.writeText(
-        `Room: ${roomNumber}\nPassword: ${roomPassword.trim()}`
+        `${URL_BASE}/room/${roomNumber}?pw=${roomPassword.trim()}`
       );
       setCopied(true);
       setTimeout(() => {
@@ -229,9 +225,11 @@ export const CreateNewRoom: FC<PropsI> = ({ setSelectedOption }) => {
           </ButtonBorderContainer>
         </div>
       </FormContainer>
-      <button type='button' onClick={() => setSelectedOption(undefined)}>
+      <button type='button' onClick={() => navigate('/home')}>
         Go back
       </button>
     </>
   );
 };
+
+export default CreateNewRoom;

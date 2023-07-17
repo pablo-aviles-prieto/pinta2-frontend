@@ -1,16 +1,21 @@
 import { FC } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { io } from 'socket.io-client';
+import { useNavigate } from 'react-router-dom';
 
-interface PropsI {
-  setIsRegistered: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export const RegisterUserForm: FC<PropsI> = ({ setIsRegistered }) => {
-  const { socket, username, setUsername, setSocket } = useSocket();
+export const RegisterUserForm: FC = () => {
+  const { socket, username, setUsername, setSocket, setIsRegistered } =
+    useSocket();
+  const navigate = useNavigate();
 
   const registerUser = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!username.trim()) {
+      // TODO: Display an error toast
+      return;
+    }
+
     if (!socket) {
       const newSocket = io('http://localhost:4000');
       newSocket.emit('register', username);
@@ -23,6 +28,7 @@ export const RegisterUserForm: FC<PropsI> = ({ setIsRegistered }) => {
 
     socket?.emit('register', username);
     setIsRegistered(true);
+    navigate('/home');
   };
 
   return (
@@ -42,7 +48,7 @@ export const RegisterUserForm: FC<PropsI> = ({ setIsRegistered }) => {
           className='flex-shrink-0 px-2 py-1 text-sm text-white bg-teal-500 border-4 border-teal-500 rounded hover:bg-teal-700 hover:border-teal-700'
           type='submit'
         >
-          Join
+          Acceder
         </button>
       </div>
     </form>

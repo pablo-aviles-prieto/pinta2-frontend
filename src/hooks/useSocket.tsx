@@ -11,6 +11,8 @@ interface SocketContextI {
   setUsername: React.Dispatch<React.SetStateAction<string>>;
   joinedRoom: number | undefined;
   setJoinedRoom: React.Dispatch<React.SetStateAction<number | undefined>>;
+  isRegistered: boolean;
+  setIsRegistered: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface PropsI {
@@ -26,6 +28,7 @@ export const SocketProvider: FC<PropsI> = ({ children }) => {
     DefaultEventsMap,
     DefaultEventsMap
   > | null>(null);
+  const [isRegistered, setIsRegistered] = useState(false);
 
   return (
     <SocketContext.Provider
@@ -36,6 +39,8 @@ export const SocketProvider: FC<PropsI> = ({ children }) => {
         setUsername,
         joinedRoom,
         setJoinedRoom,
+        isRegistered,
+        setIsRegistered,
       }}
     >
       {children}

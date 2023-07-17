@@ -1,39 +1,22 @@
-import { useState, useEffect } from 'react';
-import { RegisterUserForm } from '../components/RegisterUserForm';
-import { BodyContainer } from '../components/CanvasBoard/BodyContainer';
-import { useSocket } from '../hooks/useSocket';
-import { SelectRoomForm } from '../components/SelectRoomForm';
+import { useNavigate } from 'react-router-dom';
 
 const Homepage = () => {
-  const [isRegistered, setIsRegistered] = useState(false);
-  const { socket, setUsername, joinedRoom } = useSocket();
-  console.log('joinedRoom', joinedRoom);
-
-  useEffect(() => {
-    if (!isRegistered || !socket) return;
-
-    socket.on('disconnect', () => {
-      setIsRegistered(false);
-      setUsername('');
-    });
-
-    return () => {
-      if (isRegistered) {
-        socket.off('disconnect');
-      }
-    };
-  }, [isRegistered, socket]);
+  const navigate = useNavigate();
 
   return (
-    <div>
-      {!isRegistered ? (
-        <RegisterUserForm setIsRegistered={setIsRegistered} />
-      ) : !joinedRoom ? (
-        <SelectRoomForm />
-      ) : (
-        <BodyContainer />
-      )}
-    </div>
+    <>
+      <div>¿Quieres crear una sala, o unirte a una?</div>
+      <button
+        type='button'
+        className='mr-4'
+        onClick={() => navigate('/create-room')}
+      >
+        Crear
+      </button>
+      <button type='button' onClick={() => navigate('/join-room')}>
+        Unirte
+      </button>
+    </>
   );
 };
 

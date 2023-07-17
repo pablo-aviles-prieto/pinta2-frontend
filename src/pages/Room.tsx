@@ -1,37 +1,156 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { BodyContainer } from '../components/CanvasBoard/BodyContainer';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Socket, io } from 'socket.io-client';
+import { useModal } from '../hooks/useModal';
+import { DefaultEventsMap } from '@socket.io/component-emitter';
 
+// TODO: Prevent the user to go back when is in the /room route
 const Room = () => {
+  const [hasInternalPw, setHasInternalPw] = useState(false);
+  const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
+    null
+  );
   const [searchParams] = useSearchParams();
   const { roomId } = useParams();
-  const { socket, joinedRoom, setSocket } = useSocket();
-  const pw = searchParams.get('pw');
-
-  console.log('joinedRoom game', joinedRoom);
-  console.log('socket game', socket);
-  console.log('pw', pw);
-  console.log('roomId', roomId);
+  const {
+    socket,
+    joinedRoom,
+    setJoinedRoom,
+    setSocket,
+    isRegistered,
+    username,
+    setUsername,
+  } = useSocket();
+  const navigate = useNavigate();
+  const queryPw = searchParams.get('pw');
+  const {
+    RenderModal: UsernameModal,
+    closeModal: closeUsernameModal,
+    openModal: openUsernameModal,
+  } = useModal();
 
   useEffect(() => {
-    if (!socket) {
-      if (roomId && pw) {
-        // Check If the roomId exist and pw matches
-        // Set a state to show a modal to register the user (send to a new event in the back like 'register directly user')
-        // in that event, on the back, the user should be added to the users array, and into the room. Send a response event to this event
-        // The Register user modal should be closed, when there is socket, roomId, pw and joinedRoom
-        //////////////////////////////////
-        // const newSocket = io('http://localhost:4000');
-        // newSocket.emit('register', username);
-        // setSocket(newSocket);
+    // using a ref to avoid re-renders that would bug and create a second newSocket
+    // (even when checking !socket in the if condition)
+    if (!socketRef.current && roomId && queryPw) {
+      const newSocket = io('http://localhost:4000');
+      socketRef.current = newSocket;
+      setSocket(newSocket);
+      newSocket.emit('check room credentials', {
+        roomNumber: roomId,
+        roomPassword: queryPw,
+      });
+    }
+  }, [socket, roomId, queryPw]);
+
+  useEffect(() => {
+    if (joinedRoom && !queryPw && socket && isRegistered) {
+      setHasInternalPw(true);
+    }
+  }, [socket, joinedRoom, queryPw, isRegistered]);
+
+  useEffect(() => {
+    if ((!joinedRoom || !isRegistered) && !queryPw) {
+      if (isRegistered && !joinedRoom) {
+        navigate('/join-room', {
+          state: {
+            notRegistered: 'Introduzca las credenciales correctas',
+            from: location.pathname,
+          },
+        });
+      } else {
+        navigate('/', {
+          state: {
+            notRegistered: 'Para poder acceder, escriba un nombre',
+            from: location.pathname,
+          },
+        });
       }
     }
+  }, [joinedRoom, queryPw, isRegistered]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on(
+      'check room credentials response',
+      ({ message, success }: { success: boolean; message: string }) => {
+        if (!success) {
+          navigate('/', {
+            state: {
+              notRegistered: message,
+              from: location.pathname,
+            },
+          });
+        } else {
+          openUsernameModal();
+        }
+      }
+    );
+
+    return () => {
+      socket.off('check room credentials response');
+    };
   }, [socket]);
 
-  if (!socket || !roomId || !pw || !joinedRoom) {
-    return <div>Loading...</div>;
+  const onUsernameSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!username.trim()) {
+      // TODO: show toast, to indicate the user that has to put a username in the modal
+      return;
+    }
+
+    setJoinedRoom(roomId ? Number(roomId) : 9999);
+    closeUsernameModal();
+    socket?.emit('join room directly', {
+      roomNumber: roomId,
+      username,
+    });
+    // TODO: Display a toast to let know the user he joined the roomId
+  };
+
+  if (!socket || !roomId || (!queryPw && !hasInternalPw) || !joinedRoom) {
+    return (
+      <>
+        <div>Loading...</div>
+        <UsernameModal forbidClose>
+          <>
+            <div>Introduzca un nombre para unirse a la sala {roomId}</div>
+            <form className='w-full max-w-sm' onSubmit={onUsernameSubmit}>
+              <div className='flex items-center py-2 border-b border-teal-500'>
+                <input
+                  className='w-full px-2 py-1 mr-3 leading-tight text-gray-700 bg-transparent border-none appearance-none focus:outline-none'
+                  type='text'
+                  id='username'
+                  name='username'
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder='Enter a user name'
+                  aria-label='User name'
+                  autoFocus
+                />
+                <button
+                  className='flex-shrink-0 px-2 py-1 text-sm text-white bg-teal-500 border-4 border-teal-500 rounded hover:bg-teal-700 hover:border-teal-700'
+                  type='submit'
+                >
+                  Acceder
+                </button>
+                <button
+                  className='flex-shrink-0 px-2 py-1 ml-2 text-sm text-white bg-teal-500 border-4 border-teal-500 rounded hover:bg-teal-700 hover:border-teal-700'
+                  type='button'
+                  onClick={() => navigate('/')}
+                >
+                  Volver atrás
+                </button>
+              </div>
+            </form>
+          </>
+        </UsernameModal>
+      </>
+    );
   }
 
   return <BodyContainer />;

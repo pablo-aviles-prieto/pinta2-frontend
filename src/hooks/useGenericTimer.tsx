@@ -25,7 +25,7 @@ export const useGenericTimer = ({
 
     if (startCounter && count !== undefined) {
       // Initialize the worker with the current count
-      worker = new Worker('timer-worker.js');
+      worker = new Worker('/timer-worker.js');
       worker.postMessage({ startCounter, count });
 
       worker.onmessage = (e) => {

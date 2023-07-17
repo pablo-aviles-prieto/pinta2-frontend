@@ -42,7 +42,7 @@ export const useTurnCounter = ({ onCountDownComplete }: PropsI) => {
       workerRef.current.terminate();
     }
     // Initialize the worker with the current count
-    workerRef.current = new Worker('timer-worker.js');
+    workerRef.current = new Worker('/timer-worker.js');
     workerRef.current.postMessage({ startCounter, count });
 
     workerRef.current.onmessage = (e) => {
