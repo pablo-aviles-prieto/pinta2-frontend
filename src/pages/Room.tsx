@@ -6,7 +6,6 @@ import { Socket, io } from 'socket.io-client';
 import { useModal } from '../hooks/useModal';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
 
-// TODO: Prevent the user to go back when is in the /room route
 const Room = () => {
   const [hasInternalPw, setHasInternalPw] = useState(false);
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
@@ -30,6 +29,50 @@ const Room = () => {
     closeModal: closeUsernameModal,
     openModal: openUsernameModal,
   } = useModal();
+
+  // Avoid back and forward mouse buttons. Also F5 reload
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F5') {
+        e.preventDefault();
+        const confirmed = window.confirm(
+          '¿Estás seguro de que quieres salirte de la partida?'
+        );
+        if (confirmed) {
+          navigate('/', {
+            state: {
+              disconnectUser: true,
+            },
+          });
+        }
+      }
+    };
+
+    const handleMouseDown = (e: MouseEvent) => {
+      if (e.button === 3 || e.button === 4) {
+        console.log('Back button pressed');
+        e.preventDefault();
+        const confirmed = window.confirm(
+          '¿Estás seguro de que quieres salirte de la partida?'
+        );
+        if (confirmed) {
+          navigate('/', {
+            state: {
+              disconnectUser: true,
+            },
+          });
+        }
+      }
+    };
+
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   useEffect(() => {
     // using a ref to avoid re-renders that would bug and create a second newSocket

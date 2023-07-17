@@ -48,7 +48,9 @@ const CreateNewRoom: FC = () => {
           });
           setCreateRoomToastId(undefined);
         }
-        navigate(`/room/${response.room}`);
+        navigate(`/room/${response.room}`, {
+          replace: true,
+        });
         // TODO: Clean inputs? (atm im using the roomDigits)
       } else {
         if (createRoomToastId) {

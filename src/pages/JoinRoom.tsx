@@ -55,7 +55,7 @@ const JoinRoom: FC = () => {
           setJoinRoomToastId(undefined);
         }
 
-        navigate(`/room/${response.room}`);
+        navigate(`/room/${response.room}`, { replace: true });
 
         // TODO: Clear inputs?
       } else {
