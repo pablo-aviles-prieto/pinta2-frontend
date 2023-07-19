@@ -34,6 +34,8 @@ interface JoinRoomDirectlyResponse {
 export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
+  const [drawColor, setDrawColor] = useState('#df4b26');
+  const [drawStroke, setDrawStroke] = useState(5);
   const [possibleCategories, setPossibleCategories] = useState<string[]>([]);
   const [possibleTurnDuration, setPosibleTurnDuration] = useState<
     Record<string, number>
@@ -245,10 +247,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
         if (updatedLines[lineNumber]) {
           updatedLines[lineNumber].points = lineSegment.points;
         } else {
-          updatedLines.push({
-            tool: lineSegment.tool,
-            points: lineSegment.points,
-          });
+          updatedLines.push({ ...lineSegment });
         }
         return updatedLines;
       });
@@ -506,7 +505,15 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     isDrawing.current = true;
     const pos = e.target.getStage()?.getPointerPosition();
     if (!pos) return;
-    setLines([...lines, { tool, points: [pos.x, pos.y] }]);
+    setLines([
+      ...lines,
+      {
+        tool,
+        points: [pos.x, pos.y],
+        color: drawColor,
+        strokeWidth: drawStroke,
+      },
+    ]);
   };
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -585,6 +592,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   };
 
   return (
+    // TODO: Add color and strokeWidth to the lines, and handle it to receive'em
     // TODO: Extract the drawing tools into a component
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     // TODO: Disable the input when user is in turnScore ???
@@ -623,6 +631,19 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           Clear board
         </button>
       )}
+      {
+        <button
+          className='ml-6'
+          type='button'
+          onClick={() =>
+            setDrawColor((prevColor) =>
+              prevColor === '#df4b26' ? '#23ad01' : '#df4b26'
+            )
+          }
+        >
+          Green/red color
+        </button>
+      }
       <div className='py-5 bg-gray-300'>
         <div className='mx-auto flex gap-5 w-[1100px] h-[600px]'>
           <Stage
@@ -638,7 +659,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
                 <Line
                   key={i}
                   points={line.points}
-                  stroke='#df4b26'
+                  stroke={line.color ?? '#df4b26'}
                   strokeWidth={5}
                   tension={0.5}
                   lineCap='round'
