@@ -221,7 +221,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
 
     // Separate the useEffect, to listen to isPlaying changes
     socket.on('countdown preDraw start', () => {
-      console.log('CHECK isPlaying =>', isPlaying);
       const currentGameState = useGameData.getState().gameState;
       if (currentGameState.preTurn) {
         setGameState({ ...currentGameState, preTurn: false });
@@ -432,6 +431,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       setIsRegistered(false);
       setUsername('');
       // TODO: navigate to path '/' with a state prop 'notRegistered' in the navigate
+      // should be already re-directed with that states changeds
     });
 
     socket.on(
@@ -454,11 +454,15 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           newUsers && setUserList(newUsers);
           gameState && setGameState(gameState);
           isPlaying && setIsPlaying(isPlaying);
+          if (isPlaying) {
+            socket.emit('update users not playing', {
+              roomNumber: joinedRoom,
+            });
+          }
         }
       }
     );
 
-    // TODO: Create the routes to join directly to the room!
     // TODO: Apply some sound for the preTurnCount (for each of the 3 seconds)
     // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
     // TODO: Add a button to copy the link to a friend in the Board
@@ -592,8 +596,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   };
 
   return (
-    // TODO: Add color and strokeWidth to the lines, and handle it to receive'em
-    // TODO: Extract the drawing tools into a component
+    // TODO: Extract the drawing tools into a component (with the color and stroke)
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     // TODO: Disable the input when user is in turnScore ???
     // TODO: Add a restart game button for the owner (it should display a modal to confirm the action)!
