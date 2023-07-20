@@ -6,6 +6,7 @@ import CreateNewRoom from './pages/CreateNewRoom';
 import JoinRoom from './pages/JoinRoom';
 import ProtectRegisteredRoute from './pages/ProtectRegisteredRoute';
 
+// TODO: Redirect in the 404 Not found
 const routes = [
   {
     path: '/',

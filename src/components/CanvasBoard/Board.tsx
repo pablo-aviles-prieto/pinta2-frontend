@@ -16,6 +16,7 @@ import {
 } from '../../utils/const';
 import { useCustomToast } from '../../hooks/useCustomToast';
 import { GuessedWord } from '../GuessedWord';
+import { DrawingPanel } from './DrawingPanel';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -29,13 +30,11 @@ interface JoinRoomDirectlyResponse {
   gameState?: GameStateI;
 }
 
-// TODO: Should be a page and not a component!
-// TODO: Has to check for query params (room & pw), so user can access directly
 export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const [tool, setTool] = useState('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
-  const [drawColor, setDrawColor] = useState('#df4b26');
-  const [drawStroke, setDrawStroke] = useState(5);
+  const [drawColor, setDrawColor] = useState('#000000');
+  const [drawStroke, setDrawStroke] = useState(6);
   const [possibleCategories, setPossibleCategories] = useState<string[]>([]);
   const [possibleTurnDuration, setPosibleTurnDuration] = useState<
     Record<string, number>
@@ -596,10 +595,12 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   };
 
   return (
-    // TODO: Extract the drawing tools into a component (with the color and stroke)
+    // TODO: New user should recieve the lines even if not in game.
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     // TODO: Disable the input when user is in turnScore ???
     // TODO: Add a restart game button for the owner (it should display a modal to confirm the action)!
+    // TODO: Create a history of lines drew (for example, an id/index for each time the user write a line without
+    // leaving the mouse), so the user can go back and forth for last things drew
     <>
       {gameState.started &&
         gameState.turn !== undefined &&
@@ -620,34 +621,20 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       <div className='my-4'>
         <button onClick={() => handleTurnCounter(true)}>Restart timer</button>
       </div>
-      <select
-        value={tool}
-        onChange={(e) => {
-          setTool(e.target.value);
-        }}
-      >
-        <option value='pen'>Pen</option>
-        <option value='eraser'>Eraser</option>
-      </select>
       {(!gameState.started || gameState.drawer?.id === socket?.id) && (
         <button type='button' onClick={clearBoard}>
           Clear board
         </button>
       )}
-      {
-        <button
-          className='ml-6'
-          type='button'
-          onClick={() =>
-            setDrawColor((prevColor) =>
-              prevColor === '#df4b26' ? '#23ad01' : '#df4b26'
-            )
-          }
-        >
-          Green/red color
-        </button>
-      }
-      <div className='py-5 bg-gray-300'>
+      <div className='relative py-5 bg-gray-300'>
+        {/* TODO: only display it to the drawer and when not in game */}
+        <DrawingPanel
+          color={drawColor}
+          stroke={drawStroke}
+          setColor={setDrawColor}
+          setStroke={setDrawStroke}
+          setTool={setTool}
+        />
         <div className='mx-auto flex gap-5 w-[1100px] h-[600px]'>
           <Stage
             width={770}
@@ -655,6 +642,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             onMouseDown={handleMouseDown}
             onMousemove={handleMouseMove}
             onMouseup={handleMouseUp}
+            onMouseLeave={handleMouseUp}
             className='bg-white rounded-lg shadow-md'
           >
             <Layer>
@@ -663,7 +651,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
                   key={i}
                   points={line.points}
                   stroke={line.color ?? '#df4b26'}
-                  strokeWidth={5}
+                  strokeWidth={line.strokeWidth}
                   tension={0.5}
                   lineCap='round'
                   lineJoin='round'
