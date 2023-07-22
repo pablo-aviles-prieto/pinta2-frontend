@@ -40,6 +40,9 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     Record<string, number>
   >({});
   const [possibleWords, setPossibleWords] = useState<string[]>([]);
+  const [canvasCursorStyle, setCanvasCursorStyle] = useState(
+    `url('../../../public/svgs/pencil-tool.svg') 5 5, auto`
+  );
   const [displayGuessedWord, setDisplayGuessedWord] = useState(false);
   const [guessedMsgDisplayed, setGuessedMsgDisplayed] = useState<
     string | undefined
@@ -157,7 +160,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     },
   });
 
-  console.log('gameState', gameState);
+  // console.log('gameState', gameState);
   // console.log('userList', userList);
 
   useEffect(() => {
@@ -595,6 +598,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   };
 
   return (
+    // TODO: Remove unnecessary SVGs
     // TODO: New user should recieve the lines even if not in game.
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     // TODO: Disable the input when user is in turnScore ???
@@ -633,7 +637,9 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           stroke={drawStroke}
           setColor={setDrawColor}
           setStroke={setDrawStroke}
+          tool={tool}
           setTool={setTool}
+          setCanvasCursorStyle={setCanvasCursorStyle}
         />
         <div className='mx-auto flex gap-5 w-[1100px] h-[600px]'>
           <Stage
@@ -644,6 +650,10 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             onMouseup={handleMouseUp}
             onMouseLeave={handleMouseUp}
             className='bg-white rounded-lg shadow-md'
+            style={{
+              cursor:
+                gameState.started && !isDrawer ? 'auto' : canvasCursorStyle,
+            }}
           >
             <Layer>
               {lines.map((line, i) => (
