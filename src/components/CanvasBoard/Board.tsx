@@ -500,6 +500,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     setCategorySelected(category);
   };
 
+  // TODO: Check whenever the user was pressing mouse1 outisde the canvas,
+  // so it start drawing when entering the canvas
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
     if (
       !e.target ||
@@ -625,22 +627,23 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       <div className='my-4'>
         <button onClick={() => handleTurnCounter(true)}>Restart timer</button>
       </div>
-      {(!gameState.started || gameState.drawer?.id === socket?.id) && (
+      {(!gameState.started || isDrawer) && (
         <button type='button' onClick={clearBoard}>
           Clear board
         </button>
       )}
       <div className='relative py-5 bg-gray-300'>
-        {/* TODO: only display it to the drawer and when not in game */}
-        <DrawingPanel
-          color={drawColor}
-          stroke={drawStroke}
-          setColor={setDrawColor}
-          setStroke={setDrawStroke}
-          tool={tool}
-          setTool={setTool}
-          setCanvasCursorStyle={setCanvasCursorStyle}
-        />
+        {(!gameState.started || isDrawer) && (
+          <DrawingPanel
+            color={drawColor}
+            stroke={drawStroke}
+            setColor={setDrawColor}
+            setStroke={setDrawStroke}
+            tool={tool}
+            setTool={setTool}
+            setCanvasCursorStyle={setCanvasCursorStyle}
+          />
+        )}
         <div className='mx-auto flex gap-5 w-[1100px] h-[600px]'>
           <Stage
             width={770}

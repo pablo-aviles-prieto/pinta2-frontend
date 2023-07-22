@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { CirclePicker } from 'react-color';
 import { DrawEraser, DrawPencil } from '../Icons';
 
