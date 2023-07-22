@@ -31,7 +31,7 @@ export const DrawingPanel: FC<Props> = ({
         colors={[
           '#FF0000',
           '#FFA500',
-          '#FFFF00',
+          '#ffe600',
           '#008000',
           '#00FF00',
           '#40E0D0',
