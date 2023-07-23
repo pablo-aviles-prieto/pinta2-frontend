@@ -6,26 +6,32 @@ import { PALETTE_COLORS } from '../../utils/const';
 
 interface Props {
   color: string;
-  stroke: number;
-  tool: string;
+  pencilStroke: number;
+  eraserStroke: number;
+  tool: 'pen' | 'eraser';
   setColor: React.Dispatch<React.SetStateAction<string>>;
-  setStroke: React.Dispatch<React.SetStateAction<number>>;
-  setTool: React.Dispatch<React.SetStateAction<string>>;
+  setPencilStroke: React.Dispatch<React.SetStateAction<number>>;
+  setEraserStroke: React.Dispatch<React.SetStateAction<number>>;
+  setTool: React.Dispatch<React.SetStateAction<'pen' | 'eraser'>>;
   setCanvasCursorStyle: React.Dispatch<React.SetStateAction<string>>;
 }
 
 type SwappedTool = 'pen' | 'eraser';
 
-const MIN_WIDTH_STROKE = 4;
-const MAX_WIDTH_STROKE = 9;
+const MIN_PEN_WIDTH_STROKE = 5;
+const MAX_PEN_WIDTH_STROKE = 10;
+const MIN_ERASER_WIDTH_STROKE = 15;
+const MAX_ERASER_WIDTH_STROKE = 20;
 
 // TODO:? Add more width when eraser tool?
 export const DrawingPanel: FC<Props> = ({
   color,
-  stroke,
+  pencilStroke,
+  eraserStroke,
   tool,
   setColor,
-  setStroke,
+  setPencilStroke,
+  setEraserStroke,
   setTool,
   setCanvasCursorStyle,
 }) => {
@@ -62,23 +68,27 @@ export const DrawingPanel: FC<Props> = ({
         <input
           className='slider-vertical h-[100px] w-[8px] px-2'
           type='range'
-          min={MIN_WIDTH_STROKE}
-          max={MAX_WIDTH_STROKE}
-          value={stroke}
-          onChange={(e) => setStroke(Number(e.target.value))}
+          min={tool === 'pen' ? MIN_PEN_WIDTH_STROKE : MIN_ERASER_WIDTH_STROKE}
+          max={tool === 'pen' ? MAX_PEN_WIDTH_STROKE : MAX_ERASER_WIDTH_STROKE}
+          value={tool === 'pen' ? pencilStroke : eraserStroke}
+          onChange={(e) =>
+            tool === 'pen'
+              ? setPencilStroke(Number(e.target.value))
+              : setEraserStroke(Number(e.target.value))
+          }
         />
         <div className='text-xs font-bold h-[100px] flex flex-col-reverse items-center'>
-          {[...Array(MAX_WIDTH_STROKE - MIN_WIDTH_STROKE + 1).keys()].map(
-            (i) => (
-              <div
-                className='block w-6 my-[6px]'
-                key={i}
-                style={{
-                  borderTop: `${i + 2}px solid black`,
-                }}
-              />
-            )
-          )}
+          {[
+            ...Array(MAX_PEN_WIDTH_STROKE - MIN_PEN_WIDTH_STROKE + 1).keys(),
+          ].map((i) => (
+            <div
+              className='block w-6 my-[6px]'
+              key={i}
+              style={{
+                borderTop: `${i + 2}px solid black`,
+              }}
+            />
+          ))}
         </div>
       </div>
       <div className='flex flex-col justify-between'>

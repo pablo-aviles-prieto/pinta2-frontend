@@ -31,11 +31,13 @@ interface JoinRoomDirectlyResponse {
   gameState?: GameStateI;
 }
 
+// TODO: Print in the chat whenever a new game is started
 export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
-  const [tool, setTool] = useState('pen');
+  const [tool, setTool] = useState<'pen' | 'eraser'>('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
   const [drawColor, setDrawColor] = useState('#000000');
-  const [drawStroke, setDrawStroke] = useState(6);
+  const [pencilStroke, setPencilStroke] = useState(7);
+  const [eraserStroke, setEraserStroke] = useState(17);
   const [possibleCategories, setPossibleCategories] = useState<string[]>([]);
   const [possibleTurnDuration, setPosibleTurnDuration] = useState<
     Record<string, number>
@@ -523,7 +525,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
         tool,
         points: [pos.x, pos.y],
         color: drawColor,
-        strokeWidth: drawStroke,
+        strokeWidth: tool === 'pen' ? pencilStroke : eraserStroke,
       },
     ]);
   };
@@ -640,9 +642,11 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
         {(!gameState.started || isDrawer) && (
           <DrawingPanel
             color={drawColor}
-            stroke={drawStroke}
+            pencilStroke={pencilStroke}
+            eraserStroke={eraserStroke}
             setColor={setDrawColor}
-            setStroke={setDrawStroke}
+            setPencilStroke={setPencilStroke}
+            setEraserStroke={setEraserStroke}
             tool={tool}
             setTool={setTool}
             setCanvasCursorStyle={setCanvasCursorStyle}
