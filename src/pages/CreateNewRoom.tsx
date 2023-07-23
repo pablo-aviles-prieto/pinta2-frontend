@@ -120,6 +120,7 @@ const CreateNewRoom: FC = () => {
     try {
       const roomNumber = +roomDigits.join('');
       const URL_BASE = import.meta.env.VITE_APP_BASE_URL;
+      console.log('URL_BASE', URL_BASE);
       navigator.clipboard.writeText(
         `${URL_BASE}/room/${roomNumber}?pw=${roomPassword.trim()}`
       );

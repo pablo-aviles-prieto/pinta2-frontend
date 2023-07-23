@@ -34,3 +34,36 @@ export const MAX_POINTS_IN_SINGLE_ARRAY = 2500;
 export const DEFAULT_TURN_DURATION = 120; // in miliseconds
 export const DEFAULT_CATEGORY_SELECTED = 'Aleatorio';
 export const FALLBACK_USER_COLOR = '#7d7d7d';
+
+export const PALETTE_COLORS = [
+  '#FF0000',
+  '#FFA500',
+  '#FFE600',
+  '#008000',
+  '#00FF00',
+  '#40E0D0',
+  '#0000FF',
+  '#000080',
+  '#800080',
+  '#FF00FF',
+  '#A52A2A',
+  '#FFC0CB',
+  '#808080',
+  '#000000',
+];
+export const DARKER_COLORS_MAP = {
+  '#FF0000': '#ff2525',
+  '#FFA500': '#ffb730',
+  '#FFE600': '#ffeb39',
+  '#008000': '#00c200',
+  '#00FF00': '#35ff35',
+  '#40E0D0': '#2d998e',
+  '#0000FF': '#2323ff',
+  '#000080': '#0000be',
+  '#800080': '#b800b8',
+  '#FF00FF': '#ff31ff',
+  '#A52A2A': '#d63838',
+  '#FFC0CB': '#ffd9df',
+  '#808080': '#acacac',
+  '#000000': '#353535',
+};

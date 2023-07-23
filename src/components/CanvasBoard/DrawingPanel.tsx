@@ -1,6 +1,8 @@
 import { FC } from 'react';
 import { CirclePicker } from 'react-color';
 import { DrawEraser, DrawPencil } from '../Icons';
+import { getBase64SVGURL } from '../../utils';
+import { PALETTE_COLORS } from '../../utils/const';
 
 interface Props {
   color: string;
@@ -14,8 +16,8 @@ interface Props {
 
 type SwappedTool = 'pen' | 'eraser';
 
-const minWidthStroke = 4;
-const maxWidthStroke = 9;
+const MIN_WIDTH_STROKE = 4;
+const MAX_WIDTH_STROKE = 9;
 
 // TODO:? Add more width when eraser tool?
 export const DrawingPanel: FC<Props> = ({
@@ -27,10 +29,17 @@ export const DrawingPanel: FC<Props> = ({
   setTool,
   setCanvasCursorStyle,
 }) => {
-  const onToolChange = (tool: SwappedTool) => {
+  const onToolChange = ({
+    tool,
+    color,
+  }: {
+    tool: SwappedTool;
+    color: string;
+  }) => {
+    const cursorDataURL = getBase64SVGURL(color);
     const cursorStyle =
       tool === 'pen'
-        ? `url('../../../public/svgs/pencil-tool.svg') 5 5, auto`
+        ? `url(${cursorDataURL}) 5 5,  auto`
         : `url('../../../public/svgs/eraser-tool.svg') 1 19, auto`;
     setCanvasCursorStyle(cursorStyle);
     setTool(tool);
@@ -43,24 +52,9 @@ export const DrawingPanel: FC<Props> = ({
         circleSize={30}
         circleSpacing={6}
         color={color}
-        colors={[
-          '#FF0000',
-          '#FFA500',
-          '#ffe600',
-          '#008000',
-          '#00FF00',
-          '#40E0D0',
-          '#0000FF',
-          '#000080',
-          '#800080',
-          '#FF00FF',
-          '#A52A2A',
-          '#FFC0CB',
-          '#808080',
-          '#000000',
-        ]}
+        colors={PALETTE_COLORS}
         onChange={(color) => {
-          onToolChange('pen');
+          onToolChange({ tool: 'pen', color: color.hex });
           setColor(color.hex);
         }}
       />
@@ -68,21 +62,23 @@ export const DrawingPanel: FC<Props> = ({
         <input
           className='slider-vertical h-[100px] w-[8px] px-2'
           type='range'
-          min={minWidthStroke}
-          max={maxWidthStroke}
+          min={MIN_WIDTH_STROKE}
+          max={MAX_WIDTH_STROKE}
           value={stroke}
           onChange={(e) => setStroke(Number(e.target.value))}
         />
         <div className='text-xs font-bold h-[100px] flex flex-col-reverse items-center'>
-          {[...Array(maxWidthStroke - minWidthStroke + 1).keys()].map((i) => (
-            <div
-              className='block w-6 my-[6px]'
-              key={i}
-              style={{
-                borderTop: `${i + 2}px solid black`,
-              }}
-            />
-          ))}
+          {[...Array(MAX_WIDTH_STROKE - MIN_WIDTH_STROKE + 1).keys()].map(
+            (i) => (
+              <div
+                className='block w-6 my-[6px]'
+                key={i}
+                style={{
+                  borderTop: `${i + 2}px solid black`,
+                }}
+              />
+            )
+          )}
         </div>
       </div>
       <div className='flex flex-col justify-between'>
@@ -91,7 +87,7 @@ export const DrawingPanel: FC<Props> = ({
             tool === 'pen' && 'shadow-sm'
           }`}
         >
-          <button onClick={() => onToolChange('pen')}>
+          <button onClick={() => onToolChange({ tool: 'pen', color })}>
             <DrawPencil width={45} height={40} />
           </button>
         </div>
@@ -100,7 +96,7 @@ export const DrawingPanel: FC<Props> = ({
             tool === 'eraser' && 'shadow-sm'
           }`}
         >
-          <button onClick={() => onToolChange('eraser')}>
+          <button onClick={() => onToolChange({ tool: 'eraser', color })}>
             <DrawEraser width={45} height={40} />
           </button>
         </div>

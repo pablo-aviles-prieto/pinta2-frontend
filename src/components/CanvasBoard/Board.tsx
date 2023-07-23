@@ -17,6 +17,7 @@ import {
 import { useCustomToast } from '../../hooks/useCustomToast';
 import { GuessedWord } from '../GuessedWord';
 import { DrawingPanel } from './DrawingPanel';
+import { getBase64SVGURL } from '../../utils';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -40,9 +41,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     Record<string, number>
   >({});
   const [possibleWords, setPossibleWords] = useState<string[]>([]);
-  const [canvasCursorStyle, setCanvasCursorStyle] = useState(
-    `url('../../../public/svgs/pencil-tool.svg') 5 5, auto`
-  );
+  const [canvasCursorStyle, setCanvasCursorStyle] = useState(`auto`);
   const [displayGuessedWord, setDisplayGuessedWord] = useState(false);
   const [guessedMsgDisplayed, setGuessedMsgDisplayed] = useState<
     string | undefined
@@ -162,6 +161,11 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
 
   // console.log('gameState', gameState);
   // console.log('userList', userList);
+
+  useEffect(() => {
+    const cursorDataURL = getBase64SVGURL(drawColor);
+    setCanvasCursorStyle(`url(${cursorDataURL}) 5 5,  auto`);
+  }, []);
 
   useEffect(() => {
     setIsDrawer(socket?.id === gameState.drawer?.id);
