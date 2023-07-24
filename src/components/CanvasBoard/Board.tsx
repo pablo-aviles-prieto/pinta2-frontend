@@ -18,6 +18,7 @@ import { useCustomToast } from '../../hooks/useCustomToast';
 import { GuessedWord } from '../GuessedWord';
 import { DrawingPanel } from './DrawingPanel';
 import { getBase64SVGURL } from '../../utils';
+import { UserBoard } from '../UserList/UserBoard';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -638,7 +639,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
 
   return (
     // TODO: Remove unnecessary SVGs
-    // TODO: New user should recieve the lines even if not in game.
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     // TODO: Disable the input when user is in turnScore ???
     // TODO: Add a restart game button for the owner (it should display a modal to confirm the action)!
@@ -670,6 +670,9 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
         </button>
       )}
       <div className='relative py-5 bg-gray-300'>
+        {/* TODO: Restyle the width of canvas, userList and chat */}
+        {/* TODO: Should not be absoluted, just staying on the left of the canvas  */}
+        <UserBoard extraStyles='absolute left-5' />
         {(!gameState.started || isDrawer) && (
           <DrawingPanel
             color={drawColor}

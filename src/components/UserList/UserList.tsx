@@ -1,7 +1,7 @@
 import { useGameData } from '../../hooks/useGameData';
 
-// TODO: Set another color for the user
 // TODO: Refactor component to accept props to hide some total or turn score
+// Plain user list component. Has to show no score, or turnScores, or totalScores or both of them
 export const UserList = () => {
   const { userList, gameState } = useGameData();
 
