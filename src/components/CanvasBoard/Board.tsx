@@ -201,10 +201,17 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
 
           const currentGameState =
             newGameState ?? useGameData.getState().gameState;
+          const currentUserList = useGameData.getState().userList;
+
+          // if there is newUser joining, we check if there is drawer, in that case the drawer
+          // will hydrate the new user, if it doesnt exist, it will get the 1st user in the array
+          // (should be the owner), and hydrate the new user
           if (
             newUser &&
-            !currentGameState.preTurn &&
-            socket?.id === currentGameState.drawer?.id
+            ((currentGameState.drawer?.id &&
+              socket?.id === currentGameState.drawer?.id) ||
+              (!currentGameState.drawer?.id &&
+                socket?.id === currentUserList[0]?.id))
           ) {
             socket.emit('hydrate new player', {
               newUser,
