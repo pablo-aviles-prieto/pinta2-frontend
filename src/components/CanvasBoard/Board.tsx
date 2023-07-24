@@ -578,6 +578,42 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const handleMouseUp = () => {
     isDrawing.current = false;
   };
+  const handleMouseEnter = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    if (e.evt.buttons === 1) {
+      // TODO: Create logic to draw when coming from outside
+      if (
+        !e.target ||
+        (gameState.started && gameState.drawer?.id !== socket?.id)
+      ) {
+        return;
+      }
+
+      isDrawing.current = true;
+      const pos = e.target.getStage()?.getPointerPosition();
+      if (!pos) return;
+      const newLines = [...lines];
+      newLines.push({
+        tool,
+        points: [pos.x, pos.y],
+        color: drawColor,
+        strokeWidth: tool === 'pen' ? pencilStroke : eraserStroke,
+      });
+      console.log('lines', lines);
+      console.log('newLines', newLines);
+      setLines((prevLines) => {
+        console.log('prevLines', prevLines);
+        return [
+          ...prevLines,
+          {
+            tool,
+            points: [pos.x, pos.y],
+            color: drawColor,
+            strokeWidth: tool === 'pen' ? pencilStroke : eraserStroke,
+          },
+        ];
+      });
+    }
+  };
 
   const clearBoard = () => {
     setLines([]);
@@ -660,6 +696,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             onMousemove={handleMouseMove}
             onMouseup={handleMouseUp}
             onMouseLeave={handleMouseUp}
+            onMouseEnter={handleMouseEnter}
             className='bg-white rounded-lg shadow-md'
             style={{
               cursor:
