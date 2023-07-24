@@ -31,6 +31,7 @@ interface JoinRoomDirectlyResponse {
   gameState?: GameStateI;
 }
 
+// TODO: IMPORTANT There is a bug when hte user join directly to the room, and then press the disconnect button
 // TODO: Print in the chat whenever a new game is started
 export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const [tool, setTool] = useState<'pen' | 'eraser'>('pen');
@@ -506,16 +507,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     setCategorySelected(category);
   };
 
-  // TODO: Check whenever the user was pressing mouse1 outisde the canvas,
-  // so it start drawing when entering the canvas
-  const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
-    if (
-      !e.target ||
-      (gameState.started && gameState.drawer?.id !== socket?.id)
-    ) {
-      return;
-    }
-
+  const handleStartDrawing = (e: Konva.KonvaEventObject<MouseEvent>) => {
     isDrawing.current = true;
     const pos = e.target.getStage()?.getPointerPosition();
     if (!pos) return;
@@ -530,6 +522,35 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     ]);
   };
 
+  const handleMouseEnter = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    if (e.evt.buttons === 1) {
+      if (
+        !e.target ||
+        (gameState.started && gameState.drawer?.id !== socket?.id)
+      ) {
+        return;
+      }
+      handleStartDrawing(e);
+    }
+  };
+
+  const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    if (
+      !e.target ||
+      (gameState.started && gameState.drawer?.id !== socket?.id)
+    ) {
+      return;
+    }
+    handleStartDrawing(e);
+  };
+
+  // TODO: Have to improve performance, since if the user wnat to fill an area drawing a lot of lines
+  // in the same section, it creates a lot of data in the lines array, specially if the user does it
+  // on a canvas edge, creating tons of new arrays
+  // IMPORTANT 1 possible solution is to expand the canvas, but the drawing area (visible area where the lines
+  // are going to be displayed) is a bit less than the whole canvas, so if the user try to fill an area
+  // near corners, i could manage it as a single line, since theorically the user didnt leave the canvas
+  // only left the drawing/visible area, so it doesnt create hundred of unnecessary new lines
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
     // no drawing - skipping
     if (
@@ -544,75 +565,42 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     const point = stage?.getPointerPosition();
     if (!point) return;
 
-    const newLines = [...lines];
-    const lastLine = newLines[newLines.length - 1];
+    // Logic under the setter setLines, to get the updated prevLines
+    setLines((prevLines) => {
+      const newLines = [...prevLines];
+      const lastLine = newLines[newLines.length - 1];
 
-    // If lastLine has reached the limit, start a new line
-    if (lastLine.points.length >= MAX_POINTS_IN_SINGLE_ARRAY) {
-      const newLine = {
-        ...lastLine,
-        // Add the last point of the old line as the first point of the new line to avoid a gap
-        points: [...lastLine.points.slice(-2), point.x, point.y],
-      };
-      newLines.push(newLine);
-      socket?.emit('new segment', {
-        lineLength: newLines.length - 1,
-        lineSegment: newLine,
-        roomNumber: joinedRoom,
-      });
-    } else {
-      // add point to the existing line
-      lastLine.points = lastLine.points.concat([point.x, point.y]);
-      // replace the last line in newLines with the updated lastLine
-      newLines[newLines.length - 1] = lastLine;
-      socket?.emit('new segment', {
-        lineLength: newLines.length - 1,
-        lineSegment: lastLine,
-        roomNumber: joinedRoom,
-      });
-    }
+      // If lastLine has reached the limit, start a new line
+      if (lastLine.points.length >= MAX_POINTS_IN_SINGLE_ARRAY) {
+        const newLine = {
+          ...lastLine,
+          // Add the last point of the old line as the first point of the new line to avoid a gap
+          points: [...lastLine.points.slice(-2), point.x, point.y],
+        };
+        newLines.push(newLine);
+        socket?.emit('new segment', {
+          lineLength: newLines.length - 1,
+          lineSegment: newLine,
+          roomNumber: joinedRoom,
+        });
+      } else {
+        // add point to the existing line
+        lastLine.points = lastLine.points.concat([point.x, point.y]);
+        // replace the last line in newLines with the updated lastLine
+        newLines[newLines.length - 1] = lastLine;
+        socket?.emit('new segment', {
+          lineLength: newLines.length - 1,
+          lineSegment: lastLine,
+          roomNumber: joinedRoom,
+        });
+      }
 
-    setLines(newLines);
+      return newLines;
+    });
   };
 
   const handleMouseUp = () => {
     isDrawing.current = false;
-  };
-  const handleMouseEnter = (e: Konva.KonvaEventObject<MouseEvent>) => {
-    if (e.evt.buttons === 1) {
-      // TODO: Create logic to draw when coming from outside
-      if (
-        !e.target ||
-        (gameState.started && gameState.drawer?.id !== socket?.id)
-      ) {
-        return;
-      }
-
-      isDrawing.current = true;
-      const pos = e.target.getStage()?.getPointerPosition();
-      if (!pos) return;
-      const newLines = [...lines];
-      newLines.push({
-        tool,
-        points: [pos.x, pos.y],
-        color: drawColor,
-        strokeWidth: tool === 'pen' ? pencilStroke : eraserStroke,
-      });
-      console.log('lines', lines);
-      console.log('newLines', newLines);
-      setLines((prevLines) => {
-        console.log('prevLines', prevLines);
-        return [
-          ...prevLines,
-          {
-            tool,
-            points: [pos.x, pos.y],
-            color: drawColor,
-            strokeWidth: tool === 'pen' ? pencilStroke : eraserStroke,
-          },
-        ];
-      });
-    }
   };
 
   const clearBoard = () => {
