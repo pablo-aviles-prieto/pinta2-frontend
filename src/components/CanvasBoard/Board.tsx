@@ -670,9 +670,9 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
         </button>
       )}
       <div className='relative py-5 bg-gray-300'>
-        {/* TODO: Restyle the width of canvas, userList and chat */}
-        {/* TODO: Should not be absoluted, just staying on the left of the canvas  */}
-        <UserBoard extraStyles='absolute left-5' />
+        {/* TODO: Restyle the width of canvas, userList and chat! */}
+        {/* TODO: UJserBoard should not be absoluted, just staying on the left of the canvas!  */}
+        <UserBoard extraStyles='absolute left-5 w-36' />
         {(!gameState.started || isDrawer) && (
           <DrawingPanel
             color={drawColor}

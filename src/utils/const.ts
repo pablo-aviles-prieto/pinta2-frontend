@@ -51,7 +51,7 @@ export const PALETTE_COLORS = [
   '#808080',
   '#000000',
 ];
-export const DARKER_COLORS_MAP = {
+export const LIGHTER_COLORS_MAP = {
   '#FF0000': '#ff2525',
   '#FFA500': '#ffb730',
   '#FFE600': '#ffeb39',
