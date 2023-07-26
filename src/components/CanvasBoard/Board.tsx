@@ -301,6 +301,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
 
     socket.on('pre turn no drawer', ({ message }: { message: string }) => {
       // TODO: Print the message somewhere in the UI for the no drawers
+      // display it on the WordContainer component, where the word lays
       console.log('message no drawer', message);
     });
 

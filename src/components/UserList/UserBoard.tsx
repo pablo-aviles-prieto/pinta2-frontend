@@ -1,6 +1,7 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useGameData } from '../../hooks/useGameData';
 import React from 'react';
+import { useSocket } from '../../hooks/useSocket';
 
 interface Props {
   extraStyles?: string;
@@ -17,6 +18,19 @@ const Divider = () => {
 // User list displayed in the container board
 export const UserBoard: FC<Props> = ({ extraStyles }) => {
   const { userList, gameState } = useGameData();
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('user guessed', ({ msg }: { msg: string }) => {
+      console.log('CHCEK user board comp', msg);
+    });
+
+    return () => {
+      socket.off('user guessed');
+    };
+  }, [socket]);
 
   const renderImg = (isDrawer: boolean) => {
     return isDrawer ? (
@@ -48,23 +62,38 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
                 const user = userList.find((user) => user.id === key);
                 const colorUser = user ? user.color.toLowerCase() : '#ff0000';
                 return (
+                  // TODO: Dont show image at all when player not playing the round
+                  // (or use a stop image or something alike)
                   <React.Fragment key={key}>
                     {i > 0 && <Divider />}
                     <li className='p-3'>
                       <div
-                        className={`w-20 h-20 m-auto mb-2 bg-transparent rounded-full 
+                        className={`w-20 h-20 m-auto mb-1 bg-transparent rounded-full 
                         overflow-hidden border-4`}
-                        style={{ borderColor: colorUser }}
+                        style={{
+                          borderColor: colorUser,
+                          backgroundColor: colorUser,
+                        }}
                       >
+                        {/* TODO: Render pencil SVG near photo of drawer */}
                         {renderImg(user?.id === gameState.drawer?.id)}
                       </div>
                       {/* TODO: Style the turnScores and totalScores */}
-                      <p className='text-center'>
+                      <div className='text-center'>
+                        <p className='text-xl leading-6'>{val.name}</p>
+                        <p className='leading-5'>
+                          <span className='text-lg font-bold leading-5'>
+                            {val.value}
+                          </span>
+                          <span className='text-xs leading-5'>pts</span>
+                        </p>
+                      </div>
+                      {/* <p className='text-center'>
                         {val.name} - Total:{val.value} / Turno:
                         {!gameState.turnScores
                           ? 0
                           : gameState.turnScores[key]?.value ?? 0}
-                      </p>
+                      </p> */}
                     </li>
                   </React.Fragment>
                 );
@@ -74,15 +103,16 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
                 {i > 0 && <Divider />}
                 <li className='p-3'>
                   <div
-                    className={`w-20 h-20 m-auto mb-2 bg-transparent rounded-full 
-                    overflow-hidden border-4`}
-                    style={{ borderColor: user.color }}
+                    className={`w-20 h-20 m-auto mb-1 bg-transparent rounded-full 
+                    overflow-hidden border-4 flex items-center justify-center`}
+                    style={{
+                      borderColor: user.color,
+                      backgroundColor: user.color,
+                    }}
                   >
-                    <img
-                      className='max-w-none w-[97%]'
-                      src='../../../public/imgs/painter.png'
-                      alt='Pintando...'
-                    />
+                    <p className='text-5xl'>
+                      {user.name.trim().slice(0, 1).toUpperCase()}
+                    </p>
                   </div>
                   <p className='text-center'>{user.name}</p>
                 </li>
