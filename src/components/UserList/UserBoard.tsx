@@ -1,7 +1,8 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useGameData } from '../../hooks/useGameData';
 import React from 'react';
 import { useSocket } from '../../hooks/useSocket';
+import { GreenArrowUp } from '../Icons';
 
 interface Props {
   extraStyles?: string;
@@ -17,14 +18,16 @@ const Divider = () => {
 // of points are getting for that guessing. It should have a duration of 5 secs top.
 // User list displayed in the container board
 export const UserBoard: FC<Props> = ({ extraStyles }) => {
+  const [fadeUpAnimation, setFadeUpAnimation] = useState(false);
   const { userList, gameState } = useGameData();
   const { socket } = useSocket();
-
+  console.log('fadeUpAnimation', fadeUpAnimation);
   useEffect(() => {
     if (!socket) return;
 
     socket.on('user guessed', ({ msg }: { msg: string }) => {
       console.log('CHCEK user board comp', msg);
+      setFadeUpAnimation(true);
     });
 
     return () => {
@@ -48,6 +51,8 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
     );
   };
 
+  // const handleFadeUpAnimation = useCallback
+
   return (
     <div
       className={`rounded-lg bg-indigo-100 border border-emerald-500 ${
@@ -67,18 +72,38 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
                   <React.Fragment key={key}>
                     {i > 0 && <Divider />}
                     <li className='p-3'>
-                      <div
-                        className={`w-20 h-20 m-auto mb-1 bg-transparent rounded-full 
+                      <div className='relative'>
+                        <div
+                          className={`w-20 h-20 m-auto mb-1 rounded-full 
                         overflow-hidden border-4`}
-                        style={{
-                          borderColor: colorUser,
-                          backgroundColor: colorUser,
-                        }}
-                      >
-                        {/* TODO: Render pencil SVG near photo of drawer */}
-                        {renderImg(user?.id === gameState.drawer?.id)}
+                          style={{
+                            borderColor: colorUser,
+                            backgroundColor: colorUser,
+                          }}
+                        >
+                          {/* TODO: Render pencil SVG near photo of drawer */}
+                          {renderImg(user?.id === gameState.drawer?.id)}
+                          {gameState.turnScores && (
+                            <div
+                              className={`absolute -bottom-5 -right-5 transition-all duration-1000 ${
+                                gameState.turnScores[key]?.value
+                                  ? 'top-3 opacity-100'
+                                  : 'top-[70px] opacity-0'
+                              }`}
+                            >
+                              <div className='relative'>
+                                <GreenArrowUp width={85} height={85} />
+                                <p
+                                  className={`absolute text-xl font-bold text-center top-5 left-[50%]
+                                  -translate-x-[50%]`}
+                                >
+                                  {gameState.turnScores[key]?.value}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      {/* TODO: Style the turnScores and totalScores */}
                       <div className='text-center'>
                         <p className='text-xl leading-6'>{val.name}</p>
                         <p className='leading-5'>
@@ -88,12 +113,6 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
                           <span className='text-xs leading-5'>pts</span>
                         </p>
                       </div>
-                      {/* <p className='text-center'>
-                        {val.name} - Total:{val.value} / Turno:
-                        {!gameState.turnScores
-                          ? 0
-                          : gameState.turnScores[key]?.value ?? 0}
-                      </p> */}
                     </li>
                   </React.Fragment>
                 );

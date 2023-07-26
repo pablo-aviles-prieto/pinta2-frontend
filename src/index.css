@@ -34,6 +34,11 @@ input[type='number'] {
   width: auto;
 }
 
+.slider-vertical {
+  writing-mode: bt-lr; /* IE */
+  -webkit-appearance: slider-vertical; /* WebKit */
+}
+
 /* Zoom in animation */
 @keyframes zoomInOut {
   0% {
@@ -60,9 +65,4 @@ input[type='number'] {
   animation-name: zoomInOut;
   animation-duration: 3s; /* 3s in total, 0.5s to zoom in, 2s to stay, 0.5s to zoom out */
   animation-fill-mode: both;
-}
-
-.slider-vertical {
-  writing-mode: bt-lr; /* IE */
-  -webkit-appearance: slider-vertical; /* WebKit */
 }

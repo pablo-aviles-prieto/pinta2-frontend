@@ -7,3 +7,4 @@ export { CloseSquare } from './CloseSquare';
 export { Pencil } from './Pencil';
 export { DrawPencil } from './DrawPencil';
 export { DrawEraser } from './DrawEraser';
+export { GreenArrowUp } from './GreenArrowUp';
