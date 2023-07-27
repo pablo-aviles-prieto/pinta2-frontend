@@ -50,7 +50,6 @@ const Room = () => {
 
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button === 3 || e.button === 4) {
-        console.log('Back button pressed');
         e.preventDefault();
         const confirmed = window.confirm(
           '¿Estás seguro de que quieres salirte de la partida?'

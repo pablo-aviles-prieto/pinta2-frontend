@@ -3,6 +3,7 @@ import { useGameData } from '../../hooks/useGameData';
 import React from 'react';
 import { GreenArrowUp, PencilStraight } from '../Icons';
 import { useSocket } from '../../hooks/useSocket';
+import { UserRoomI } from '../../interfaces';
 
 interface Props {
   extraStyles?: string;
@@ -14,20 +15,38 @@ const Divider = () => {
 
 // User list displayed in the container board
 export const UserBoard: FC<Props> = ({ extraStyles }) => {
-  const { userList, gameState } = useGameData();
+  const { userList, gameState, usersNotPlaying } = useGameData();
   const { socket } = useSocket();
 
-  const renderImg = (isDrawer: boolean) => {
+  const renderImg = ({
+    isDrawer,
+    usersNotPlaying,
+    user,
+  }: {
+    isDrawer: boolean;
+    usersNotPlaying: string[];
+    user: UserRoomI | undefined;
+  }) => {
+    // In case that a user is in the usersNotPlaying array, displaying a forbidden img
+    if (user && usersNotPlaying.includes(user.id)) {
+      return (
+        <img
+          className='w-full max-w-none'
+          src='../../../public/imgs/forbidden.webp'
+          alt='Pintando...'
+        />
+      );
+    }
     return isDrawer ? (
       <img
         className='max-w-none w-[97%]'
-        src='../../../public/imgs/painter.png'
+        src='../../../public/imgs/painter.webp'
         alt='Pintando...'
       />
     ) : (
       <img
         className='max-w-none w-[115%]'
-        src='../../../public/imgs/inspector-gadget.png'
+        src='../../../public/imgs/inspector-gadget.webp'
         alt='Investigando...'
       />
     );
@@ -68,7 +87,11 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
                               <PencilStraight width={50} height={50} />
                             </div>
                           )}
-                          {renderImg(user?.id === gameState.drawer?.id)}
+                          {renderImg({
+                            isDrawer: user?.id === gameState.drawer?.id,
+                            usersNotPlaying,
+                            user,
+                          })}
                           {gameState.turnScores && (
                             <div
                               className={`absolute -bottom-5 -right-5 transition-all duration-1000 ${

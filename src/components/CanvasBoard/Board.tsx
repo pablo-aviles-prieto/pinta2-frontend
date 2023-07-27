@@ -76,6 +76,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     setTurnDuration,
     setIsDrawer,
     setIsPlaying,
+    setUsersNotPlaying,
   } = useGameData();
   const {
     count: turnCount,
@@ -203,6 +204,17 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           const currentGameState =
             newGameState ?? useGameData.getState().gameState;
           const currentUserList = useGameData.getState().userList;
+          const currentusersNotPlaying = useGameData.getState().usersNotPlaying;
+
+          // Storing the new user in the array state
+          if (
+            newUser &&
+            currentGameState.started &&
+            !currentGameState.endGame &&
+            !currentGameState.preTurn
+          ) {
+            setUsersNotPlaying([...currentusersNotPlaying, newUser.id]);
+          }
 
           // if there is newUser joining, we check if there is drawer, in that case the drawer
           // will hydrate the new user, if it doesnt exist, it will get the 1st user in the array
@@ -218,6 +230,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
               newUser,
               turnCount,
               draw: lines,
+              roomNumber: joinedRoom,
             });
           }
 
@@ -247,6 +260,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       }
       handlePreTurnCounter(true);
       clearBoard();
+      setUsersNotPlaying([]);
     });
 
     return () => {
@@ -423,13 +437,27 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       ({
         turnCount,
         draw,
+        usersNotPlaying,
       }: {
         turnCount: number | undefined;
         draw: LinesI[];
+        usersNotPlaying: string[];
       }) => {
         if (turnCount) {
           resetTurnCounter(turnCount);
           setTurnStartCounter(true);
+        }
+
+        const currentGameState = useGameData.getState().gameState;
+        // Storing the new user in the array state
+        if (
+          currentGameState.started &&
+          !currentGameState.endGame &&
+          !currentGameState.preTurn
+        ) {
+          // For new users, this is the latest event recieved when joining a room
+          // since has a timeout of 300ms on the back, so has the usersNotPlaying up to date
+          setUsersNotPlaying([...usersNotPlaying, socket.id]);
         }
         setLines(draw);
       }

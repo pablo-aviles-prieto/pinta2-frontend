@@ -9,3 +9,4 @@ export { DrawPencil } from './DrawPencil';
 export { DrawEraser } from './DrawEraser';
 export { GreenArrowUp } from './GreenArrowUp';
 export { PencilStraight } from './PencilStraight';
+export { Forbidden } from './Forbidden';

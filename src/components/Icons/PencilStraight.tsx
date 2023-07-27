@@ -6,6 +6,8 @@ export const PencilStraight = (props: SVGProps<SVGSVGElement>) => (
     fill='none'
     stroke='#000'
     strokeWidth={0}
+    // TODO: Merge this component into Pencil, using a prop for the Transform
+    // this transform, is to put straight the pencil for the userList
     transform='scale(-1 1) rotate(-45)'
     viewBox='0 0 24 24'
     {...props}

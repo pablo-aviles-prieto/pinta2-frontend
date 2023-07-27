@@ -111,7 +111,9 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
       >
         <input
           disabled={isPlaying}
-          placeholder='Type a message...'
+          placeholder={
+            isPlaying ? '🚫 Espera al siguiente turno' : 'Escribe un mensaje...'
+          }
           onChange={(e) => setMessage(e.target.value)}
           value={message}
           className='w-full px-2 outline-none focus:outline-none ring-0 focus:ring-0'

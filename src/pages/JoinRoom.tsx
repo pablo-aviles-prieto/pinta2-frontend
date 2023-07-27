@@ -44,9 +44,10 @@ const JoinRoom: FC = () => {
         setJoinedRoom(response.room);
         response.newUsers && setUserList(response.newUsers);
         response.gameState && setGameState(response.gameState);
-        response.isPlaying && setIsPlaying(response.isPlaying);
+        // response.isPlaying && setIsPlaying(response.isPlaying);
 
         if (response.isPlaying) {
+          setIsPlaying(response.isPlaying);
           socket.emit('update users not playing', {
             roomNumber: response.room,
           });

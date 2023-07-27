@@ -13,12 +13,14 @@ interface GameDataStore {
   turnDuration: number | null; // stored in seconds
   isDrawer: boolean;
   isPlaying: boolean;
+  usersNotPlaying: string[];
   setUserList: (userList: UserRoomI[]) => void;
   setGameState: (gameState: GameStateI) => void;
   setCategorySelected: (categorySelected: string | null) => void;
   setTurnDuration: (turnDuration: number | null) => void;
   setIsDrawer: (condition: boolean) => void;
   setIsPlaying: (isPlaying: boolean) => void;
+  setUsersNotPlaying: (usersPlaying: string[]) => void;
 }
 
 const INIT_GAME_STATE = {
@@ -33,6 +35,7 @@ export const useGameData = create<GameDataStore>((set) => {
     turnDuration: DEFAULT_TURN_DURATION,
     isDrawer: false,
     isPlaying: false,
+    usersNotPlaying: [],
     setUserList: (userList: UserRoomI[]) => set({ userList }),
     setGameState: (gameState: GameStateI) => set({ gameState }),
     setCategorySelected: (categorySelected: string | null) =>
@@ -40,5 +43,6 @@ export const useGameData = create<GameDataStore>((set) => {
     setTurnDuration: (turnDuration: number | null) => set({ turnDuration }),
     setIsDrawer: (condition: boolean) => set({ isDrawer: condition }),
     setIsPlaying: (isPlaying: boolean) => set({ isPlaying }),
+    setUsersNotPlaying: (usersNotPlaying: string[]) => set({ usersNotPlaying }),
   };
 });
