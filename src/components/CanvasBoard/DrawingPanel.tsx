@@ -23,7 +23,6 @@ const MAX_PEN_WIDTH_STROKE = 10;
 const MIN_ERASER_WIDTH_STROKE = 15;
 const MAX_ERASER_WIDTH_STROKE = 20;
 
-// TODO:? Add more width when eraser tool?
 export const DrawingPanel: FC<Props> = ({
   color,
   pencilStroke,

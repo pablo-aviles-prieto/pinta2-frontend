@@ -76,7 +76,7 @@ const Room = () => {
   useEffect(() => {
     // using a ref to avoid re-renders that would bug and create a second newSocket
     // (even when checking !socket in the if condition)
-    // TODO: IMPORTANT Sanitize queryPw (query param) and roomId (param) to not seend weird things to back
+    // TODO: IMPORTANT Sanitize queryPw (query param) and roomId (param) to not send weird things to back
     if (!socketRef.current && roomId && queryPw) {
       const newSocket = io('http://localhost:4000');
       socketRef.current = newSocket;

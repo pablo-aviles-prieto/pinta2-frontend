@@ -1,17 +1,15 @@
 import Room from './pages/Room';
-import NotFound from './pages/NotFound';
 import RegisterUser from './pages/RegisterUser';
 import Homepage from './pages/Homepage';
 import CreateNewRoom from './pages/CreateNewRoom';
 import JoinRoom from './pages/JoinRoom';
 import ProtectRegisteredRoute from './pages/ProtectRegisteredRoute';
+import { Navigate } from 'react-router-dom';
 
-// TODO: Redirect in the 404 Not found
 const routes = [
   {
     path: '/',
     element: <RegisterUser />,
-    errorElement: <NotFound />,
   },
   {
     path: '/room/:roomId',
@@ -39,6 +37,17 @@ const routes = [
       <ProtectRegisteredRoute>
         <JoinRoom />
       </ProtectRegisteredRoute>
+    ),
+  },
+  {
+    path: '*',
+    element: (
+      <Navigate
+        to='/'
+        state={{
+          notValidPath: 'La URL indicada no es correcta, revísela por favor',
+        }}
+      />
     ),
   },
 ];
