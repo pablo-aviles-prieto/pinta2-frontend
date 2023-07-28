@@ -51,63 +51,74 @@ export const DrawingPanel: FC<Props> = ({
   };
 
   return (
-    <div className='z-10 absolute top-0 left-[200px] bg-stone-300 rounded-lg shadow-md p-2 flex gap-10'>
-      <CirclePicker
-        className='items-center justify-center'
-        circleSize={30}
-        circleSpacing={6}
-        color={color}
-        colors={PALETTE_COLORS}
-        onChange={(color) => {
-          onToolChange({ tool: 'pen', color: color.hex });
-          setColor(color.hex);
-        }}
-      />
-      <div className='flex gap-2'>
-        <input
-          className='slider-vertical h-[102px] w-[8px] px-2'
-          type='range'
-          min={tool === 'pen' ? MIN_PEN_WIDTH_STROKE : MIN_ERASER_WIDTH_STROKE}
-          max={tool === 'pen' ? MAX_PEN_WIDTH_STROKE : MAX_ERASER_WIDTH_STROKE}
-          value={tool === 'pen' ? pencilStroke : eraserStroke}
-          onChange={(e) =>
-            tool === 'pen'
-              ? setPencilStroke(Number(e.target.value))
-              : setEraserStroke(Number(e.target.value))
-          }
+    <div
+      className='z-[1] absolute top-0 left-[200px] h-[280px] w-[410px]'
+      style={{
+        backgroundImage: 'url(../../../public/imgs/painter-palette.webp)',
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      <div className='relative'>
+        <CirclePicker
+          className='absolute items-center justify-center top-[48px] left-[95px]'
+          circleSize={30}
+          circleSpacing={6}
+          color={color}
+          colors={PALETTE_COLORS}
+          onChange={(color) => {
+            onToolChange({ tool: 'pen', color: color.hex });
+            setColor(color.hex);
+          }}
         />
-        <div className='text-xs font-bold h-[102px] flex flex-col-reverse items-center'>
-          {[
-            ...Array(MAX_PEN_WIDTH_STROKE - MIN_PEN_WIDTH_STROKE + 1).keys(),
-          ].map((i) => (
-            <div
-              className='block w-6 my-[6px]'
-              key={i}
-              style={{
-                borderTop: `${i + 3}px solid black`,
-              }}
-            />
-          ))}
+        <div className='absolute flex gap-2 top-[122px] left-[101px]'>
+          <input
+            className='slider-vertical h-[102px] w-[8px] px-2'
+            type='range'
+            min={
+              tool === 'pen' ? MIN_PEN_WIDTH_STROKE : MIN_ERASER_WIDTH_STROKE
+            }
+            max={
+              tool === 'pen' ? MAX_PEN_WIDTH_STROKE : MAX_ERASER_WIDTH_STROKE
+            }
+            value={tool === 'pen' ? pencilStroke : eraserStroke}
+            onChange={(e) =>
+              tool === 'pen'
+                ? setPencilStroke(Number(e.target.value))
+                : setEraserStroke(Number(e.target.value))
+            }
+          />
+          <div className='text-xs font-bold h-[102px] flex flex-col-reverse items-center'>
+            {[
+              ...Array(MAX_PEN_WIDTH_STROKE - MIN_PEN_WIDTH_STROKE + 1).keys(),
+            ].map((i) => (
+              <div
+                className='block w-6 my-[6px]'
+                key={i}
+                style={{
+                  borderTop: `${i + 3}px solid black`,
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-      <div className='flex flex-col justify-between'>
-        <div
-          className={`flex justify-between rounded-md shadow-lg hover:shadow-inner ${
-            tool === 'pen' && 'shadow-sm'
-          }`}
-        >
-          <button onClick={() => onToolChange({ tool: 'pen', color })}>
-            <DrawPencil width={45} height={40} />
-          </button>
-        </div>
-        <div
-          className={`flex justify-center rounded-md shadow-lg hover:shadow-inner ${
-            tool === 'eraser' && 'shadow-sm'
-          }`}
-        >
-          <button onClick={() => onToolChange({ tool: 'eraser', color })}>
-            <DrawEraser width={45} height={40} />
-          </button>
+        <div className='absolute top-[120px] left-[180px] flex flex-col justify-between'>
+          <div className={`flex justify-between mb-2`}>
+            <button onClick={() => onToolChange({ tool: 'pen', color })}>
+              <DrawPencil
+                width={tool === 'eraser' ? 45 : 60}
+                height={tool === 'eraser' ? 40 : 55}
+              />
+            </button>
+          </div>
+          <div className={`flex justify-center`}>
+            <button onClick={() => onToolChange({ tool: 'eraser', color })}>
+              <DrawEraser
+                width={tool === 'eraser' ? 60 : 45}
+                height={tool === 'eraser' ? 55 : 40}
+              />
+            </button>
+          </div>
         </div>
       </div>
     </div>
