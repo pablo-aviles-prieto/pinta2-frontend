@@ -667,6 +667,10 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   };
 
   return (
+    // TODO: Add more width to the canvas and add the userboard bground color to the chat bground
+    // TODO: Move the drawing panel to the top, near the word container
+    // TODO: Add word container in top of canvas
+    // TODO: Add message container in top of the word container?
     // TODO: Remove unnecessary SVGs
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     // TODO: Disable the input when user is in turnScore ???
@@ -690,18 +694,12 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           )}
         </div>
       )}
-      <div className='my-4'>
-        <button onClick={() => handleTurnCounter(true)}>Restart timer</button>
-      </div>
       {(!gameState.started || isDrawer) && (
         <button type='button' onClick={clearBoard}>
           Clear board
         </button>
       )}
       <div className='relative py-5 bg-gray-300'>
-        {/* TODO: Restyle the width of canvas, userList and chat! */}
-        {/* TODO: UJserBoard should not be absoluted, just staying on the left of the canvas!  */}
-        <UserBoard extraStyles='absolute left-5 w-36' />
         {(!gameState.started || isDrawer) && (
           <DrawingPanel
             color={drawColor}
@@ -715,7 +713,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             setCanvasCursorStyle={setCanvasCursorStyle}
           />
         )}
-        <div className='mx-auto flex gap-5 w-[1100px] h-[600px]'>
+        <div className='mx-auto flex gap-5 w-[1244px] h-[600px]'>
+          <UserBoard extraStyles='w-[144px] h-full' />
           <Stage
             width={770}
             height={600}

@@ -17,6 +17,24 @@
   scroll-behavior: smooth;
   font-family: 'Poppins', sans-serif;
   list-style: none;
+  scrollbar-color: #34d399;
+  scrollbar-width: auto;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.35);
+  border-radius: 10px;
+  background-color: #e0e7ff;
+}
+::-webkit-scrollbar {
+  border-radius: 10px;
+  width: 8px;
+  background-color: #e0e7ff;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #34d399;
 }
 
 input[type='number']::-webkit-inner-spin-button,

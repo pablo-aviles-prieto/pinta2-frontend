@@ -54,9 +54,9 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
 
   return (
     <div
-      className={`rounded-lg bg-indigo-100 border border-emerald-500 ${
+      className={`rounded-lg bg-indigo-100 border border-emerald-500 shadow-lg ${
         extraStyles ?? ''
-      }`}
+      } overflow-auto`}
     >
       <ul>
         {gameState.started && gameState.drawer && gameState.totalScores
@@ -64,14 +64,11 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
               .sort(([, a], [, b]) => b.value - a.value)
               .map(([key, val], i) => {
                 const user = userList.find((user) => user.id === key);
-                const colorUser = user ? user.color.toLowerCase() : '#ff0000';
+                const colorUser = user ? user.color.toLowerCase() : '#bd0000';
                 return (
-                  // TODO?: Dont show image at all when player not playing the round
-                  // (to do this, we need to more info, atm only the user that joined
-                  // in the middle of the turn, knows he cant play, but the rest doesnt know)
                   <React.Fragment key={key}>
                     {i > 0 && <Divider />}
-                    <li className='p-3 pt-4'>
+                    <li className='p-2 pt-3'>
                       <div className='relative'>
                         <div
                           className={`w-20 h-20 m-auto mb-1 rounded-full 
@@ -130,7 +127,7 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
           : userList.map((user, i) => (
               <React.Fragment key={user.id}>
                 {i > 0 && <Divider />}
-                <li className='p-3'>
+                <li className='p-2 pt-3'>
                   <div
                     className={`w-20 h-20 m-auto mb-1 bg-transparent rounded-full 
                     overflow-hidden border-4 flex items-center justify-center`}

@@ -158,6 +158,7 @@ const Room = () => {
   if (!socket || !roomId || (!queryPw && !hasInternalPw) || !joinedRoom) {
     return (
       <>
+        {/* TODO: Change the loading with a skeleton of the finished game board */}
         <div>Loading...</div>
         <UsernameModal forbidClose>
           <>
