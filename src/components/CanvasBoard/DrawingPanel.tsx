@@ -51,7 +51,7 @@ export const DrawingPanel: FC<Props> = ({
   };
 
   return (
-    <div className='z-10 absolute top-0 left-[200px] bg-stone-300 rounded-lg shadow-md p-2 flex gap-10'>
+    <div className='flex gap-10 p-2 rounded-lg shadow-lg bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-100'>
       <CirclePicker
         className='items-center justify-center'
         circleSize={30}

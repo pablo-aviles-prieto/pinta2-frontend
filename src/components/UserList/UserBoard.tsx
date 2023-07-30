@@ -52,12 +52,13 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
     );
   };
 
+  // TODO: IMPORTANT change the color of the circle of the own user from red to emerald/teal
   return (
     <div
       className={`bg-gradient-to-b from-amber-50 via-neutral-50 to-amber-50
       rounded-lg border border-emerald-500 shadow-lg ${
         extraStyles ?? ''
-      } overflow-auto`}
+      } overflow-y-auto overflow-x-hidden`}
     >
       <ul>
         {gameState.started && gameState.drawer && gameState.totalScores
@@ -91,6 +92,8 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
                             user,
                           })}
                           {gameState.turnScores && (
+                            // TODO: The class names for the transition could be returned by a function
+                            // that delays a bit the return, so it always renders the arrow with the transition
                             <div
                               className={`absolute -bottom-5 -right-5 transition-all duration-1000 ${
                                 gameState.turnScores[key]?.value

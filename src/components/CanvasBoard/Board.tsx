@@ -679,9 +679,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const copyBtnStyles = copied ? 'bg-gray-500 text-white' : '';
 
   return (
-    // TODO: Add more width to the canvas and add the userboard bground color to the chat bground!
-    // TODO: Move the drawing panel to the top, near the word container!
-    // TODO: Add word container in top of canvas!
     // TODO: Add message container in top of the word container?
     // TODO: Remove unnecessary SVGs
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
@@ -695,105 +692,179 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // TODO: Check that when pressing a link on the header, it doesnt navigate right away, should
     // alert the user
     <>
-      <div className='w-[200px] mb-2'>
-        <ButtonBorderContainer>
-          <button
-            className={`${copyBtnStyles} w-full mx-auto text-lg
-                rounded-md bg-teal-400 py-2 transition flex items-center justify-evenly 
-                hover:text-white hover:bg-teal-600`}
-            type='button'
-            onClick={() =>
-              copyToClipboard({
-                isCopied: copied,
-                setIsCopied: setCopied,
-                roomNumber: joinedRoom ?? 9999,
-                roomPassword,
-              })
-            }
-          >
-            <span>{copied ? 'Copiado!' : 'Copiar enlace'}</span>
-            {copied ? (
-              <CopyOk width={27} height={27} />
-            ) : (
-              <Copy width={27} height={27} />
-            )}
-          </button>
-        </ButtonBorderContainer>
-      </div>
-      {gameState.started &&
+      {/* TODO: IMPORTANT Put the turn and the round somewhere? */}
+      {/* {gameState.started &&
         gameState.turn !== undefined &&
         gameState.round !== undefined && (
           <div className='my-4'>
             <p>Turn: {gameState.turn}</p>
             <p>Round: {gameState.round}</p>
           </div>
+        )} */}
+      {/* TODO: IMPORTANT Extract to a single component the whole <ButtonBorderContainer>
+        since is repeated identically 3 times */}
+      {gameState.started &&
+        (gameState.preTurn || !startTurnCounter) &&
+        !isDrawer && (
+          <div className='flex justify-end mb-1'>
+            <div className='w-[200px]'>
+              <ButtonBorderContainer>
+                <button
+                  className={`${copyBtnStyles} w-full mx-auto text-lg
+            rounded-md py-2 transition flex items-center justify-evenly 
+            bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50
+            hover:text-emerald-500`}
+                  type='button'
+                  onClick={() =>
+                    copyToClipboard({
+                      isCopied: copied,
+                      setIsCopied: setCopied,
+                      roomNumber: joinedRoom ?? 9999,
+                      roomPassword,
+                    })
+                  }
+                >
+                  <span>{copied ? 'Copiado!' : 'Copiar enlace'}</span>
+                  {copied ? (
+                    <CopyOk width={27} height={27} />
+                  ) : (
+                    <Copy width={27} height={27} />
+                  )}
+                </button>
+              </ButtonBorderContainer>
+            </div>
+          </div>
         )}
       {gameState.started && !gameState.preTurn && startTurnCounter && (
-        <div className='my-8'>
-          <p>{turnCount}</p>
-          {gameState.currentWord && (
-            <p>{isDrawer ? gameState.currentWord : gameState.cryptedWord}</p>
+        <div className='flex items-end justify-between mb-1'>
+          {!isDrawer && <div className='w-[129px]' />}
+          <div
+            className={`flex items-center justify-center gap-4 px-4 py-2 border-2 rounded-lg 
+          shadow-lg border-emerald-300 w-[225px] m-auto text-2xl
+          bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50`}
+          >
+            <p className='font-bold w-[45px]'>{turnCount}</p>
+            {gameState.currentWord && (
+              <p>{isDrawer ? gameState.currentWord : gameState.cryptedWord}</p>
+            )}
+          </div>
+          {!isDrawer && (
+            <div className='w-[200px]'>
+              <ButtonBorderContainer>
+                <button
+                  className={`${copyBtnStyles} w-full mx-auto text-lg
+            rounded-md py-2 transition flex items-center justify-evenly 
+            bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50
+            hover:text-emerald-500`}
+                  type='button'
+                  onClick={() =>
+                    copyToClipboard({
+                      isCopied: copied,
+                      setIsCopied: setCopied,
+                      roomNumber: joinedRoom ?? 9999,
+                      roomPassword,
+                    })
+                  }
+                >
+                  <span>{copied ? 'Copiado!' : 'Copiar enlace'}</span>
+                  {copied ? (
+                    <CopyOk width={27} height={27} />
+                  ) : (
+                    <Copy width={27} height={27} />
+                  )}
+                </button>
+              </ButtonBorderContainer>
+            </div>
           )}
         </div>
       )}
       {(!gameState.started || isDrawer) && (
-        <button type='button' onClick={clearBoard}>
-          Clear board
-        </button>
-      )}
-      <div className='relative py-5'>
-        {(!gameState.started || isDrawer) && (
-          <DrawingPanel
-            color={drawColor}
-            pencilStroke={pencilStroke}
-            eraserStroke={eraserStroke}
-            setColor={setDrawColor}
-            setPencilStroke={setPencilStroke}
-            setEraserStroke={setEraserStroke}
-            tool={tool}
-            setTool={setTool}
-            setCanvasCursorStyle={setCanvasCursorStyle}
-          />
-        )}
-        <div className='mx-auto flex gap-2 w-[1280px] h-[600px]'>
-          <UserBoard extraStyles='w-[144px] h-full' />
-          <Stage
-            width={858}
-            height={600}
-            onMouseDown={handleMouseDown}
-            onMousemove={handleMouseMove}
-            onMouseup={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onMouseEnter={handleMouseEnter}
-            className='bg-white border rounded-lg shadow-lg border-emerald-500'
-            style={{
-              cursor:
-                gameState.started && !isDrawer ? 'auto' : canvasCursorStyle,
-            }}
+        <div className='flex items-end justify-between gap-2 mb-1'>
+          <button
+            className='p-2 border-2 rounded-lg border-emerald-400 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50'
+            type='button'
+            onClick={clearBoard}
           >
-            <Layer>
-              {lines.map((line, i) => (
-                <Line
-                  key={i}
-                  points={line.points}
-                  stroke={line.color ?? '#df4b26'}
-                  strokeWidth={line.strokeWidth}
-                  tension={0.5}
-                  lineCap='round'
-                  lineJoin='round'
-                  globalCompositeOperation={
-                    line.tool === 'eraser' ? 'destination-out' : 'source-over'
-                  }
-                />
-              ))}
-            </Layer>
-          </Stage>
-          <div
-            className='bg-gradient-to-b from-amber-50 via-neutral-50 to-amber-50
-           border border-emerald-500 rounded-lg shadow-lg w-[278px] h-full'
-          >
-            <Chat joinedRoom={joinedRoom} turnCount={turnCount} />
+            Limpiar lienzo
+          </button>
+          <div className='w-[435px]'>
+            <DrawingPanel
+              color={drawColor}
+              pencilStroke={pencilStroke}
+              eraserStroke={eraserStroke}
+              setColor={setDrawColor}
+              setPencilStroke={setPencilStroke}
+              setEraserStroke={setEraserStroke}
+              tool={tool}
+              setTool={setTool}
+              setCanvasCursorStyle={setCanvasCursorStyle}
+            />
           </div>
+          <div className='w-[200px]'>
+            <ButtonBorderContainer>
+              <button
+                className={`${copyBtnStyles} w-full mx-auto text-lg
+                rounded-md py-2 transition flex items-center justify-evenly 
+                bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50
+                hover:text-emerald-500`}
+                type='button'
+                onClick={() =>
+                  copyToClipboard({
+                    isCopied: copied,
+                    setIsCopied: setCopied,
+                    roomNumber: joinedRoom ?? 9999,
+                    roomPassword,
+                  })
+                }
+              >
+                <span>{copied ? 'Copiado!' : 'Copiar enlace'}</span>
+                {copied ? (
+                  <CopyOk width={27} height={27} />
+                ) : (
+                  <Copy width={27} height={27} />
+                )}
+              </button>
+            </ButtonBorderContainer>
+          </div>
+        </div>
+      )}
+      <div className='mx-auto flex gap-2 w-[1280px] h-[600px]'>
+        <UserBoard extraStyles='w-[144px] h-full' />
+        <Stage
+          width={858}
+          height={600}
+          onMouseDown={handleMouseDown}
+          onMousemove={handleMouseMove}
+          onMouseup={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onMouseEnter={handleMouseEnter}
+          className='bg-white border rounded-lg shadow-lg border-emerald-500'
+          style={{
+            cursor: gameState.started && !isDrawer ? 'auto' : canvasCursorStyle,
+          }}
+        >
+          <Layer>
+            {lines.map((line, i) => (
+              <Line
+                key={i}
+                points={line.points}
+                stroke={line.color ?? '#df4b26'}
+                strokeWidth={line.strokeWidth}
+                tension={0.5}
+                lineCap='round'
+                lineJoin='round'
+                globalCompositeOperation={
+                  line.tool === 'eraser' ? 'destination-out' : 'source-over'
+                }
+              />
+            ))}
+          </Layer>
+        </Stage>
+        <div
+          className='bg-gradient-to-b from-amber-50 via-neutral-50 to-amber-50
+           border border-emerald-500 rounded-lg shadow-lg w-[278px] h-full'
+        >
+          <Chat joinedRoom={joinedRoom} turnCount={turnCount} />
         </div>
       </div>
       {!gameState.started && (
