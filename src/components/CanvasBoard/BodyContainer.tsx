@@ -3,7 +3,6 @@ import { ConnectionManager } from '../ConnectionManager';
 import { Board } from './Board';
 import { useSocket } from '../../hooks/useSocket';
 import { useGameData } from '../../hooks/useGameData';
-import { UserList } from '../UserList/UserList';
 
 export const BodyContainer: FC = () => {
   const [awaitPlayersMsg, setAwaitPlayersMsg] = useState<string | undefined>(
@@ -36,14 +35,14 @@ export const BodyContainer: FC = () => {
 
   return (
     <>
-      <p>Habitación: {joinedRoom}</p>
+      {/* <p>Habitación: {joinedRoom}</p> */}
       {!awaitPlayersMsg && gameCancelled && !gameState.started && (
         <div className='my-4 text-xl font-bold'>{gameCancelled}</div>
       )}
       {awaitPlayersMsg && !gameState.started && (
         <div className='my-4 text-xl font-bold'>{awaitPlayersMsg}</div>
       )}
-      <ConnectionManager />
+      {/* <ConnectionManager /> */}
       <Board
         setAwaitPlayersMsg={setAwaitPlayersMsg}
         setGameCancelled={setGameCancelled}

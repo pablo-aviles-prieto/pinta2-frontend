@@ -692,6 +692,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // TODO: Check that the chat behaviour is correct (scroll might fail)
     // TODO: Add the possibility to remove the previous lines (should be just remove the
     // line from the lines state?)
+    // TODO: Check that when pressing a link on the header, it doesnt navigate right away, should
+    // alert the user
     <>
       <div className='w-[200px] mb-2'>
         <ButtonBorderContainer>
@@ -739,7 +741,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           Clear board
         </button>
       )}
-      <div className='relative py-5 bg-gray-300'>
+      <div className='relative py-5'>
         {(!gameState.started || isDrawer) && (
           <DrawingPanel
             color={drawColor}
@@ -753,17 +755,17 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             setCanvasCursorStyle={setCanvasCursorStyle}
           />
         )}
-        <div className='mx-auto flex gap-5 w-[1244px] h-[600px]'>
+        <div className='mx-auto flex gap-2 w-[1280px] h-[600px]'>
           <UserBoard extraStyles='w-[144px] h-full' />
           <Stage
-            width={770}
+            width={858}
             height={600}
             onMouseDown={handleMouseDown}
             onMousemove={handleMouseMove}
             onMouseup={handleMouseUp}
             onMouseLeave={handleMouseUp}
             onMouseEnter={handleMouseEnter}
-            className='bg-white rounded-lg shadow-md'
+            className='bg-white border rounded-lg shadow-lg border-emerald-500'
             style={{
               cursor:
                 gameState.started && !isDrawer ? 'auto' : canvasCursorStyle,
@@ -787,8 +789,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             </Layer>
           </Stage>
           <div
-            className='w-[278px] h-full bg-slate-100
-           border border-emerald-500 rounded-lg shadow-lg'
+            className='bg-gradient-to-b from-amber-50 via-neutral-50 to-amber-50
+           border border-emerald-500 rounded-lg shadow-lg w-[278px] h-full'
           >
             <Chat joinedRoom={joinedRoom} turnCount={turnCount} />
           </div>

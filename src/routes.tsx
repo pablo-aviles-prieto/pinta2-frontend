@@ -4,16 +4,25 @@ import Homepage from './pages/Homepage';
 import CreateNewRoom from './pages/CreateNewRoom';
 import JoinRoom from './pages/JoinRoom';
 import ProtectRegisteredRoute from './pages/ProtectRegisteredRoute';
-import { Navigate } from 'react-router-dom';
+import { Navigate, RouteObject } from 'react-router-dom';
+import { Layout } from './components/Styles/Layout';
 
-const routes = [
+const routes: RouteObject[] = [
   {
     path: '/',
-    element: <RegisterUser />,
+    element: (
+      <Layout>
+        <RegisterUser />
+      </Layout>
+    ),
   },
   {
     path: '/room/:roomId',
-    element: <Room />,
+    element: (
+      <Layout>
+        <Room />
+      </Layout>
+    ),
   },
   {
     path: '/home', // Only accesible if the user is registered

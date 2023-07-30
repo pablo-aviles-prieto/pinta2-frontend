@@ -107,7 +107,7 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
       </div>
       <form
         onSubmit={onSubmit}
-        className='flex w-full py-1 border-t-2 border-gray-700'
+        className='flex w-full py-1 border-t-2 border-emerald-600'
       >
         <input
           disabled={isPlaying}
@@ -116,10 +116,10 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
           }
           onChange={(e) => setMessage(e.target.value)}
           value={message}
-          className='w-full px-2 outline-none focus:outline-none ring-0 focus:ring-0'
+          className='w-full px-2 outline-none bg-amber-50 focus:outline-none ring-0 focus:ring-0'
         />
         <button type='submit'>
-          <Send width={30} height={30} className='text-cyan-300' />
+          <Send width={30} height={30} className='text-emerald-600' />
         </button>
       </form>
     </div>

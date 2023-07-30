@@ -54,7 +54,8 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
 
   return (
     <div
-      className={`rounded-lg bg-slate-100 border border-emerald-500 shadow-lg ${
+      className={`bg-gradient-to-b from-amber-50 via-neutral-50 to-amber-50
+      rounded-lg border border-emerald-500 shadow-lg ${
         extraStyles ?? ''
       } overflow-auto`}
     >
