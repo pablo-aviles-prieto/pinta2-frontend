@@ -17,8 +17,10 @@ import {
 import { useCustomToast } from '../../hooks/useCustomToast';
 import { GuessedWord } from '../GuessedWord';
 import { DrawingPanel } from './DrawingPanel';
-import { getBase64SVGURL } from '../../utils';
+import { copyToClipboard, getBase64SVGURL } from '../../utils';
 import { UserBoard } from '../UserList/UserBoard';
+import { ButtonBorderContainer } from '../Styles/ButtonBorderContainer';
+import { Copy, CopyOk } from '../Icons';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -47,11 +49,19 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   const [possibleWords, setPossibleWords] = useState<string[]>([]);
   const [canvasCursorStyle, setCanvasCursorStyle] = useState(`auto`);
   const [displayGuessedWord, setDisplayGuessedWord] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [guessedMsgDisplayed, setGuessedMsgDisplayed] = useState<
     string | undefined
   >(undefined);
   const isDrawing = useRef(false);
-  const { socket, joinedRoom, setIsRegistered, setUsername } = useSocket();
+  const {
+    socket,
+    joinedRoom,
+    roomPassword,
+    setIsRegistered,
+    setUsername,
+    setRoomPassword,
+  } = useSocket();
   const { showToast } = useCustomToast();
   const {
     RenderModal: ModalOwnerCategories,
@@ -666,18 +676,48 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     handleConfigGameCounter(false);
   };
 
+  const copyBtnStyles = copied ? 'bg-gray-500 text-white' : '';
+
   return (
-    // TODO: Add more width to the canvas and add the userboard bground color to the chat bground
-    // TODO: Move the drawing panel to the top, near the word container
-    // TODO: Add word container in top of canvas
+    // TODO: Add more width to the canvas and add the userboard bground color to the chat bground!
+    // TODO: Move the drawing panel to the top, near the word container!
+    // TODO: Add word container in top of canvas!
     // TODO: Add message container in top of the word container?
     // TODO: Remove unnecessary SVGs
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
-    // TODO: Disable the input when user is in turnScore ???
+    // TODO: Disable the input when user is in turnScore so he cant keep chatting ???
     // TODO: Add a restart game button for the owner (it should display a modal to confirm the action)!
     // TODO: Create a history of lines drew (for example, an id/index for each time the user write a line without
     // leaving the mouse), so the user can go back and forth for last things drew
+    // TODO: Check that the chat behaviour is correct (scroll might fail)
+    // TODO: Add the possibility to remove the previous lines (should be just remove the
+    // line from the lines state?)
     <>
+      <div className='w-[200px] mb-2'>
+        <ButtonBorderContainer>
+          <button
+            className={`${copyBtnStyles} w-full mx-auto text-lg
+                rounded-md bg-teal-400 py-2 transition flex items-center justify-evenly 
+                hover:text-white hover:bg-teal-600`}
+            type='button'
+            onClick={() =>
+              copyToClipboard({
+                isCopied: copied,
+                setIsCopied: setCopied,
+                roomNumber: joinedRoom ?? 9999,
+                roomPassword,
+              })
+            }
+          >
+            <span>{copied ? 'Copiado!' : 'Copiar enlace'}</span>
+            {copied ? (
+              <CopyOk width={27} height={27} />
+            ) : (
+              <Copy width={27} height={27} />
+            )}
+          </button>
+        </ButtonBorderContainer>
+      </div>
       {gameState.started &&
         gameState.turn !== undefined &&
         gameState.round !== undefined && (
@@ -746,7 +786,10 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
               ))}
             </Layer>
           </Stage>
-          <div className='w-[278px] h-full bg-white rounded-lg shadow-md'>
+          <div
+            className='w-[278px] h-full bg-slate-100
+           border border-emerald-500 rounded-lg shadow-lg'
+          >
             <Chat joinedRoom={joinedRoom} turnCount={turnCount} />
           </div>
         </div>

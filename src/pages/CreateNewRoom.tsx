@@ -8,6 +8,7 @@ import { useGameData } from '../hooks/useGameData';
 import { useCustomToast } from '../hooks/useCustomToast';
 import { Id } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { copyToClipboard } from '../utils';
 
 interface CreateRoomResponse {
   success: boolean;
@@ -17,7 +18,6 @@ interface CreateRoomResponse {
 }
 
 const CreateNewRoom: FC = () => {
-  const [roomPassword, setRoomPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [roomDigits, setRoomDigits] = useState<(number | '')[]>(
     Array(4).fill('')
@@ -28,7 +28,7 @@ const CreateNewRoom: FC = () => {
   );
   const digitsInputRef = useRef<(HTMLInputElement | null)[]>([]);
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
-  const { socket, setJoinedRoom } = useSocket();
+  const { socket, setJoinedRoom, roomPassword, setRoomPassword } = useSocket();
   const { setUserList } = useGameData();
   const { showToast, showLoadingToast, updateToast } = useCustomToast();
   const navigate = useNavigate();
@@ -115,23 +115,6 @@ const CreateNewRoom: FC = () => {
     }
   };
 
-  const copyToClipboard = async () => {
-    if (copied) return;
-    try {
-      const roomNumber = +roomDigits.join('');
-      const URL_BASE = import.meta.env.VITE_APP_BASE_URL;
-      navigator.clipboard.writeText(
-        `${URL_BASE}/room/${roomNumber}?pw=${roomPassword.trim()}`
-      );
-      setCopied(true);
-      setTimeout(() => {
-        setCopied(false);
-      }, 1500);
-    } catch (e) {
-      console.error('failed to copy data', e);
-    }
-  };
-
   const copyBtnStyles = copied ? 'bg-gray-500 text-white' : '';
 
   return (
@@ -207,9 +190,16 @@ const CreateNewRoom: FC = () => {
                 rounded-md bg-teal-400 py-2 transition flex items-center justify-evenly 
                 hover:text-white hover:bg-teal-600`}
               type='button'
-              onClick={copyToClipboard}
+              onClick={() =>
+                copyToClipboard({
+                  isCopied: copied,
+                  setIsCopied: setCopied,
+                  roomNumber: +roomDigits.join(''),
+                  roomPassword,
+                })
+              }
             >
-              <span>{copied ? 'Copied' : 'Copy details'}</span>
+              <span>{copied ? 'Copiado!' : 'Copiar enlace'}</span>
               {copied ? (
                 <CopyOk width={27} height={27} />
               ) : (
@@ -222,7 +212,7 @@ const CreateNewRoom: FC = () => {
               type='submit'
               className='w-full py-2 overflow-hidden text-lg text-white bg-teal-600 rounded-md hover:bg-teal-400 hover:text-black'
             >
-              Go to room
+              Ir a la sala
             </button>
           </ButtonBorderContainer>
         </div>

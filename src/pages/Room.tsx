@@ -21,6 +21,7 @@ const Room = () => {
     isRegistered,
     username,
     setUsername,
+    setRoomPassword,
   } = useSocket();
   const navigate = useNavigate();
   const queryPw = searchParams.get('pw');
@@ -147,6 +148,7 @@ const Room = () => {
     }
 
     setJoinedRoom(roomId ? Number(roomId) : 9999);
+    setRoomPassword(queryPw ?? '');
     closeUsernameModal();
     socket?.emit('join room directly', {
       roomNumber: roomId,

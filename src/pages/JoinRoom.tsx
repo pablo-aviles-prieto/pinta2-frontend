@@ -18,11 +18,11 @@ interface JoinRoomResponse {
 
 const JoinRoom: FC = () => {
   const [roomNumber, setRoomNumber] = useState('');
-  const [roomPassword, setRoomPassword] = useState('');
   const [joinRoomToastId, setJoinRoomToastId] = useState<Id | undefined>(
     undefined
   );
-  const { socket, setJoinedRoom, joinedRoom } = useSocket();
+  const { socket, setJoinedRoom, joinedRoom, roomPassword, setRoomPassword } =
+    useSocket();
   const { showToast, showLoadingToast, updateToast } = useCustomToast();
   const { setUserList, setGameState, setIsPlaying, setTurnDuration } =
     useGameData();

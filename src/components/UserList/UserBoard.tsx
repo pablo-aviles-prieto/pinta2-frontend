@@ -54,7 +54,7 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
 
   return (
     <div
-      className={`rounded-lg bg-indigo-100 border border-emerald-500 shadow-lg ${
+      className={`rounded-lg bg-slate-100 border border-emerald-500 shadow-lg ${
         extraStyles ?? ''
       } overflow-auto`}
     >

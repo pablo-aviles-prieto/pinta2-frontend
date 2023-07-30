@@ -1,11 +1,12 @@
 import { useSocket } from '../hooks/useSocket';
 
 export const ConnectionManager = () => {
-  const { socket, username, setJoinedRoom } = useSocket();
+  const { socket, username, setJoinedRoom, setRoomPassword } = useSocket();
 
   function disconnect() {
     socket?.disconnect();
     setJoinedRoom(undefined);
+    setRoomPassword('');
   }
 
   return (

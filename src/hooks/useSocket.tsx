@@ -13,6 +13,8 @@ interface SocketContextI {
   setJoinedRoom: React.Dispatch<React.SetStateAction<number | undefined>>;
   isRegistered: boolean;
   setIsRegistered: React.Dispatch<React.SetStateAction<boolean>>;
+  roomPassword: string;
+  setRoomPassword: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface PropsI {
@@ -23,6 +25,7 @@ const SocketContext = createContext<SocketContextI | undefined>(undefined);
 
 export const SocketProvider: FC<PropsI> = ({ children }) => {
   const [username, setUsername] = useState('');
+  const [roomPassword, setRoomPassword] = useState<string>('');
   const [joinedRoom, setJoinedRoom] = useState<number | undefined>(undefined);
   const [socket, setSocket] = useState<Socket<
     DefaultEventsMap,
@@ -41,6 +44,8 @@ export const SocketProvider: FC<PropsI> = ({ children }) => {
         setJoinedRoom,
         isRegistered,
         setIsRegistered,
+        roomPassword,
+        setRoomPassword,
       }}
     >
       {children}
