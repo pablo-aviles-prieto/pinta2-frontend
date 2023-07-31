@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { RegisterUserForm } from '../components/RegisterUserForm';
 import { useLocation } from 'react-router-dom';
 import { useSocket } from '../hooks/useSocket';
-import * as img from '../../public/imgs/gecko-artist.webp';
 
 const RegisterUser = () => {
   const { socket } = useSocket();
@@ -59,7 +58,7 @@ const RegisterUser = () => {
             </span>
             <span
               style={{ fontFamily: 'inherit' }}
-              className='text-[290px] absolute -top-[90px] -right-[125px] transform -rotate-12 text-red-600'
+              className='text-[290px] absolute -top-[95px] -right-[120px] transform -rotate-[15deg] text-red-600'
             >
               2
             </span>

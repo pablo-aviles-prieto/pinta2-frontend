@@ -17,10 +17,8 @@ import {
 import { useCustomToast } from '../../hooks/useCustomToast';
 import { GuessedWord } from '../GuessedWord';
 import { DrawingPanel } from './DrawingPanel';
-import { copyToClipboard, getBase64SVGURL } from '../../utils';
+import { getBase64SVGURL } from '../../utils';
 import { UserBoard } from '../UserList/UserBoard';
-import { ButtonBorderContainer } from '../Styles/ButtonBorderContainer';
-import { Copy, CopyOk } from '../Icons';
 import { CopyBtnComponent } from '../Styles/CopyBtn';
 
 interface Props {
@@ -691,6 +689,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // alert the user
     // TODO: IMPORTANT Check the cursor on the bottom of the canvas, since it disappear if it doesnt have
     // enought space
+    // TODO: Add a footer with my details and a little explanation??
     <>
       {/* TODO: IMPORTANT Put the turn and the round somewhere! */}
       {/* {gameState.started &&
