@@ -678,7 +678,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   };
 
   return (
-    // TODO: Add message container in top of the word container?
     // TODO: Remove unnecessary SVGs
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     // TODO: Disable the input when user is in turnScore so he cant keep chatting ???
@@ -690,6 +689,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // line from the lines state?)
     // TODO: Check that when pressing a link on the header, it doesnt navigate right away, should
     // alert the user
+    // TODO: IMPORTANT Check the cursor on the bottom of the canvas, since it disappear if it doesnt have
+    // enought space
     <>
       {/* TODO: IMPORTANT Put the turn and the round somewhere! */}
       {/* {gameState.started &&

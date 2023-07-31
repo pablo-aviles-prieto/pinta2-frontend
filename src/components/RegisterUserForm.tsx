@@ -33,7 +33,7 @@ export const RegisterUserForm: FC = () => {
 
   return (
     <form className='w-full max-w-sm' onSubmit={registerUser}>
-      <div className='flex items-center py-2 border-b border-teal-500'>
+      <div className='flex items-end py-1 border-t border-b border-teal-500'>
         <input
           className='w-full px-2 py-1 mr-3 leading-tight text-gray-700 bg-transparent border-none appearance-none focus:outline-none'
           type='text'
@@ -41,7 +41,7 @@ export const RegisterUserForm: FC = () => {
           name='username'
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder='Enter a user name'
+          placeholder='Nombre de usuario'
           aria-label='User name'
         />
         <button
