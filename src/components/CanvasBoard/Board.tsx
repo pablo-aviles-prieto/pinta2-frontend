@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Stage, Layer, Line } from 'react-konva';
 import Konva from 'konva';
 import { useSocket } from '../../hooks/useSocket';
@@ -21,6 +21,7 @@ import { copyToClipboard, getBase64SVGURL } from '../../utils';
 import { UserBoard } from '../UserList/UserBoard';
 import { ButtonBorderContainer } from '../Styles/ButtonBorderContainer';
 import { Copy, CopyOk } from '../Icons';
+import { CopyBtnComponent } from '../Styles/CopyBtn';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -676,8 +677,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     handleConfigGameCounter(false);
   };
 
-  const copyBtnStyles = copied ? 'bg-gray-500 text-white' : '';
-
   return (
     // TODO: Add message container in top of the word container?
     // TODO: Remove unnecessary SVGs
@@ -692,7 +691,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // TODO: Check that when pressing a link on the header, it doesnt navigate right away, should
     // alert the user
     <>
-      {/* TODO: IMPORTANT Put the turn and the round somewhere? */}
+      {/* TODO: IMPORTANT Put the turn and the round somewhere! */}
       {/* {gameState.started &&
         gameState.turn !== undefined &&
         gameState.round !== undefined && (
@@ -701,37 +700,17 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             <p>Round: {gameState.round}</p>
           </div>
         )} */}
-      {/* TODO: IMPORTANT Extract to a single component the whole <ButtonBorderContainer>
-        since is repeated identically 3 times */}
       {gameState.started &&
         (gameState.preTurn || !startTurnCounter) &&
         !isDrawer && (
           <div className='flex justify-end mb-1'>
             <div className='w-[200px]'>
-              <ButtonBorderContainer>
-                <button
-                  className={`${copyBtnStyles} w-full mx-auto text-lg
-            rounded-md py-2 transition flex items-center justify-evenly 
-            bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50
-            hover:text-emerald-500`}
-                  type='button'
-                  onClick={() =>
-                    copyToClipboard({
-                      isCopied: copied,
-                      setIsCopied: setCopied,
-                      roomNumber: joinedRoom ?? 9999,
-                      roomPassword,
-                    })
-                  }
-                >
-                  <span>{copied ? 'Copiado!' : 'Copiar enlace'}</span>
-                  {copied ? (
-                    <CopyOk width={27} height={27} />
-                  ) : (
-                    <Copy width={27} height={27} />
-                  )}
-                </button>
-              </ButtonBorderContainer>
+              <CopyBtnComponent
+                copied={copied}
+                joinedRoom={joinedRoom ?? 9999}
+                roomPassword={roomPassword}
+                setCopied={setCopied}
+              />
             </div>
           </div>
         )}
@@ -750,30 +729,12 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           </div>
           {!isDrawer && (
             <div className='w-[200px]'>
-              <ButtonBorderContainer>
-                <button
-                  className={`${copyBtnStyles} w-full mx-auto text-lg
-            rounded-md py-2 transition flex items-center justify-evenly 
-            bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50
-            hover:text-emerald-500`}
-                  type='button'
-                  onClick={() =>
-                    copyToClipboard({
-                      isCopied: copied,
-                      setIsCopied: setCopied,
-                      roomNumber: joinedRoom ?? 9999,
-                      roomPassword,
-                    })
-                  }
-                >
-                  <span>{copied ? 'Copiado!' : 'Copiar enlace'}</span>
-                  {copied ? (
-                    <CopyOk width={27} height={27} />
-                  ) : (
-                    <Copy width={27} height={27} />
-                  )}
-                </button>
-              </ButtonBorderContainer>
+              <CopyBtnComponent
+                copied={copied}
+                joinedRoom={joinedRoom ?? 9999}
+                roomPassword={roomPassword}
+                setCopied={setCopied}
+              />
             </div>
           )}
         </div>
@@ -801,30 +762,12 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             />
           </div>
           <div className='w-[200px]'>
-            <ButtonBorderContainer>
-              <button
-                className={`${copyBtnStyles} w-full mx-auto text-lg
-                rounded-md py-2 transition flex items-center justify-evenly 
-                bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50
-                hover:text-emerald-500`}
-                type='button'
-                onClick={() =>
-                  copyToClipboard({
-                    isCopied: copied,
-                    setIsCopied: setCopied,
-                    roomNumber: joinedRoom ?? 9999,
-                    roomPassword,
-                  })
-                }
-              >
-                <span>{copied ? 'Copiado!' : 'Copiar enlace'}</span>
-                {copied ? (
-                  <CopyOk width={27} height={27} />
-                ) : (
-                  <Copy width={27} height={27} />
-                )}
-              </button>
-            </ButtonBorderContainer>
+            <CopyBtnComponent
+              copied={copied}
+              joinedRoom={joinedRoom ?? 9999}
+              roomPassword={roomPassword}
+              setCopied={setCopied}
+            />
           </div>
         </div>
       )}
