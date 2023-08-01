@@ -66,7 +66,7 @@ const RegisterUser = () => {
             </span>
           </h1>
           <h3
-            className='absolute top-[205px] left-[45px] text-[20px] font-sans font-bold'
+            className='absolute top-[190px] left-[45px] text-[20px] font-sans font-bold'
             style={{ fontFamily: 'Edu SA Beginner' }}
           >
             ¡Da rienda suelta a tus habilidades!

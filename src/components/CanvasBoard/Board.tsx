@@ -719,7 +719,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           {!isDrawer && <div className='w-[129px]' />}
           <div
             className={`flex items-center justify-center gap-4 px-4 py-2 border-2 rounded-lg 
-          shadow-lg border-emerald-300 w-[225px] m-auto text-2xl
+          shadow-lg border-emerald-300 m-auto text-2xl
           bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50`}
           >
             <p className='font-bold w-[45px]'>{turnCount}</p>
@@ -824,9 +824,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
                 {possibleCategories.map((cat) => (
                   <p
                     key={cat}
-                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
-                      categorySelected === cat && 'bg-teal-200'
-                    }`}
+                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${categorySelected === cat && 'bg-teal-200'
+                      }`}
                     onClick={() => handleCategoryChoice(cat)}
                   >
                     {cat}
@@ -842,9 +841,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
                 {Object.entries(possibleTurnDuration).map(([key, value]) => (
                   <p
                     key={key}
-                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
-                      turnDuration === value / 1000 && 'bg-teal-200'
-                    }`}
+                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${turnDuration === value / 1000 && 'bg-teal-200'
+                      }`}
                     onClick={() => handleTurnDuration(value)}
                   >
                     {value / 1000}s
