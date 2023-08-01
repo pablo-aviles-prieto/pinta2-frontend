@@ -15,11 +15,11 @@ const Homepage = () => {
         style={{ borderRadius: '49% 51% 51% 49% / 100% 0% 100% 0%' }}
       >
         <h1
-          className='absolute right-[22px] top-[150px] font-bold text-[25px]'
+          className='absolute right-[22px] top-[150px] font-bold text-[25px] z-[1]'
           style={{ fontFamily: 'Edu SA Beginner' }}>
           Crea o accede a una sala para empezar a jugar
         </h1>
-        <div className='absolute top-[205px] left-[95px] flex gap-10'>
+        <div className='absolute top-[205px] left-[95px] flex gap-10 z-[1]'>
           <BtnContainer
             onClickHandler={() => navigate('/create-room')}
             extraStyles='w-[160px] py-3'

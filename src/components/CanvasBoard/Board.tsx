@@ -692,6 +692,9 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // TODO: Add a footer with my details and a little explanation??
     <>
       {/* TODO: IMPORTANT Put the turn and the round somewhere! */}
+      {/* TODO: IMPORTANT Move 'limpiar lienzo' to the drawing panel
+      and put there the turn and round (same width than the 'copiar
+      enlace' button), so the drawing panel is 100% centered */}
       {/* {gameState.started &&
         gameState.turn !== undefined &&
         gameState.round !== undefined && (
@@ -714,6 +717,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             </div>
           </div>
         )}
+      {/* TODO: Extract into a component IMPORTANT */}
+      {/* TODO: Change the * for _ (for no drawers) IMPORTANT */}
       {gameState.started && !gameState.preTurn && startTurnCounter && (
         <div className='flex items-end justify-between mb-1'>
           {!isDrawer && <div className='w-[129px]' />}
