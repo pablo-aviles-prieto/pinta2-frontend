@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { LOGO_COLORS_CLASSES } from '../../utils/const';
 
 interface Props {
   children: JSX.Element;
@@ -29,34 +30,35 @@ export const Layout: FC<Props> = ({ children }) => {
             >
               <span
                 style={{ fontFamily: 'inherit' }}
-                className='text-[45px] text-emerald-600'
+                className={`text-[45px] ${LOGO_COLORS_CLASSES.p}`}
               >
                 P
               </span>
               <span
                 style={{ fontFamily: 'inherit' }}
-                className='text-indigo-600'
+                className={LOGO_COLORS_CLASSES.i}
               >
                 i
               </span>
               <span
                 style={{ fontFamily: 'inherit' }}
-                className='text-amber-600'
+                className={LOGO_COLORS_CLASSES.n}
               >
                 n
               </span>
               <span
                 style={{ fontFamily: 'inherit' }}
-                className='text-purple-600'
+                className={LOGO_COLORS_CLASSES.t}
               >
                 t
               </span>
-              <span style={{ fontFamily: 'inherit' }} className='text-cyan-600'>
+              <span style={{ fontFamily: 'inherit' }} className={LOGO_COLORS_CLASSES.a}>
                 a
               </span>
               <span
                 style={{ fontFamily: 'inherit' }}
-                className='text-[65px] absolute -top-[16px] -right-[22px] transform -rotate-[18deg] text-red-600'
+                className={`text-[65px] absolute -top-[16px] -right-[22px] transform -rotate-[18deg]
+                 ${LOGO_COLORS_CLASSES['2']}`}
               >
                 2
               </span>

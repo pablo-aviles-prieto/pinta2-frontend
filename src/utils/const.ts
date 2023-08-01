@@ -67,3 +67,12 @@ export const LIGHTER_COLORS_MAP = {
   '#808080': '#acacac',
   '#000000': '#353535',
 };
+
+export const LOGO_COLORS_CLASSES = {
+  'p': 'text-emerald-600',
+  'i': 'text-indigo-600',
+  'n': 'text-amber-600',
+  't': 'text-purple-600',
+  'a': 'text-cyan-600',
+  '2': 'text-red-600',
+}
