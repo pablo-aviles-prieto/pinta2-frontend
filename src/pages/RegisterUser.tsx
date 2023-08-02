@@ -1,11 +1,14 @@
-import { useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { RegisterUserForm } from '../components/RegisterUserForm';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSocket } from '../hooks/useSocket';
 import { LOGO_COLORS_CLASSES } from '../utils/const';
 import { useCustomToast } from '../hooks/useCustomToast';
 
-const RegisterUser = () => {
+const RegisterUser: FC = () => {
+  const [redirectedURL, setRedirectedURL] = useState<string | undefined>(
+    undefined
+  );
   const { socket, setSocket } = useSocket();
   const location = useLocation();
   const { showToast } = useCustomToast();
@@ -14,15 +17,19 @@ const RegisterUser = () => {
 
   useEffect(() => {
     if (browsingState) {
-      // TODO: Display an error toast with the msg => browsingState.notRegistered
-      // TODO: Check the from property in the state to redirect the user back => browsingState.from
-      // (both coming from ProtectRegisteredRoute)
-      // TODO: After settled to a state the url to be redirected, clear the location.state
+      if (browsingState.notRegistered) {
+        showToast({
+          msg: browsingState.notRegistered,
+          options: { type: 'warning' },
+        });
+        setRedirectedURL(browsingState.from);
+      }
       if (browsingState.disconnectUser) {
         setSocket(null);
         socket?.disconnect();
         showToast({
           msg: 'Sigue los pasos para unirte/crear una sala y empezar a jugar!',
+          options: { type: 'warning' },
         });
         navigate(location.pathname, {
           state: { ...browsingState, disconnectUser: undefined },
@@ -95,7 +102,11 @@ const RegisterUser = () => {
             >
               Accede para crear o entrar en una sala
             </p>
-            <RegisterUserForm />
+            <RegisterUserForm
+              redirectedURL={redirectedURL}
+              browsingState={browsingState}
+              setRedirectedURL={setRedirectedURL}
+            />
           </div>
         </div>
         <div className='absolute -right-[363px] -top-[65px]'>

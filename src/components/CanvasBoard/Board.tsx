@@ -655,7 +655,10 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   };
 
   const handleStartGame = () => {
-    if (!categorySelected || userList.length < 3) return; // TODO: Use a toast to provide feedback
+    if (!categorySelected || userList.length < 3) {
+      showToast({ msg: 'Se necesitan al menos 3 jugadores' });
+      return;
+    }
 
     socket?.emit('init game', {
       roomNumber: joinedRoom,
@@ -832,8 +835,9 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
                 {possibleCategories.map((cat) => (
                   <p
                     key={cat}
-                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${categorySelected === cat && 'bg-teal-200'
-                      }`}
+                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
+                      categorySelected === cat && 'bg-teal-200'
+                    }`}
                     onClick={() => handleCategoryChoice(cat)}
                   >
                     {cat}
@@ -849,8 +853,9 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
                 {Object.entries(possibleTurnDuration).map(([key, value]) => (
                   <p
                     key={key}
-                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${turnDuration === value / 1000 && 'bg-teal-200'
-                      }`}
+                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
+                      turnDuration === value / 1000 && 'bg-teal-200'
+                    }`}
                     onClick={() => handleTurnDuration(value)}
                   >
                     {value / 1000}s

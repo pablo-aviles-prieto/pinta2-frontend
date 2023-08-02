@@ -4,7 +4,17 @@ import { io } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { useCustomToast } from '../hooks/useCustomToast';
 
-export const RegisterUserForm: FC = () => {
+type Props = {
+  redirectedURL?: string;
+  browsingState?: any;
+  setRedirectedURL?: React.Dispatch<React.SetStateAction<string | undefined>>;
+};
+
+export const RegisterUserForm: FC<Props> = ({
+  redirectedURL,
+  browsingState,
+  setRedirectedURL,
+}) => {
   const { socket, username, setUsername, setSocket, setIsRegistered } =
     useSocket();
   const navigate = useNavigate();
@@ -32,7 +42,13 @@ export const RegisterUserForm: FC = () => {
       setIsRegistered(true);
     }
 
-    navigate('/home');
+    const redirectURL =
+      redirectedURL && redirectedURL !== '/' ? redirectedURL : '/home';
+    navigate(redirectURL, {
+      state: { ...(browsingState || {}), notRegistered: undefined },
+      replace: true,
+    });
+    setRedirectedURL && setRedirectedURL(undefined);
   };
 
   return (

@@ -5,6 +5,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Socket, io } from 'socket.io-client';
 import { useModal } from '../hooks/useModal';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
+import { useCustomToast } from '../hooks/useCustomToast';
 
 const Room = () => {
   const [hasInternalPw, setHasInternalPw] = useState(false);
@@ -30,6 +31,7 @@ const Room = () => {
     closeModal: closeUsernameModal,
     openModal: openUsernameModal,
   } = useModal();
+  const { showToast } = useCustomToast();
 
   const displayConfirmMsg = () => {
     const confirmed = window.confirm(
@@ -139,18 +141,21 @@ const Room = () => {
     e.preventDefault();
 
     if (!username.trim()) {
-      // TODO: show toast, to indicate the user that has to put a username in the modal
+      showToast({
+        msg: 'Introduzca un nombre válido',
+        options: { type: 'error' },
+      });
       return;
     }
 
     setJoinedRoom(roomId ? Number(roomId) : 9999);
     setRoomPassword(queryPw ?? '');
     closeUsernameModal();
+    // No need to display in here a toast, since its displayed from the update user event
     socket?.emit('join room directly', {
       roomNumber: roomId,
-      username,
+      username: username.trim(),
     });
-    // TODO: Display a toast to let know the user he joined the roomId
   };
 
   if (!socket || !roomId || (!queryPw && !hasInternalPw) || !joinedRoom) {
