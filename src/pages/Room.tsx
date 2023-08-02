@@ -31,37 +31,33 @@ const Room = () => {
     openModal: openUsernameModal,
   } = useModal();
 
+  const displayConfirmMsg = () => {
+    const confirmed = window.confirm(
+      '¿Estás seguro de que quieres salirte de la partida?'
+    );
+    if (confirmed) {
+      navigate('/', {
+        state: {
+          disconnectUser: true,
+        },
+        replace: true,
+      });
+    }
+  };
+
   // Avoid back and forward mouse buttons. Also F5 reload
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F5') {
         e.preventDefault();
-        const confirmed = window.confirm(
-          '¿Estás seguro de que quieres salirte de la partida?'
-        );
-        if (confirmed) {
-          navigate('/', {
-            state: {
-              disconnectUser: true,
-            },
-          });
-        }
+        displayConfirmMsg();
       }
     };
 
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button === 3 || e.button === 4) {
         e.preventDefault();
-        const confirmed = window.confirm(
-          '¿Estás seguro de que quieres salirte de la partida?'
-        );
-        if (confirmed) {
-          navigate('/', {
-            state: {
-              disconnectUser: true,
-            },
-          });
-        }
+        displayConfirmMsg();
       }
     };
 

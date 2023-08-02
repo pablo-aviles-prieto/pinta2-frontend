@@ -11,22 +11,27 @@ interface Props {
 // or just leave it to the board the disconnect option
 const NAV_OPTIONS = [
   { id: 'home', label: 'Inicio', path: '/', altPath: '/home' },
-  { id: 'create', label: 'Crear sala', path: '/create-room', protectRegistered: true }, // Visible when user registered
+  {
+    id: 'create',
+    label: 'Crear sala',
+    path: '/create-room',
+    protectRegistered: true,
+  }, // Visible when user registered
   { id: 'join', label: 'Unirse', path: '/join-room', protectRegistered: true }, // Visible when user registered
   { id: 'contact', label: 'Contactar', path: '/contact' },
   { id: 'help', label: 'Ayuda', path: '/help' },
-]
+];
 
 const Divider = () => {
-  return <span className="mx-2 text-2xl text-teal-500">|</span>
-}
+  return <span className='mx-2 text-2xl text-teal-500'>|</span>;
+};
 
 // TODO: IMPORTANT The 'Contacto' option (should be a modal sending a mail in the form
 // like I did on the portfolio)
 // TODO: IMPORTANT The 'Ayuda' option should be a modal aswell, so it can be opened while gaming
 // (maybe it should be displayed on hover, and no need to click!!!)
 export const Layout: FC<Props> = ({ children }) => {
-  const { socket } = useSocket()
+  const { socket } = useSocket();
 
   return (
     <div
@@ -72,7 +77,10 @@ export const Layout: FC<Props> = ({ children }) => {
               >
                 t
               </span>
-              <span style={{ fontFamily: 'inherit' }} className={LOGO_COLORS_CLASSES.a}>
+              <span
+                style={{ fontFamily: 'inherit' }}
+                className={LOGO_COLORS_CLASSES.a}
+              >
                 a
               </span>
               <span
@@ -87,25 +95,30 @@ export const Layout: FC<Props> = ({ children }) => {
           <div>
             <ul className='flex items-center'>
               {NAV_OPTIONS.map((option, i) => {
-                if (option.protectRegistered && !socket) return
-                return <Fragment key={option.id}>
-                  <li>
-                    <NavLink
-                      className={({ isActive }) =>
-                        `${isActive ? "text-emerald-500" : "text-neutral-600"} 
+                if (option.protectRegistered && !socket) return;
+                return (
+                  <Fragment key={option.id}>
+                    <li>
+                      <NavLink
+                        className={({ isActive }) =>
+                          `${
+                            isActive ? 'text-emerald-500' : 'text-neutral-600'
+                          } 
                         text-lg`
-                      }
-                      to={option.altPath && socket
-                        ? option.altPath
-                        : option.path
-                      }>
-                      {option.label}
-                    </NavLink >
-                  </li>
-                  {i !== NAV_OPTIONS.length - 1 && <Divider />}
-                </Fragment>
-              }
-              )}
+                        }
+                        to={
+                          option.altPath && socket
+                            ? option.altPath
+                            : option.path
+                        }
+                      >
+                        {option.label}
+                      </NavLink>
+                    </li>
+                    {i !== NAV_OPTIONS.length - 1 && <Divider />}
+                  </Fragment>
+                );
+              })}
             </ul>
           </div>
         </div>

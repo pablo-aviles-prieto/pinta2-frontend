@@ -1,28 +1,33 @@
 import { useEffect } from 'react';
 import { RegisterUserForm } from '../components/RegisterUserForm';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSocket } from '../hooks/useSocket';
 import { LOGO_COLORS_CLASSES } from '../utils/const';
+import { useCustomToast } from '../hooks/useCustomToast';
 
 const RegisterUser = () => {
-  const { socket } = useSocket();
+  const { socket, setSocket } = useSocket();
   const location = useLocation();
+  const { showToast } = useCustomToast();
+  const navigate = useNavigate();
   const browsingState = location.state;
 
   useEffect(() => {
     if (browsingState) {
-      console.log('browsingState', browsingState);
       // TODO: Display an error toast with the msg => browsingState.notRegistered
       // TODO: Check the from property in the state to redirect the user back => browsingState.from
       // (both coming from ProtectRegisteredRoute)
       // TODO: After settled to a state the url to be redirected, clear the location.state
       if (browsingState.disconnectUser) {
+        setSocket(null);
         socket?.disconnect();
-        console.log(
-          'Sigue los pasos para unirte/crear una sala y empezar a jugar!'
-        );
-        // TODO: Show a toast instead of a console.log
-        // TODO:? Restart the disconnectUser prop to avoid possible problems
+        showToast({
+          msg: 'Sigue los pasos para unirte/crear una sala y empezar a jugar!',
+        });
+        navigate(location.pathname, {
+          state: { ...browsingState, disconnectUser: undefined },
+          replace: true,
+        });
       }
     }
   }, [browsingState]);
@@ -45,16 +50,28 @@ const RegisterUser = () => {
             >
               P
             </span>
-            <span style={{ fontFamily: 'inherit' }} className={LOGO_COLORS_CLASSES.i}>
+            <span
+              style={{ fontFamily: 'inherit' }}
+              className={LOGO_COLORS_CLASSES.i}
+            >
               i
             </span>
-            <span style={{ fontFamily: 'inherit' }} className={LOGO_COLORS_CLASSES.n}>
+            <span
+              style={{ fontFamily: 'inherit' }}
+              className={LOGO_COLORS_CLASSES.n}
+            >
               n
             </span>
-            <span style={{ fontFamily: 'inherit' }} className={LOGO_COLORS_CLASSES.t}>
+            <span
+              style={{ fontFamily: 'inherit' }}
+              className={LOGO_COLORS_CLASSES.t}
+            >
               t
             </span>
-            <span style={{ fontFamily: 'inherit' }} className={LOGO_COLORS_CLASSES.a}>
+            <span
+              style={{ fontFamily: 'inherit' }}
+              className={LOGO_COLORS_CLASSES.a}
+            >
               a
             </span>
             <span
@@ -89,7 +106,7 @@ const RegisterUser = () => {
           />
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 

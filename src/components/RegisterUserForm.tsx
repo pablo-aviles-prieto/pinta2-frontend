@@ -2,32 +2,36 @@ import { FC } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { io } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
+import { useCustomToast } from '../hooks/useCustomToast';
 
 export const RegisterUserForm: FC = () => {
   const { socket, username, setUsername, setSocket, setIsRegistered } =
     useSocket();
   const navigate = useNavigate();
+  const { showToast } = useCustomToast();
 
   const registerUser = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!username.trim()) {
-      // TODO: Display an error toast
+      showToast({
+        msg: 'Introduzca un nombre válido',
+        options: { type: 'error' },
+      });
       return;
-    }
-
-    if (!socket) {
-      const newSocket = io('http://localhost:4000');
-      newSocket.emit('register', username);
-      setSocket(newSocket);
     }
 
     if (socket && !socket?.connected) {
       socket.connect();
     }
 
-    socket?.emit('register', username);
-    setIsRegistered(true);
+    if (!socket) {
+      const newSocket = io('http://localhost:4000');
+      newSocket.emit('register', username);
+      setSocket(newSocket);
+      setIsRegistered(true);
+    }
+
     navigate('/home');
   };
 

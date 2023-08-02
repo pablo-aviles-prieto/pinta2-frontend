@@ -675,6 +675,9 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     handleConfigGameCounter(false);
   };
 
+  // TODO: IMPORTANT block navigation (refresh or close the browser
+  // should display an alert like chats) or even when pressing the
+  // navlinks on header
   return (
     // TODO: Remove unnecessary SVGs
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
