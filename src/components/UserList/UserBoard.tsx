@@ -32,7 +32,7 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
       return (
         <img
           className='w-full max-w-none'
-          src='../../../public/imgs/forbidden.webp'
+          src='/imgs/forbidden.webp'
           alt='Pintando...'
         />
       );
@@ -40,13 +40,13 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
     return isDrawer ? (
       <img
         className='max-w-none w-[97%]'
-        src='../../../public/imgs/painter.webp'
+        src='/imgs/painter.webp'
         alt='Pintando...'
       />
     ) : (
       <img
         className='max-w-none w-[115%]'
-        src='../../../public/imgs/inspector-gadget.webp'
+        src='/imgs/inspector-gadget.webp'
         alt='Investigando...'
       />
     );

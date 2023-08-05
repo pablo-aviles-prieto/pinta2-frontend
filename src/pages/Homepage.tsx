@@ -44,7 +44,7 @@ const Homepage = () => {
             className={`transition-all duration-500 ${
               btnHovered === 'create' ? '' : 'grayscale'
             }`}
-            src='../../public/imgs/gears.webp'
+            src='/imgs/gears.webp'
             alt='Engranajes'
           />
         </div>
@@ -53,7 +53,7 @@ const Homepage = () => {
             className={`transition-all duration-500 ${
               btnHovered === 'join' ? '' : 'grayscale'
             }`}
-            src='../../public/imgs/door-cartoon.webp'
+            src='/imgs/door-cartoon.webp'
             alt='Puerta'
           />
         </div>
@@ -62,7 +62,7 @@ const Homepage = () => {
             className={`transition-all duration-500 ${
               btnHovered === 'join' ? '' : 'grayscale'
             }`}
-            src='../../public/imgs/canvas.webp'
+            src='/imgs/canvas.webp'
             alt='Lienzo'
           />
         </div>

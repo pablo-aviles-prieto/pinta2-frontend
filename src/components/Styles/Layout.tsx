@@ -37,7 +37,7 @@ export const Layout: FC<Props> = ({ children }) => {
     <div
       className='min-h-[99vh] xl:min-h-[100vh]'
       style={{
-        backgroundImage: `url('../../../public/imgs/bg-cartoons-light.webp')`,
+        backgroundImage: `url('/imgs/bg-cartoons-light.webp')`,
       }}
     >
       <div

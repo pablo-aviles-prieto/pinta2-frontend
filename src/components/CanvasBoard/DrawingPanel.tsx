@@ -45,7 +45,7 @@ export const DrawingPanel: FC<Props> = ({
     const cursorStyle =
       tool === 'pen'
         ? `url(${cursorDataURL}) 5 5,  auto`
-        : `url('../../../public/svgs/eraser-tool.svg') 1 19, auto`;
+        : `url('/svgs/eraser-tool.svg') 1 19, auto`;
     setCanvasCursorStyle(cursorStyle);
     setTool(tool);
   };

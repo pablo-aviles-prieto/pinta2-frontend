@@ -112,7 +112,7 @@ const RegisterUser: FC = () => {
         <div className='absolute -right-[363px] -top-[65px]'>
           <img
             style={{ transform: 'scaleX(-1)' }}
-            src='../../public/imgs/gecko-artist.webp'
+            src='/imgs/gecko-artist.webp'
             alt='Un reptil pintor'
           />
         </div>
