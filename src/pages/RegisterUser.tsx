@@ -19,7 +19,7 @@ const RegisterUser: FC = () => {
     if (browsingState) {
       if (browsingState.notRegistered) {
         showToast({
-          msg: browsingState.notRegistered,
+          msg: browsingState.notRegistered ?? '',
           options: { type: 'warning' },
         });
         setRedirectedURL(browsingState.from);
@@ -31,9 +31,16 @@ const RegisterUser: FC = () => {
           msg: 'Sigue los pasos para unirte/crear una sala y empezar a jugar!',
           options: { type: 'warning' },
         });
+        // Resetting the disconnectUser prop on the location.state
         navigate(location.pathname, {
           state: { ...browsingState, disconnectUser: undefined },
           replace: true,
+        });
+      }
+      if (browsingState.notValidPath) {
+        showToast({
+          msg: browsingState.notValidPath ?? '',
+          options: { type: 'warning' },
         });
       }
     }
