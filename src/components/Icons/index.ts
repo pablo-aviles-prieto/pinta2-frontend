@@ -10,3 +10,5 @@ export { DrawEraser } from './DrawEraser';
 export { GreenArrowUp } from './GreenArrowUp';
 export { PencilStraight } from './PencilStraight';
 export { Forbidden } from './Forbidden';
+export { Join } from './Join';
+export { Back } from './Back';

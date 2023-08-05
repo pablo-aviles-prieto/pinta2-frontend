@@ -75,7 +75,7 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
   return (
     <div className='flex flex-col justify-between w-full h-full'>
       <div className='flex flex-col-reverse h-[93%]'>
-        <ul className='overflow-y-auto'>
+        <ul className='px-2 overflow-y-auto'>
           {chatMsgs.map((event, index) => (
             <li
               key={index}

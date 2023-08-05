@@ -3,7 +3,7 @@ import { textSize, maxWidthClasses } from '../../utils/const';
 
 type IProps = {
   children: ReactNode;
-  title: string;
+  title?: string;
   onSubmit: (e: React.FormEvent) => void;
   containerWidth?: keyof typeof maxWidthClasses;
   titleSize?: keyof typeof textSize;
@@ -20,11 +20,15 @@ export const FormContainer: FC<IProps> = ({
     <div className={`w-full ${maxWidthClasses[containerWidth || 'sm']}`}>
       <form
         onSubmit={onSubmit}
-        className='px-8 pt-6 pb-8 mb-4 rounded shadow-md bg-gradient-to-tl from-emerald-400 to-cyan-400'
+        className='py-[80px] px-[70px] shadow-md bg-gradient-to-tl
+        border border-emerald-400 from-amber-50 via-orange-50 to-amber-50'
+        style={{ borderRadius: '23% 77% 20% 80% / 75% 32% 68% 25%' }}
       >
-        <h3 className={`mb-2 font-bold ${textSize[titleSize || 'xl3']}`}>
-          {title}
-        </h3>
+        {title && (
+          <h3 className={`mb-2 font-bold ${textSize[titleSize || 'xl3']}`}>
+            {title}
+          </h3>
+        )}
         {children}
       </form>
     </div>
@@ -34,4 +38,5 @@ export const FormContainer: FC<IProps> = ({
 FormContainer.defaultProps = {
   containerWidth: 'sm',
   titleSize: 'xl3',
+  title: undefined,
 };

@@ -3,18 +3,20 @@ import { ButtonBorderContainer } from './ButtonBorderContainer';
 
 type Props = {
   extraStyles?: string;
-  children: JSX.Element
-  onClickHandler: () => void
-  onMouseEnter?: () => void
-  onMouseLeave?: () => void
+  children: JSX.Element;
+  isSubmitBtn?: boolean;
+  onClickHandler?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 };
 
 export const BtnContainer: FC<Props> = ({
   extraStyles,
   children,
+  isSubmitBtn,
   onClickHandler,
   onMouseEnter,
-  onMouseLeave
+  onMouseLeave,
 }) => (
   <ButtonBorderContainer>
     <button
@@ -22,12 +24,12 @@ export const BtnContainer: FC<Props> = ({
         rounded-md py-2 transition flex items-center justify-evenly 
         bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50
       hover:text-teal-700`}
-      type='button'
+      type={isSubmitBtn ? 'submit' : 'button'}
       onClick={onClickHandler}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
       {children}
     </button>
-  </ButtonBorderContainer >
+  </ButtonBorderContainer>
 );

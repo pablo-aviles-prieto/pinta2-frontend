@@ -46,6 +46,7 @@ const RegisterUser: FC = () => {
     }
   }, [browsingState]);
 
+  // TODO: IMPORTANT sanitize the data of the username (set max characters (10?) condition)
   return (
     <div className='flex items-center justify-center h-[75vh]'>
       <div

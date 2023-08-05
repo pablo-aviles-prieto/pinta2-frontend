@@ -85,3 +85,16 @@ input[type='number'] {
   animation-duration: 3s; /* 3s in total, 0.5s to zoom in, 2s to stay, 0.5s to zoom out */
   animation-fill-mode: both;
 }
+
+.tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 91%;
+  left: 50%;
+  transform: translateX(-50%) rotate(135deg);
+  width: 10px;
+  height: 10px;
+  border-left: 1px solid rgb(52, 211, 153);
+  border-bottom: 1px solid rgb(52, 211, 153);
+  background-color: #ffedd5;
+}

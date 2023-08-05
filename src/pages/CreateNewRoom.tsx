@@ -1,7 +1,6 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { FormContainer } from '../components/Styles/FormContainer';
-import { Copy, CopyOk, Eye, EyeOff } from '../components/Icons';
-import { ButtonBorderContainer } from '../components/Styles/ButtonBorderContainer';
+import { Back, Copy, CopyOk, Eye, EyeOff, Join } from '../components/Icons';
 import { useSocket } from '../hooks/useSocket';
 import type { UserRoomI } from '../interfaces';
 import { useGameData } from '../hooks/useGameData';
@@ -9,6 +8,7 @@ import { useCustomToast } from '../hooks/useCustomToast';
 import { Id } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { copyToClipboard } from '../utils';
+import { BtnContainer } from '../components/Styles/BtnContainer';
 
 interface CreateRoomResponse {
   success: boolean;
@@ -17,6 +17,11 @@ interface CreateRoomResponse {
   roomUsers: UserRoomI[];
 }
 
+const TOOLTIP_WIDTH = 'w-[150px]';
+
+// TODO: IMPORTANT sanitize the data of the password (max characts (10?) and some regex to not use any white space
+// and dont use any special character, just normal chars???)
+// TODO: IMPORTANT Test if the users should and can use special characters on the password field
 const CreateNewRoom: FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [roomDigits, setRoomDigits] = useState<(number | '')[]>(
@@ -51,7 +56,6 @@ const CreateNewRoom: FC = () => {
         navigate(`/room/${response.room}`, {
           replace: true,
         });
-        // TODO: Clean inputs? (atm im using the roomDigits)
       } else {
         if (createRoomToastId) {
           updateToast({
@@ -115,21 +119,18 @@ const CreateNewRoom: FC = () => {
     }
   };
 
-  const copyBtnStyles = copied ? 'bg-gray-500 text-white' : '';
+  const tooltipClass = `absolute tooltip ${TOOLTIP_WIDTH} py-2 bg-orange-100 text-emerald-600 text-center 
+  rounded-md shadow-md opacity-0 top-16 border border-emerald-400 group-hover:opacity-100 transform
+   transition ease-in-out duration-200`;
 
   return (
     // TODO: Create button to auto generate the room number
-    // maybe remove the title of form container ?
-    <>
-      <FormContainer
-        title='Create a room'
-        containerWidth='md'
-        onSubmit={onSubmit}
-      >
+    <div className='flex items-center justify-center h-[75vh]'>
+      <FormContainer title='Crear sala' containerWidth='md' onSubmit={onSubmit}>
         <div className='space-y-6'>
           <div>
             <label className='text-xl' htmlFor='roomNumber'>
-              Room Nº
+              Número de la sala
             </label>
             <div className='flex justify-between'>
               {roomDigits.map((digit, index) => (
@@ -144,8 +145,9 @@ const CreateNewRoom: FC = () => {
                   autoFocus={index === 0}
                   maxLength={1}
                   value={digit}
-                  onChange={handleInputChange(index)}
-                  className='w-[55px] h-[55px] text-2xl rounded-full border outline-none text-center'
+                  onInput={handleInputChange(index)}
+                  className='w-[55px] h-[55px] text-2xl rounded-full border border-emerald-600
+                   text-center outline-none focus-visible:border-emerald-300'
                   onFocus={(e) => e.target.select()}
                 />
               ))}
@@ -153,15 +155,15 @@ const CreateNewRoom: FC = () => {
           </div>
           <div>
             <label className='text-xl' htmlFor='roomPassword'>
-              Password
+              Contraseña
             </label>
             <div className='relative'>
               <input
                 ref={passwordInputRef}
                 type={showPassword ? 'text' : 'password'}
-                placeholder='Password'
+                placeholder='Contraseña...'
                 value={roomPassword}
-                className='w-full px-4 py-3 text-sm border rounded-lg outline-none'
+                className='w-full px-4 py-3 text-sm border rounded-lg outline-none border-emerald-600 focus-visible:border-emerald-300'
                 name='roomPassword'
                 onChange={(e) => setRoomPassword(e.target.value)}
               />
@@ -184,43 +186,46 @@ const CreateNewRoom: FC = () => {
           </div>
         </div>
         <div className='flex items-center mt-10 gap-x-2'>
-          <ButtonBorderContainer>
-            <button
-              className={`${copyBtnStyles} w-full mx-auto text-lg
-                rounded-md bg-teal-400 py-2 transition flex items-center justify-evenly 
-                hover:text-white hover:bg-teal-600`}
-              type='button'
-              onClick={() =>
-                copyToClipboard({
-                  isCopied: copied,
-                  setIsCopied: setCopied,
-                  roomNumber: +roomDigits.join(''),
-                  roomPassword,
-                })
-              }
-            >
-              <span>{copied ? 'Copiado!' : 'Copiar enlace'}</span>
+          <BtnContainer
+            extraStyles='py-3 relative group h-[51px]'
+            onClickHandler={() => navigate('/home')}
+          >
+            <>
+              <span className={tooltipClass}>Volver atrás</span>
+              <Back width={33} height={33} />
+            </>
+          </BtnContainer>
+          <BtnContainer
+            extraStyles='py-3 relative group h-[51px]'
+            onClickHandler={() =>
+              copyToClipboard({
+                isCopied: copied,
+                setIsCopied: setCopied,
+                roomNumber: +roomDigits.join(''),
+                roomPassword,
+              })
+            }
+          >
+            <>
+              <span className={tooltipClass}>
+                {copied ? 'Copiado!' : 'Copiar enlace'}
+              </span>
               {copied ? (
-                <CopyOk width={27} height={27} />
+                <CopyOk width={29} height={29} />
               ) : (
-                <Copy width={27} height={27} />
+                <Copy width={29} height={29} />
               )}
-            </button>
-          </ButtonBorderContainer>
-          <ButtonBorderContainer>
-            <button
-              type='submit'
-              className='w-full py-2 overflow-hidden text-lg text-white bg-teal-600 rounded-md hover:bg-teal-400 hover:text-black'
-            >
-              Ir a la sala
-            </button>
-          </ButtonBorderContainer>
+            </>
+          </BtnContainer>
+          <BtnContainer extraStyles='py-3 relative group h-[51px]' isSubmitBtn>
+            <>
+              <span className={tooltipClass}>Ir a la sala</span>
+              <Join width={24} height={24} />
+            </>
+          </BtnContainer>
         </div>
       </FormContainer>
-      <button type='button' onClick={() => navigate('/home')}>
-        Go back
-      </button>
-    </>
+    </div>
   );
 };
 
