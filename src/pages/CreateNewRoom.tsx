@@ -126,6 +126,13 @@ const CreateNewRoom: FC = () => {
   return (
     // TODO: Create button to auto generate the room number
     <div className='flex items-center justify-center h-[75vh]'>
+      <div className='absolute top-7'>
+        <img
+          className='w-[700px] h-[830px]'
+          src='/imgs/bground-create-room.webp'
+          alt='Utensilios para dibujar'
+        />
+      </div>
       <FormContainer title='Crear sala' containerWidth='md' onSubmit={onSubmit}>
         <div className='space-y-6'>
           <div>

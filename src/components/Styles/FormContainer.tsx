@@ -17,10 +17,10 @@ export const FormContainer: FC<IProps> = ({
   onSubmit,
 }) => {
   return (
-    <div className={`w-full ${maxWidthClasses[containerWidth || 'sm']}`}>
+    <div className={`w-full ${maxWidthClasses[containerWidth || 'sm']} z-[2]`}>
       <form
         onSubmit={onSubmit}
-        className='py-[80px] px-[70px] shadow-md bg-gradient-to-tl
+        className='py-[80px] px-[70px] pt-[70px] shadow-md bg-gradient-to-tl
         border border-emerald-400 from-amber-50 via-orange-50 to-amber-50'
         style={{ borderRadius: '23% 77% 20% 80% / 75% 32% 68% 25%' }}
       >

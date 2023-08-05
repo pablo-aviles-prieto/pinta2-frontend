@@ -26,6 +26,8 @@ const Divider = () => {
   return <span className='mx-2 text-2xl text-teal-500'>|</span>;
 };
 
+// TODO: IMPORTANT In case that game started, the 'Crear sala', 'Unirse' and it should
+// have the option to disconnect in the layout!
 // TODO: IMPORTANT The 'Contacto' option (should be a modal sending a mail in the form
 // like I did on the portfolio)
 // TODO: IMPORTANT The 'Ayuda' option should be a modal aswell, so it can be opened while gaming
