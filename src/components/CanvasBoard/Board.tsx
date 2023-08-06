@@ -518,6 +518,10 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       }
     );
 
+    socket.on('update lines state', ({ lines }: { lines: LinesI[] }) => {
+      setLines(lines);
+    });
+
     // TODO: Apply some sound for the preTurnCount (for each of the 3 seconds)
     // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
     // TODO: Add a button to copy the link to a friend in the Board
@@ -542,6 +546,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       socket.off('user guessed');
       socket.off('disconnect');
       socket.off('join room directly response');
+      socket.off('update lines state');
     };
   }, []);
 
@@ -678,6 +683,18 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     handleConfigGameCounter(false);
   };
 
+  const handleUndo = () => {
+    setLines((prevLines) => {
+      const newLinesState =
+        prevLines.length > 0 ? prevLines.slice(0, -1) : prevLines;
+      socket?.emit('update drawing lines', {
+        roomNumber: joinedRoom,
+        draw: newLinesState,
+      });
+      return newLinesState;
+    });
+  };
+
   // TODO: IMPORTANT block navigation (refresh or close the browser
   // should display an alert like chats) or even when pressing the
   // navlinks on header
@@ -686,80 +703,53 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     // TODO: Disable the input when user is in turnScore so he cant keep chatting ???
     // TODO: Add a restart game button for the owner (it should display a modal to confirm the action)!
-    // TODO: Create a history of lines drew (for example, an id/index for each time the user write a line without
-    // leaving the mouse), so the user can go back and forth for last things drew
     // TODO: Check that the chat behaviour is correct (scroll might fail)
-    // TODO: Add the possibility to remove the previous lines (should be just remove the
-    // line from the lines state?)
     // TODO: Check that when pressing a link on the header, it doesnt navigate right away, should
     // alert the user
     // TODO: IMPORTANT Check the cursor on the bottom of the canvas, since it disappear if it doesnt have
     // enought space
     // TODO: Add a footer with my details and a little explanation??
     <>
-      {/* TODO: IMPORTANT Put the turn and the round somewhere! */}
-      {/* TODO: IMPORTANT Move 'limpiar lienzo' to the drawing panel
-      and put there the turn and round (same width than the 'copiar
-      enlace' button), so the drawing panel is 100% centered */}
-      {/* {gameState.started &&
-        gameState.turn !== undefined &&
-        gameState.round !== undefined && (
-          <div className='my-4'>
-            <p>Turn: {gameState.turn}</p>
-            <p>Round: {gameState.round}</p>
-          </div>
-        )} */}
-      {gameState.started &&
-        (gameState.preTurn || !startTurnCounter) &&
-        !isDrawer && (
-          <div className='flex justify-end mb-1'>
-            <div className='w-[200px]'>
-              <CopyBtnComponent
-                copied={copied}
-                joinedRoom={joinedRoom ?? 9999}
-                roomPassword={roomPassword}
-                setCopied={setCopied}
-              />
-            </div>
-          </div>
-        )}
       {/* TODO: Extract into a component IMPORTANT */}
-      {/* TODO: Change the * for _ (for no drawers) IMPORTANT */}
-      {gameState.started && !gameState.preTurn && startTurnCounter && (
-        <div className='flex items-end justify-between mb-1'>
-          {!isDrawer && <div className='w-[129px]' />}
-          <div
-            className={`flex items-center justify-center gap-4 px-4 py-2 border-2 rounded-lg 
-          shadow-lg border-emerald-300 m-auto text-2xl
-          bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50`}
-          >
-            <p className='font-bold w-[45px]'>{turnCount}</p>
-            {gameState.currentWord && (
-              <p>{isDrawer ? gameState.currentWord : gameState.cryptedWord}</p>
-            )}
-          </div>
-          {!isDrawer && (
-            <div className='w-[200px]'>
-              <CopyBtnComponent
-                copied={copied}
-                joinedRoom={joinedRoom ?? 9999}
-                roomPassword={roomPassword}
-                setCopied={setCopied}
-              />
-            </div>
+      <div className='flex items-end justify-between gap-2 mb-1'>
+        {/* Turn/Round container */}
+        <div
+          className='w-[137px] p-3 px-0 text-sm border rounded-lg text-center
+        border-emerald-500 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50'
+        >
+          {gameState.started && (
+            <p>
+              Ronda{' '}
+              <span className='mr-2 text-base font-bold text-emerald-600'>
+                {gameState.round}
+              </span>
+              Turno{' '}
+              <span className='text-base font-bold text-emerald-600'>
+                {gameState.turn !== undefined && gameState.turn + 1}
+              </span>
+            </p>
           )}
         </div>
-      )}
-      {(!gameState.started || isDrawer) && (
-        <div className='flex items-end justify-between gap-2 mb-1'>
-          <button
-            className='p-2 border-2 rounded-lg border-emerald-400 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50'
-            type='button'
-            onClick={clearBoard}
-          >
-            Limpiar lienzo
-          </button>
-          <div className='w-[435px]'>
+        {/* Word container & DrawingPanel */}
+        {/* TODO: Change the * for _ (for no drawers) IMPORTANT */}
+        <div>
+          {gameState.started && !gameState.preTurn && startTurnCounter && (
+            <div className='flex items-center justify-center mb-1'>
+              <div
+                className={`flex items-center justify-center gap-4 px-4 py-2 border-2 rounded-lg 
+          shadow-lg border-emerald-300 m-auto text-2xl
+          bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50`}
+              >
+                <p className='font-bold w-[45px]'>{turnCount}</p>
+                {gameState.currentWord && (
+                  <p>
+                    {isDrawer ? gameState.currentWord : gameState.cryptedWord}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+          {(!gameState.started || isDrawer) && (
             <DrawingPanel
               color={drawColor}
               pencilStroke={pencilStroke}
@@ -770,18 +760,21 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
               tool={tool}
               setTool={setTool}
               setCanvasCursorStyle={setCanvasCursorStyle}
+              clearBoard={clearBoard}
+              handleUndo={handleUndo}
             />
-          </div>
-          <div className='w-[200px]'>
-            <CopyBtnComponent
-              copied={copied}
-              joinedRoom={joinedRoom ?? 9999}
-              roomPassword={roomPassword}
-              setCopied={setCopied}
-            />
-          </div>
+          )}
         </div>
-      )}
+        {/* CopyBtn container */}
+        <div className='w-[266px]'>
+          <CopyBtnComponent
+            copied={copied}
+            joinedRoom={joinedRoom ?? 9999}
+            roomPassword={roomPassword}
+            setCopied={setCopied}
+          />
+        </div>
+      </div>
       <div className='mx-auto flex gap-2 w-[1280px] h-[600px]'>
         <UserBoard extraStyles='w-[144px] h-full' />
         <Stage

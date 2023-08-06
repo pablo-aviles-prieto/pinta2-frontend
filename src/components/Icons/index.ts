@@ -12,3 +12,5 @@ export { PencilStraight } from './PencilStraight';
 export { Forbidden } from './Forbidden';
 export { Join } from './Join';
 export { Back } from './Back';
+export { Canvas } from './Canvas';
+export { Undo } from './Undo';

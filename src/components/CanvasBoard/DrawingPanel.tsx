@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { CirclePicker } from 'react-color';
-import { DrawEraser, DrawPencil } from '../Icons';
+import { Canvas, DrawEraser, DrawPencil, Undo } from '../Icons';
 import { getBase64SVGURL } from '../../utils';
 import { PALETTE_COLORS } from '../../utils/const';
 
@@ -14,6 +14,8 @@ interface Props {
   setEraserStroke: React.Dispatch<React.SetStateAction<number>>;
   setTool: React.Dispatch<React.SetStateAction<'pen' | 'eraser'>>;
   setCanvasCursorStyle: React.Dispatch<React.SetStateAction<string>>;
+  clearBoard: () => void;
+  handleUndo: () => void;
 }
 
 type SwappedTool = 'pen' | 'eraser';
@@ -33,6 +35,8 @@ export const DrawingPanel: FC<Props> = ({
   setEraserStroke,
   setTool,
   setCanvasCursorStyle,
+  clearBoard,
+  handleUndo,
 }) => {
   const onToolChange = ({
     tool,
@@ -51,7 +55,7 @@ export const DrawingPanel: FC<Props> = ({
   };
 
   return (
-    <div className='flex p-2 border-2 rounded-lg shadow-md gap-9 border-emerald-300 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-100'>
+    <div className='flex p-2 w-[480px] border-2 rounded-lg gap-7 shadow-m border-emerald-300 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-100'>
       <CirclePicker
         className='items-center justify-center'
         circleSize={30}
@@ -90,14 +94,21 @@ export const DrawingPanel: FC<Props> = ({
           ))}
         </div>
       </div>
-      <div className='flex flex-col justify-between'>
+      <div className='w-[110px] grid grid-cols-2 gap-x-2 gap-y-1'>
         <div
-          className={`flex justify-between rounded-md shadow-lg hover:shadow-inner ${
+          className={`flex justify-center rounded-md shadow-lg hover:shadow-inner ${
             tool === 'pen' && 'shadow-sm'
           }`}
         >
           <button onClick={() => onToolChange({ tool: 'pen', color })}>
-            <DrawPencil width={45} height={40} />
+            <DrawPencil width={40} height={40} />
+          </button>
+        </div>
+        <div
+          className={`flex justify-center rounded-md shadow-lg hover:shadow-inner`}
+        >
+          <button onClick={() => handleUndo()}>
+            <Undo width={35} height={35} />
           </button>
         </div>
         <div
@@ -106,7 +117,14 @@ export const DrawingPanel: FC<Props> = ({
           }`}
         >
           <button onClick={() => onToolChange({ tool: 'eraser', color })}>
-            <DrawEraser width={45} height={40} />
+            <DrawEraser width={40} height={40} />
+          </button>
+        </div>
+        <div
+          className={`flex justify-center rounded-md shadow-lg hover:shadow-inner`}
+        >
+          <button onClick={() => clearBoard()}>
+            <Canvas width={40} height={40} />
           </button>
         </div>
       </div>
