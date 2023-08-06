@@ -25,7 +25,11 @@ export const FormContainer: FC<IProps> = ({
         style={{ borderRadius: '23% 77% 20% 80% / 75% 32% 68% 25%' }}
       >
         {title && (
-          <h3 className={`mb-2 font-bold ${textSize[titleSize || 'xl3']}`}>
+          <h3
+            className={`mb-2 font-bold ${
+              textSize[titleSize || 'xl3']
+            } text-emerald-600`}
+          >
             {title}
           </h3>
         )}

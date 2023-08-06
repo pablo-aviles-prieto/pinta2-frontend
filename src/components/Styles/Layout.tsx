@@ -7,8 +7,7 @@ interface Props {
   children: JSX.Element;
 }
 
-// TODO: Add the 'Disconnect' option, so the user can disconnect?
-// or just leave it to the board the disconnect option
+// TODO: IMPORTANT Add the 'Disconnect' option, so the user can disconnect
 const NAV_OPTIONS = [
   { id: 'home', label: 'Inicio', path: '/', altPath: '/home' },
   {
@@ -26,8 +25,8 @@ const Divider = () => {
   return <span className='mx-2 text-2xl text-teal-500'>|</span>;
 };
 
-// TODO: IMPORTANT In case that game started, the 'Crear sala', 'Unirse' and it should
-// have the option to disconnect in the layout!
+// TODO: IMPORTANT In case that game started, the 'Inicio', 'Crear sala' & 'Unirse'
+// and it should have the option to disconnect in the layout replacing Inicio!
 // TODO: IMPORTANT The 'Contacto' option (should be a modal sending a mail in the form
 // like I did on the portfolio)
 // TODO: IMPORTANT The 'Ayuda' option should be a modal aswell, so it can be opened while gaming

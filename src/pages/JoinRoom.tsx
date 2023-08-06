@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import type { GameStateI, UserRoomI } from '../interfaces';
 import { useGameData } from '../hooks/useGameData';
@@ -6,6 +6,9 @@ import { DEFAULT_TURN_DURATION } from '../utils/const';
 import { useCustomToast } from '../hooks/useCustomToast';
 import { Id } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { RoomForm } from '../components/Styles/RoomForm';
+import { BtnContainer } from '../components/Styles/BtnContainer';
+import { Back, Join } from '../components/Icons';
 
 interface JoinRoomResponse {
   success: boolean;
@@ -16,14 +19,19 @@ interface JoinRoomResponse {
   gameState?: GameStateI;
 }
 
+const TOOLTIP_WIDTH = 'w-[150px]';
+
 const JoinRoom: FC = () => {
-  const [roomNumber, setRoomNumber] = useState('');
   const [joinRoomToastId, setJoinRoomToastId] = useState<Id | undefined>(
     undefined
   );
-  const { socket, setJoinedRoom, joinedRoom, roomPassword, setRoomPassword } =
-    useSocket();
-  const { showToast, showLoadingToast, updateToast } = useCustomToast();
+  const [roomDigits, setRoomDigits] = useState<(number | '')[]>(
+    Array(4).fill('')
+  );
+  const digitsInputRef = useRef<(HTMLInputElement | null)[]>([]);
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
+  const { socket, setJoinedRoom, joinedRoom } = useSocket();
+  const { updateToast } = useCustomToast();
   const { setUserList, setGameState, setIsPlaying, setTurnDuration } =
     useGameData();
   const navigate = useNavigate();
@@ -44,7 +52,6 @@ const JoinRoom: FC = () => {
         setJoinedRoom(response.room);
         response.newUsers && setUserList(response.newUsers);
         response.gameState && setGameState(response.gameState);
-        // response.isPlaying && setIsPlaying(response.isPlaying);
 
         if (response.isPlaying) {
           setIsPlaying(response.isPlaying);
@@ -63,8 +70,6 @@ const JoinRoom: FC = () => {
         }
 
         navigate(`/room/${response.room}`, { replace: true });
-
-        // TODO: Clear inputs?
       } else {
         if (joinRoomToastId) {
           updateToast({
@@ -83,74 +88,41 @@ const JoinRoom: FC = () => {
     };
   }, [socket, joinRoomToastId, joinedRoom]);
 
-  const joinRoom = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Check that inputs are correctly filled
-    if (
-      !roomPassword.trim()
-      // roomDigits.some((digit) => digit === '' || isNaN(digit))
-    ) {
-      showToast({
-        msg: 'Por favor, rellene todos los datos',
-        options: { type: 'error' },
-      });
-      return;
-    }
-
-    if (socket) {
-      const joinRoomToast = showLoadingToast({
-        msg: 'Accediendo a la sala...',
-      });
-      setJoinRoomToastId(joinRoomToast);
-      socket.emit('join room', { roomNumber, roomPassword });
-    }
-  };
+  const tooltipClass = `absolute tooltip ${TOOLTIP_WIDTH} py-2 bg-orange-100 text-emerald-600 text-center 
+    rounded-md shadow-md opacity-0 top-16 border border-emerald-400 group-hover:opacity-100 transform
+     transition ease-in-out duration-200`;
 
   return (
-    <>
-      <form className='w-full max-w-sm' onSubmit={joinRoom}>
-        <div className='flex items-center py-2 border-b border-teal-500'>
-          {/* TODO: Change to a digits input instead of this input text */}
-          <input
-            className='w-full px-2 py-1 mr-3 leading-tight text-gray-700 bg-transparent border-none appearance-none focus:outline-none'
-            type='text'
-            id='roomNumber'
-            name='roomNumber'
-            value={roomNumber}
-            onChange={(e) => setRoomNumber(e.target.value)}
-            placeholder='Enter the room number'
-            aria-label='Room number'
-          />
-          <button
-            className='flex-shrink-0 px-2 py-1 text-sm text-white bg-teal-500 border-4 border-teal-500 rounded hover:bg-teal-700 hover:border-teal-700'
-            type='submit'
+    <div className='flex items-center justify-center h-[75vh]'>
+      <RoomForm
+        title='Acceder a sala'
+        containerWidth='md'
+        roomDigits={roomDigits}
+        digitsInputRef={digitsInputRef}
+        setRoomDigits={setRoomDigits}
+        passwordInputRef={passwordInputRef}
+        setToastId={setJoinRoomToastId}
+        isCreating={false}
+      >
+        <div className='flex items-center mt-10 gap-x-2'>
+          <BtnContainer
+            extraStyles='py-3 relative group h-[51px]'
+            onClickHandler={() => navigate('/home')}
           >
-            Join room
-          </button>
+            <>
+              <span className={tooltipClass}>Volver atrás</span>
+              <Back width={33} height={33} />
+            </>
+          </BtnContainer>
+          <BtnContainer extraStyles='py-3 relative group h-[51px]' isSubmitBtn>
+            <>
+              <span className={tooltipClass}>Ir a la sala</span>
+              <Join width={24} height={24} />
+            </>
+          </BtnContainer>
         </div>
-        <div className='flex items-center py-2 border-b border-teal-500'>
-          <input
-            className='w-full px-2 py-1 mr-3 leading-tight text-gray-700 bg-transparent border-none appearance-none focus:outline-none'
-            type='text'
-            id='roomPassword'
-            name='roomPassword'
-            value={roomPassword}
-            onChange={(e) => setRoomPassword(e.target.value)}
-            placeholder='Enter the room password'
-            aria-label='Room password'
-          />
-          <button
-            className='flex-shrink-0 px-2 py-1 text-sm text-white bg-teal-500 border-4 border-teal-500 rounded hover:bg-teal-700 hover:border-teal-700'
-            type='submit'
-          >
-            Join room
-          </button>
-        </div>
-      </form>
-      <button className='mt-6' type='button' onClick={() => navigate('/home')}>
-        Go back
-      </button>
-    </>
+      </RoomForm>
+    </div>
   );
 };
 

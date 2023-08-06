@@ -23,6 +23,7 @@ const RegisterUser: FC = () => {
           options: { type: 'warning' },
         });
         setRedirectedURL(browsingState.from);
+        setSocket(null);
       }
       if (browsingState.disconnectUser) {
         setSocket(null);

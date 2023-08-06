@@ -96,7 +96,7 @@ const Room = () => {
   useEffect(() => {
     if ((!joinedRoom || !isRegistered) && !queryPw) {
       if (isRegistered && !joinedRoom) {
-        navigate('/join-room', {
+        navigate('/home', {
           state: {
             notRegistered: 'Introduzca las credenciales correctas',
             from: location.pathname,
