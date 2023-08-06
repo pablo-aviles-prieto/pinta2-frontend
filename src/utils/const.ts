@@ -33,6 +33,7 @@ export const maxWidthClasses = {
 export const MAX_POINTS_IN_SINGLE_ARRAY = 2500;
 export const DEFAULT_TURN_DURATION = 120; // in miliseconds
 export const DEFAULT_CATEGORY_SELECTED = 'Aleatorio';
+export const DEFAULT_INIT_GAME_STATE = { started: false };
 export const FALLBACK_USER_COLOR = '#7d7d7d';
 
 export const PALETTE_COLORS = [
@@ -69,10 +70,10 @@ export const LIGHTER_COLORS_MAP = {
 };
 
 export const LOGO_COLORS_CLASSES = {
-  'p': 'text-emerald-600',
-  'i': 'text-indigo-600',
-  'n': 'text-amber-600',
-  't': 'text-purple-600',
-  'a': 'text-cyan-600',
+  p: 'text-emerald-600',
+  i: 'text-indigo-600',
+  n: 'text-amber-600',
+  t: 'text-purple-600',
+  a: 'text-cyan-600',
   '2': 'text-red-600',
-}
+};

@@ -7,17 +7,45 @@ interface Props {
   children: JSX.Element;
 }
 
-// TODO: IMPORTANT Add the 'Disconnect' option, so the user can disconnect
+// TODO: Edit contact and help route since it should be displayed on a modal
+// and on a tooltip instead of redirecting to a path
 const NAV_OPTIONS = [
-  { id: 'home', label: 'Inicio', path: '/', altPath: '/home' },
+  {
+    id: 'home',
+    label: 'Inicio',
+    path: '/',
+    altPath: '/home',
+    protectWhilePlaying: true,
+  }, // Visible when user not playing
   {
     id: 'create',
     label: 'Crear sala',
     path: '/create-room',
     protectRegistered: true,
-  }, // Visible when user registered
-  { id: 'join', label: 'Unirse', path: '/join-room', protectRegistered: true }, // Visible when user registered
-  { id: 'contact', label: 'Contactar', path: '/contact' },
+    protectWhilePlaying: true,
+  }, // Visible when user registered and not playing
+  {
+    id: 'join',
+    label: 'Unirse',
+    path: '/join-room',
+    protectRegistered: true,
+    protectWhilePlaying: true,
+  }, // Visible when user registered and not playing
+  {
+    id: 'disconnect',
+    label: 'Desconectar',
+    path: '/',
+    state: {
+      disconnectUser: true,
+      from: location.pathname,
+    },
+    showOnPlaying: true,
+  }, // Only visible while playing
+  {
+    id: 'contact',
+    label: 'Contactar',
+    path: '/contact',
+  },
   { id: 'help', label: 'Ayuda', path: '/help' },
 ];
 
@@ -32,7 +60,7 @@ const Divider = () => {
 // TODO: IMPORTANT The 'Ayuda' option should be a modal aswell, so it can be opened while gaming
 // (maybe it should be displayed on hover, and no need to click!!!)
 export const Layout: FC<Props> = ({ children }) => {
-  const { socket } = useSocket();
+  const { socket, joinedRoom } = useSocket();
 
   return (
     <div
@@ -97,6 +125,8 @@ export const Layout: FC<Props> = ({ children }) => {
             <ul className='flex items-center'>
               {NAV_OPTIONS.map((option, i) => {
                 if (option.protectRegistered && !socket) return;
+                if (option.protectWhilePlaying && joinedRoom) return;
+                if (option.showOnPlaying && !joinedRoom) return;
                 return (
                   <Fragment key={option.id}>
                     <li>
@@ -112,6 +142,7 @@ export const Layout: FC<Props> = ({ children }) => {
                             ? option.altPath
                             : option.path
                         }
+                        state={option.state ?? {}}
                       >
                         {option.label}
                       </NavLink>

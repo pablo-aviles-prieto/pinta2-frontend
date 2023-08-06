@@ -93,7 +93,14 @@ const JoinRoom: FC = () => {
      transition ease-in-out duration-200`;
 
   return (
-    <div className='flex items-center justify-center h-[75vh]'>
+    <div className='relative flex items-center justify-center h-[75vh]'>
+      <div className='absolute -left-[650px] top-16 hover:sepia'>
+        <img
+          className='w-[1300px] h-[530px]'
+          src='/imgs/woman-silhouette-paint.webp'
+          alt='Utensilios para dibujar'
+        />
+      </div>
       <RoomForm
         title='Acceder a sala'
         containerWidth='md'

@@ -9,13 +9,14 @@ const RegisterUser: FC = () => {
   const [redirectedURL, setRedirectedURL] = useState<string | undefined>(
     undefined
   );
-  const { socket, setSocket } = useSocket();
+  const { setSocket, resetSocketAndGameData } = useSocket();
   const location = useLocation();
   const { showToast } = useCustomToast();
   const navigate = useNavigate();
   const browsingState = location.state;
 
   useEffect(() => {
+    console.log('browsingState', browsingState);
     if (browsingState) {
       if (browsingState.notRegistered) {
         showToast({
@@ -26,8 +27,7 @@ const RegisterUser: FC = () => {
         setSocket(null);
       }
       if (browsingState.disconnectUser) {
-        setSocket(null);
-        socket?.disconnect();
+        resetSocketAndGameData();
         showToast({
           msg: 'Sigue los pasos para unirte/crear una sala y empezar a jugar!',
           options: { type: 'warning' },

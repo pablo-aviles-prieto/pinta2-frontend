@@ -2,10 +2,10 @@ import { create } from 'zustand';
 import type { UserRoomI, GameStateI } from '../interfaces';
 import {
   DEFAULT_CATEGORY_SELECTED,
+  DEFAULT_INIT_GAME_STATE,
   DEFAULT_TURN_DURATION,
 } from '../utils/const';
 
-// TODO: Create a property to save and set the users array
 interface GameDataStore {
   userList: UserRoomI[];
   gameState: GameStateI;
@@ -23,14 +23,10 @@ interface GameDataStore {
   setUsersNotPlaying: (usersPlaying: string[]) => void;
 }
 
-const INIT_GAME_STATE = {
-  started: false,
-};
-
 export const useGameData = create<GameDataStore>((set) => {
   return {
     userList: [],
-    gameState: INIT_GAME_STATE,
+    gameState: DEFAULT_INIT_GAME_STATE,
     categorySelected: DEFAULT_CATEGORY_SELECTED,
     turnDuration: DEFAULT_TURN_DURATION,
     isDrawer: false,

@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react';
-import { ConnectionManager } from '../ConnectionManager';
 import { Board } from './Board';
 import { useSocket } from '../../hooks/useSocket';
 import { useGameData } from '../../hooks/useGameData';
@@ -11,7 +10,7 @@ export const BodyContainer: FC = () => {
   const [gameCancelled, setGameCancelled] = useState<string | undefined>(
     undefined
   );
-  const { socket, joinedRoom } = useSocket();
+  const { socket } = useSocket();
   const { gameState } = useGameData();
 
   useEffect(() => {
@@ -35,14 +34,12 @@ export const BodyContainer: FC = () => {
 
   return (
     <>
-      {/* <p>Habitación: {joinedRoom}</p> */}
       {!awaitPlayersMsg && gameCancelled && !gameState.started && (
         <div className='my-4 text-xl font-bold'>{gameCancelled}</div>
       )}
       {awaitPlayersMsg && !gameState.started && (
         <div className='my-4 text-xl font-bold'>{awaitPlayersMsg}</div>
       )}
-      {/* <ConnectionManager /> */}
       <Board
         setAwaitPlayersMsg={setAwaitPlayersMsg}
         setGameCancelled={setGameCancelled}

@@ -1,6 +1,12 @@
 import { FC, createContext, useContext, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
+import { useGameData } from './useGameData';
+import {
+  DEFAULT_CATEGORY_SELECTED,
+  DEFAULT_INIT_GAME_STATE,
+  DEFAULT_TURN_DURATION,
+} from '../utils/const';
 
 interface SocketContextI {
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | null;
@@ -15,6 +21,7 @@ interface SocketContextI {
   setIsRegistered: React.Dispatch<React.SetStateAction<boolean>>;
   roomPassword: string;
   setRoomPassword: React.Dispatch<React.SetStateAction<string>>;
+  resetSocketAndGameData: () => void;
 }
 
 interface PropsI {
@@ -32,6 +39,33 @@ export const SocketProvider: FC<PropsI> = ({ children }) => {
     DefaultEventsMap
   > | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
+  const {
+    setUserList,
+    setGameState,
+    setCategorySelected,
+    setTurnDuration,
+    setIsDrawer,
+    setIsPlaying,
+    setUsersNotPlaying,
+  } = useGameData();
+
+  const resetSocketAndGameData = () => {
+    socket?.disconnect();
+    // socket setters
+    setUsername('');
+    setRoomPassword('');
+    setJoinedRoom(undefined);
+    setSocket(null);
+    setIsRegistered(false);
+    // useGameData setters
+    setUserList([]);
+    setGameState(DEFAULT_INIT_GAME_STATE);
+    setCategorySelected(DEFAULT_CATEGORY_SELECTED);
+    setTurnDuration(DEFAULT_TURN_DURATION);
+    setIsDrawer(false);
+    setIsPlaying(false);
+    setUsersNotPlaying([]);
+  };
 
   return (
     <SocketContext.Provider
@@ -46,6 +80,7 @@ export const SocketProvider: FC<PropsI> = ({ children }) => {
         setIsRegistered,
         roomPassword,
         setRoomPassword,
+        resetSocketAndGameData,
       }}
     >
       {children}
