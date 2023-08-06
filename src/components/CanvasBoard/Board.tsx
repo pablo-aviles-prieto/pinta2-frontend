@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Line } from 'react-konva';
 import Konva from 'konva';
 import { useSocket } from '../../hooks/useSocket';
@@ -53,14 +53,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     string | undefined
   >(undefined);
   const isDrawing = useRef(false);
-  const {
-    socket,
-    joinedRoom,
-    roomPassword,
-    setIsRegistered,
-    setUsername,
-    setRoomPassword,
-  } = useSocket();
+  const { socket, joinedRoom, roomPassword, setIsRegistered, setUsername } =
+    useSocket();
   const { showToast } = useCustomToast();
   const {
     RenderModal: ModalOwnerCategories,
@@ -91,7 +85,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     count: turnCount,
     startCounter: startTurnCounter,
     setStartCounter: setTurnStartCounter,
-    handleCounterState: handleTurnCounter,
     resetCounterState: resetTurnCounter,
   } = useTurnCounter({
     onCountDownComplete: () => {
@@ -713,21 +706,20 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       {/* TODO: Extract into a component IMPORTANT */}
       <div className='flex items-end justify-between gap-2 mb-1'>
         {/* Turn/Round container */}
-        <div
-          className='w-[137px] p-3 px-0 text-sm border rounded-lg text-center
-        border-emerald-500 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50'
-        >
+        <div className='w-[137px]'>
           {gameState.started && (
-            <p>
-              Ronda{' '}
-              <span className='mr-2 text-base font-bold text-emerald-600'>
-                {gameState.round}
-              </span>
-              Turno{' '}
-              <span className='text-base font-bold text-emerald-600'>
-                {gameState.turn !== undefined && gameState.turn + 1}
-              </span>
-            </p>
+            <div className='p-3 px-0 text-sm text-center border rounded-lg border-emerald-500 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50'>
+              <p>
+                Ronda{' '}
+                <span className='mr-2 text-base font-bold text-emerald-600'>
+                  {gameState.round}
+                </span>
+                Turno{' '}
+                <span className='text-base font-bold text-emerald-600'>
+                  {gameState.turn !== undefined && gameState.turn + 1}
+                </span>
+              </p>
+            </div>
           )}
         </div>
         {/* Word container & DrawingPanel */}

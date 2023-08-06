@@ -98,3 +98,16 @@ input[type='number'] {
   border-bottom: 1px solid rgb(52, 211, 153);
   background-color: #ffedd5;
 }
+
+.tooltip-top::before {
+  content: '';
+  position: absolute;
+  top: 91%;
+  left: 50%;
+  transform: translateX(-50%) rotate(135deg);
+  width: 10px;
+  height: 10px;
+  border-right: 1px solid rgb(52, 211, 153);
+  border-top: 1px solid rgb(52, 211, 153);
+  background-color: #ffedd5;
+}
