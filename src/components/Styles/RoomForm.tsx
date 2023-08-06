@@ -87,6 +87,7 @@ export const RoomForm: FC<Props> = ({
       title={title}
       containerWidth={containerWidth ?? 'sm'}
       onSubmit={onSubmit}
+      isCreating={isCreating}
     >
       <div className='space-y-6'>
         <div>

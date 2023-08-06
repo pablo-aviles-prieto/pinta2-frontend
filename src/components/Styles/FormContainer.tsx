@@ -7,6 +7,7 @@ type IProps = {
   onSubmit: (e: React.FormEvent) => void;
   containerWidth?: keyof typeof maxWidthClasses;
   titleSize?: keyof typeof textSize;
+  isCreating?: boolean;
 };
 
 export const FormContainer: FC<IProps> = ({
@@ -14,6 +15,7 @@ export const FormContainer: FC<IProps> = ({
   title,
   containerWidth,
   titleSize,
+  isCreating,
   onSubmit,
 }) => {
   return (
@@ -22,7 +24,11 @@ export const FormContainer: FC<IProps> = ({
         onSubmit={onSubmit}
         className='py-[80px] px-[70px] pt-[70px] shadow-md bg-gradient-to-tl
         border border-emerald-400 from-amber-50 via-orange-50 to-amber-50'
-        style={{ borderRadius: '23% 77% 20% 80% / 75% 32% 68% 25%' }}
+        style={{
+          borderRadius: isCreating
+            ? '23% 77% 20% 80% / 75% 32% 68% 25%'
+            : '78% 22% 79% 21% / 18% 79% 21% 82%',
+        }}
       >
         {title && (
           <h3
