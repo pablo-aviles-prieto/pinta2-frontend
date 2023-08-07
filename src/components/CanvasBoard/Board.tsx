@@ -20,6 +20,7 @@ import { DrawingPanel } from './DrawingPanel';
 import { getBase64SVGURL } from '../../utils';
 import { UserBoard } from '../UserList/UserBoard';
 import { CopyBtnComponent } from '../Styles/CopyBtn';
+import { BtnContainer } from '../Styles/BtnContainer';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -688,6 +689,18 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     });
   };
 
+  const handleInitGame = () => {
+    if (userList.length < 3) {
+      showToast({
+        msg: 'Se necesitan al menos 3 jugadores para iniciar una partida!',
+        options: { type: 'error' },
+      });
+      return;
+    }
+    socket?.emit('send pre game', { roomNumber: joinedRoom });
+  };
+
+  // TODO: IMPORTANT add the room number ... in the headeR?
   // TODO: IMPORTANT block navigation (refresh or close the browser
   // should display an alert like chats) or even when pressing the
   // navlinks on header
@@ -705,7 +718,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     <>
       {/* TODO: Extract into a component IMPORTANT */}
       <div className='flex items-end justify-between gap-2 mb-1'>
-        {/* Turn/Round container */}
+        {/* Turn&Round/init game btn container */}
         <div className='w-[137px]'>
           {gameState.started && (
             <div className='p-3 px-0 text-sm text-center border rounded-lg border-emerald-500 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50'>
@@ -720,6 +733,12 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
                 </span>
               </p>
             </div>
+          )}
+          {!gameState.started && userList[0]?.id === socket?.id && (
+            <BtnContainer onClickHandler={handleInitGame}>
+              <p>Iniciar juego</p>
+              {/* <p>Empezar juego</p> */}
+            </BtnContainer>
           )}
         </div>
         {/* Word container & DrawingPanel */}
