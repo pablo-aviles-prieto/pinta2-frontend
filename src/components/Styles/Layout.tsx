@@ -49,12 +49,17 @@ const NAV_OPTIONS = [
   { id: 'help', label: 'Ayuda', path: '/help' },
 ];
 
+const ROOM_COLORS = [
+  'text-orange-500',
+  'text-pink-700',
+  'text-lime-600',
+  'text-blue-500',
+];
+
 const Divider = () => {
-  return <span className='mx-2 text-2xl text-teal-500'>|</span>;
+  return <span className='mx-2 text-2xl text-teal-500 text-'>|</span>;
 };
 
-// TODO: IMPORTANT In case that game started, the 'Inicio', 'Crear sala' & 'Unirse'
-// and it should have the option to disconnect in the layout replacing Inicio!
 // TODO: IMPORTANT The 'Contacto' option (should be a modal sending a mail in the form
 // like I did on the portfolio)
 // TODO: IMPORTANT The 'Ayuda' option should be a modal aswell, so it can be opened while gaming
@@ -121,6 +126,28 @@ export const Layout: FC<Props> = ({ children }) => {
               </span>
             </h1>
           </div>
+          {joinedRoom && (
+            <p
+              className='text-2xl italic text-emerald-600'
+              style={{ fontFamily: 'Amaranth' }}
+            >
+              Sala:{' '}
+              <span className='text-[30px]'>
+                {joinedRoom
+                  .toString()
+                  .split('')
+                  .map((char, i) => (
+                    <span
+                      key={i}
+                      className={`${ROOM_COLORS[i]} mr-[1px]`}
+                      style={{ fontFamily: 'Finger Paint' }}
+                    >
+                      {char}
+                    </span>
+                  ))}
+              </span>
+            </p>
+          )}
           <div>
             <ul className='flex items-center'>
               {NAV_OPTIONS.map((option, i) => {

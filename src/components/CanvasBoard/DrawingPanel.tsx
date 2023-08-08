@@ -62,7 +62,7 @@ export const DrawingPanel: FC<Props> = ({
         ? '-top-12 -left-14 tooltip-top'
         : 'top-14 -left-14 tooltip';
     return `z-[2] absolute ${TOOLTIP_WIDTH} ${tooltipPosition} py-2 bg-orange-100 text-emerald-600 text-center 
-     rounded-md shadow-md opacity-0 border border-emerald-400 transform group-hover:opacity-100
+     rounded-md shadow-md hidden border border-emerald-400 transform group-hover:block
       transition ease-in-out duration-200`;
   };
 

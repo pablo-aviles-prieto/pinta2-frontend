@@ -700,8 +700,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     socket?.emit('send pre game', { roomNumber: joinedRoom });
   };
 
-  // TODO: IMPORTANT add the room number ... in the headeR?
-  // TODO: IMPORTANT block navigation (refresh or close the browser
+  // TODO: block navigation (refresh or close the browser
   // should display an alert like chats) or even when pressing the
   // navlinks on header
   return (
