@@ -2,6 +2,8 @@ import { FC, Fragment } from 'react';
 import { LOGO_COLORS_CLASSES } from '../../utils/const';
 import { NavLink } from 'react-router-dom';
 import { useSocket } from '../../hooks/useSocket';
+import { ContactForm } from '../ContactForm';
+import { useModal } from '../../hooks/useModal';
 
 interface Props {
   children: JSX.Element;
@@ -45,6 +47,7 @@ const NAV_OPTIONS = [
     id: 'contact',
     label: 'Contactar',
     path: '/contact',
+    displayModal: true,
   },
   { id: 'help', label: 'Ayuda', path: '/help' },
 ];
@@ -66,6 +69,7 @@ const Divider = () => {
 // (maybe it should be displayed on hover, and no need to click!!!)
 export const Layout: FC<Props> = ({ children }) => {
   const { socket, joinedRoom } = useSocket();
+  const { RenderModal, closeModal, openModal } = useModal();
 
   return (
     <div
@@ -154,6 +158,21 @@ export const Layout: FC<Props> = ({ children }) => {
                 if (option.protectRegistered && !socket) return;
                 if (option.protectWhilePlaying && joinedRoom) return;
                 if (option.showOnPlaying && !joinedRoom) return;
+                if (option.displayModal) {
+                  return (
+                    <Fragment key={option.id}>
+                      <li>
+                        <button
+                          onClick={openModal}
+                          className='text-lg text-neutral-600'
+                        >
+                          {option.label}
+                        </button>
+                      </li>
+                      {i !== NAV_OPTIONS.length - 1 && <Divider />}
+                    </Fragment>
+                  );
+                }
                 return (
                   <Fragment key={option.id}>
                     <li>
@@ -183,6 +202,12 @@ export const Layout: FC<Props> = ({ children }) => {
         </div>
       </div>
       <div className='max-w-[1280px] m-auto mt-3'>{children}</div>
+      <RenderModal
+        extraClasses='bg-gradient-to-tl
+         from-amber-50 via-orange-50 to-amber-100'
+      >
+        <ContactForm />
+      </RenderModal>
     </div>
   );
 };

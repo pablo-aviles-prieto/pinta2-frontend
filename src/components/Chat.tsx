@@ -10,7 +10,6 @@ interface PropsI {
   turnCount: number | undefined;
 }
 
-// TODO: Si se esta en partida y en turno y el usuario ya acertó, deshabilitar el input para enviar msg
 // TODO: Limpiar el chat al empezar una nueva partida (tras enviar la config del game i guess)
 // TODO: Get via props the preTurnCount, so whenever it is a number, it doesnt send it (so the
 // user cant type while in countdown of preTurn) or disable the input. Check it!
