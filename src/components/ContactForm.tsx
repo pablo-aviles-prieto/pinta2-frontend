@@ -1,7 +1,11 @@
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
-import * as Yup from 'yup';
+import { useSocket } from '../hooks/useSocket';
+import { ContactFormSchema } from '../schemas';
+import { useCustomToast } from '../hooks/useCustomToast';
+import { FC } from 'react';
 
 const INIT_VALUES = {
+  from: 'Pinta2',
   name: '',
   contactType: 'email',
   contactInfo: '',
@@ -13,43 +17,41 @@ const CONTACT_OPTIONS = [
   { id: 'linkedin', name: 'Perfil LinkedIn' },
 ];
 
-export const ContactForm = () => {
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required('El nombre es obligatorio'),
-    contactType: Yup.string().required('Contact type is required'),
-    contactInfo: Yup.string()
-      .test(
-        'contact-info-validation',
-        'Invalid contact information',
-        function (value) {
-          const { contactType } = this.parent;
-          if (contactType === 'email') {
-            return (
-              /(.+)@(.+){2,}\.(.+){2,}/.test(value ?? '') ||
-              this.createError({ message: 'Email no válido' })
-            );
-          } else if (contactType === 'linkedin') {
-            return (
-              Yup.string().url('Invalid LinkedIn URL').isValidSync(value) ||
-              this.createError({ message: 'URL no válida' })
-            );
-          }
-          return false;
-        }
-      )
-      .required('La información de contacto es obligatoria'),
-    message: Yup.string().required('El mensaje es obligatorio'),
-  });
+type Props = {
+  closeModal: () => void;
+};
+
+export const ContactForm: FC<Props> = ({ closeModal }) => {
+  const { socket } = useSocket();
+  const { showLoadingToast, updateToast } = useCustomToast();
 
   const onSubmit = (
     values: typeof INIT_VALUES,
     { setSubmitting }: FormikHelpers<typeof INIT_VALUES>
   ) => {
-    // TODO: Actually this should be handled by the backend,with a socket event that recieves the data.
-    // SEARCH FOR EVENTS WITH ACKNOWLEDGE
-    // TODO: Use the '@formspree/react' ??
-    console.log('Form data', values);
-    setSubmitting(false);
+    setSubmitting(true);
+    const submitFormToast = showLoadingToast({ msg: 'Enviando mensaje... 📩' });
+    socket?.emit(
+      'submit contact form',
+      values,
+      (response: { success: boolean; message: string }) => {
+        if (response.success) {
+          updateToast({
+            toastId: submitFormToast,
+            content: response.message,
+            type: 'success',
+          });
+          closeModal();
+        } else {
+          updateToast({
+            toastId: submitFormToast,
+            content: response.message,
+            type: 'error',
+          });
+        }
+        setSubmitting(false);
+      }
+    );
   };
 
   const INPUT_STYLES =
@@ -60,17 +62,18 @@ export const ContactForm = () => {
   return (
     <Formik
       initialValues={INIT_VALUES}
-      validationSchema={validationSchema}
+      validationSchema={ContactFormSchema}
       onSubmit={onSubmit}
     >
-      {({ isSubmitting }) => (
-        <Form className='px-12 py-6'>
+      {({ isSubmitting, errors }) => (
+        <Form className='px-24 py-8'>
           <h1
             className='pb-4 text-4xl font-bold text-emerald-600'
             style={{ fontFamily: 'Amaranth' }}
           >
             Contáctanos!
           </h1>
+          <input name='from' id='from' hidden />
           <div className='flex flex-col'>
             <label className={LABEL_STYLES} htmlFor='name'>
               Nombre:
@@ -118,14 +121,26 @@ export const ContactForm = () => {
           </div>
           <div className='flex justify-center text-center'>
             <button
-              className={`${INPUT_STYLES} !bg-orange-100 w-[40%]`}
+              className={`${INPUT_STYLES} h-[50px] w-[40%] ${
+                Object.keys(errors).length > 0
+                  ? 'bg-neutral-300'
+                  : '!bg-orange-100 hover:!bg-orange-200'
+              } ${isSubmitting && 'hover:!bg-orange-100'}`}
               type='submit'
-              disabled={isSubmitting}
+              disabled={Object.keys(errors).length > 0 || isSubmitting}
             >
-              Enviar
+              <div className='flex items-center justify-center gap-2'>
+                {isSubmitting && (
+                  <div className='flex items-center justify-center'>
+                    <div className='relative rounded-full w-[28px] h-[28px] animate-spin bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 '>
+                      <div className='absolute w-[19px] h-[19px] transform -translate-x-1/2 -translate-y-1/2 bg-orange-100 rounded-full top-1/2 left-1/2'></div>
+                    </div>
+                  </div>
+                )}
+                <p>{isSubmitting ? 'Enviando...' : 'Enviar'}</p>
+              </div>
             </button>
           </div>
-          {/* TODO: Display a message to know the user we will contact ASAP after success submit */}
         </Form>
       )}
     </Formik>

@@ -48,7 +48,8 @@ const NAV_OPTIONS = [
     label: 'Contactar',
     path: '/contact',
     displayModal: true,
-  },
+    needSocket: true,
+  }, // Visible when user has a socket connection stablished (only displays modal)
   { id: 'help', label: 'Ayuda', path: '/help' },
 ];
 
@@ -158,6 +159,7 @@ export const Layout: FC<Props> = ({ children }) => {
                 if (option.protectRegistered && !socket) return;
                 if (option.protectWhilePlaying && joinedRoom) return;
                 if (option.showOnPlaying && !joinedRoom) return;
+                if (option.needSocket && !socket) return;
                 if (option.displayModal) {
                   return (
                     <Fragment key={option.id}>
@@ -206,7 +208,7 @@ export const Layout: FC<Props> = ({ children }) => {
         extraClasses='bg-gradient-to-tl
          from-amber-50 via-orange-50 to-amber-100'
       >
-        <ContactForm />
+        <ContactForm closeModal={closeModal} />
       </RenderModal>
     </div>
   );
