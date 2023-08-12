@@ -1,4 +1,4 @@
-import { FC, Fragment } from 'react';
+import { FC, Fragment, useState } from 'react';
 import { LOGO_COLORS_CLASSES } from '../../utils/const';
 import { NavLink } from 'react-router-dom';
 import { useSocket } from '../../hooks/useSocket';
@@ -50,7 +50,7 @@ const NAV_OPTIONS = [
     displayModal: true,
     needSocket: true,
   }, // Visible when user has a socket connection stablished (only displays modal)
-  { id: 'help', label: 'Ayuda', path: '/help' },
+  { id: 'help', label: 'Ayuda', path: '/help', displayTooltip: true },
 ];
 
 const ROOM_COLORS = [
@@ -59,6 +59,8 @@ const ROOM_COLORS = [
   'text-lime-600',
   'text-blue-500',
 ];
+
+const TOOLTIP_WIDTH = 'w-[350px]';
 
 const Divider = () => {
   return <span className='mx-2 text-2xl text-teal-500 text-'>|</span>;
@@ -69,8 +71,13 @@ const Divider = () => {
 // TODO: IMPORTANT The 'Ayuda' option should be a modal aswell, so it can be opened while gaming
 // (maybe it should be displayed on hover, and no need to click!!!)
 export const Layout: FC<Props> = ({ children }) => {
+  const [tooltipTab, setTooltipTab] = useState<'howTo' | 'rules'>('howTo');
   const { socket, joinedRoom } = useSocket();
   const { RenderModal, closeModal, openModal } = useModal();
+
+  const HELP_TOOLTIP_CLASSES = `z-[2] absolute ${TOOLTIP_WIDTH} top-[28px] -left-[300px] tooltip-help py-2 bg-orange-100 
+  text-emerald-600 text-center rounded-md shadow-md hidden border border-emerald-400 transform group-hover:block
+   transition ease-in-out duration-200`;
 
   return (
     <div
@@ -166,10 +173,44 @@ export const Layout: FC<Props> = ({ children }) => {
                       <li>
                         <button
                           onClick={openModal}
-                          className='text-lg text-neutral-600'
+                          className='text-lg text-neutral-600 hover:text-emerald-400'
                         >
                           {option.label}
                         </button>
+                      </li>
+                      {i !== NAV_OPTIONS.length - 1 && <Divider />}
+                    </Fragment>
+                  );
+                }
+                if (option.displayTooltip) {
+                  return (
+                    <Fragment key={option.id}>
+                      <li>
+                        <div className='relative text-lg cursor-help group text-neutral-600 hover:text-emerald-400'>
+                          {option.label}
+                          <div className={`${HELP_TOOLTIP_CLASSES}`}>
+                            <div>
+                              <button
+                                type='button'
+                                onClick={() => setTooltipTab('howTo')}
+                              >
+                                ¿Cómo empezar?
+                              </button>
+                              <div />
+                              <button
+                                type='button'
+                                onClick={() => setTooltipTab('rules')}
+                              >
+                                Reglas del juego
+                              </button>
+                            </div>
+                            {tooltipTab === 'howTo' ? (
+                              <div>Sección how to</div>
+                            ) : (
+                              <div>Sección Reglas del juego</div>
+                            )}
+                          </div>
+                        </div>
                       </li>
                       {i !== NAV_OPTIONS.length - 1 && <Divider />}
                     </Fragment>
@@ -181,9 +222,11 @@ export const Layout: FC<Props> = ({ children }) => {
                       <NavLink
                         className={({ isActive }) =>
                           `${
-                            isActive ? 'text-emerald-500' : 'text-neutral-600'
+                            isActive
+                              ? 'text-emerald-500 hover:text-emerald-500'
+                              : 'text-neutral-600'
                           } 
-                        text-lg`
+                        text-lg hover:text-emerald-400`
                         }
                         to={
                           option.altPath && socket
