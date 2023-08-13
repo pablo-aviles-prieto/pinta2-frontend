@@ -9,8 +9,6 @@ interface Props {
   children: JSX.Element;
 }
 
-// TODO: Edit contact and help route since it should be displayed on a modal
-// and on a tooltip instead of redirecting to a path
 const NAV_OPTIONS = [
   {
     id: 'home',
@@ -60,24 +58,16 @@ const ROOM_COLORS = [
   'text-blue-500',
 ];
 
-const TOOLTIP_WIDTH = 'w-[350px]';
+const TOOLTIP_WIDTH = 'w-[400px]';
 
 const Divider = () => {
-  return <span className='mx-2 text-2xl text-teal-500 text-'>|</span>;
+  return <span className='mx-2 text-2xl text-teal-500'>|</span>;
 };
 
-// TODO: IMPORTANT The 'Contacto' option (should be a modal sending a mail in the form
-// like I did on the portfolio)
-// TODO: IMPORTANT The 'Ayuda' option should be a modal aswell, so it can be opened while gaming
-// (maybe it should be displayed on hover, and no need to click!!!)
 export const Layout: FC<Props> = ({ children }) => {
   const [tooltipTab, setTooltipTab] = useState<'howTo' | 'rules'>('howTo');
   const { socket, joinedRoom } = useSocket();
   const { RenderModal, closeModal, openModal } = useModal();
-
-  const HELP_TOOLTIP_CLASSES = `z-[2] absolute ${TOOLTIP_WIDTH} top-[28px] -left-[300px] tooltip-help py-2 bg-orange-100 
-  text-emerald-600 text-center rounded-md shadow-md hidden border border-emerald-400 transform group-hover:block
-   transition ease-in-out duration-200`;
 
   return (
     <div
@@ -94,7 +84,7 @@ export const Layout: FC<Props> = ({ children }) => {
           className='flex h-full items-center max-w-[1280px] m-auto 
         justify-between px-16 xl:px-0'
         >
-          <div>
+          <div className='min-w-[175px]'>
             <h1
               style={{ fontFamily: 'Finger Paint' }}
               className='text-[35px] relative'
@@ -131,7 +121,7 @@ export const Layout: FC<Props> = ({ children }) => {
               </span>
               <span
                 style={{ fontFamily: 'inherit' }}
-                className={`text-[65px] absolute -top-[16px] -right-[22px] transform -rotate-[18deg]
+                className={`text-[65px] absolute -top-[17px] left-[94px] transform -rotate-[18deg]
                  ${LOGO_COLORS_CLASSES['2']}`}
               >
                 2
@@ -188,27 +178,128 @@ export const Layout: FC<Props> = ({ children }) => {
                       <li>
                         <div className='relative text-lg cursor-help group text-neutral-600 hover:text-emerald-400'>
                           {option.label}
-                          <div className={`${HELP_TOOLTIP_CLASSES}`}>
-                            <div>
+                          <div
+                            className={`z-[2] absolute ${TOOLTIP_WIDTH} top-[28px] -left-[350px] ${
+                              tooltipTab === 'howTo'
+                                ? 'tooltip-help-howto'
+                                : 'tooltip-help-rules'
+                            } bg-orange-100 
+                             text-emerald-600 text-center rounded-md shadow-md hidden border border-emerald-400 transform group-hover:block
+                             transition ease-in-out duration-200`}
+                          >
+                            <div
+                              className={`flex items-center justify-between mb-4 bg-orange-200 
+                            rounded-t-md shadow-[inset_3px_3px_15px_rgba(0,0,0,0.15)]`}
+                            >
                               <button
+                                className={`${
+                                  tooltipTab === 'howTo'
+                                    ? 'rounded-tr-xl bg-orange-100 border-r border-emerald-400 cursor-default underline'
+                                    : `bg-orange-200 border-b border-emerald-400 shadow-[inset_-2px_-3px_7px_rgba(0,0,0,0.1)]`
+                                } w-[50%] py-1 rounded-tl-md`}
                                 type='button'
                                 onClick={() => setTooltipTab('howTo')}
                               >
                                 ¿Cómo empezar?
                               </button>
-                              <div />
                               <button
+                                className={`${
+                                  tooltipTab === 'rules'
+                                    ? 'rounded-tl-xl bg-orange-100 border-l border-emerald-400 cursor-default underline'
+                                    : `bg-orange-200 border-b border-emerald-400 shadow-[inset_2px_-3px_7px_rgba(0,0,0,0.1)]`
+                                } w-[50%] py-1 rounded-tr-md`}
                                 type='button'
                                 onClick={() => setTooltipTab('rules')}
                               >
                                 Reglas del juego
                               </button>
                             </div>
-                            {tooltipTab === 'howTo' ? (
-                              <div>Sección how to</div>
-                            ) : (
-                              <div>Sección Reglas del juego</div>
-                            )}
+                            <div className='px-2 mb-4 text-base text-left'>
+                              {tooltipTab === 'howTo' ? (
+                                <ul>
+                                  <li className='my-2'>
+                                    - <span className='font-bold'>Acceda</span>{' '}
+                                    con un{' '}
+                                    <span className='font-bold'>nombre</span>{' '}
+                                    (no hace falta registrarse)
+                                  </li>
+                                  <li className='my-2'>
+                                    - <span className='font-bold'>Crea</span> o
+                                    accede a una{' '}
+                                    <span className='font-bold'>sala</span>
+                                  </li>
+                                  <li className='my-2'>
+                                    - La sala tiene que tener{' '}
+                                    <span className='font-bold'>4 dígitos</span>{' '}
+                                    y una{' '}
+                                    <span className='font-bold'>
+                                      contraseña
+                                    </span>
+                                  </li>
+                                  <li className='my-2'>
+                                    - Invita a tus amigos pasándoles el{' '}
+                                    <span className='font-bold'>enlace</span> o
+                                    los{' '}
+                                    <span className='font-bold'>detalles</span>{' '}
+                                    de la{' '}
+                                    <span className='font-bold'>sala</span>
+                                  </li>
+                                </ul>
+                              ) : (
+                                <ul>
+                                  <li className='my-2'>
+                                    - Es necesario ser un{' '}
+                                    <span className='font-bold'>mínimo</span> de{' '}
+                                    <span className='font-bold'>
+                                      3 jugadores
+                                    </span>
+                                  </li>
+                                  <li className='my-2'>
+                                    - Se puede{' '}
+                                    <span className='font-bold'>
+                                      configurar
+                                    </span>
+                                    , la{' '}
+                                    <span className='font-bold'>categoría</span>{' '}
+                                    de{' '}
+                                    <span className='font-bold'>palabras</span>{' '}
+                                    y el{' '}
+                                    <span className='font-bold'>
+                                      tiempo de ronda
+                                    </span>
+                                  </li>
+                                  <li className='my-2'>
+                                    - Cada jugador que acierta,{' '}
+                                    <span className='font-bold'>recibe</span>{' '}
+                                    los{' '}
+                                    <span className='font-bold'>
+                                      segundos restantes
+                                    </span>{' '}
+                                    como puntuación y el{' '}
+                                    <span className='font-bold'>
+                                      pintor recibe 10 puntos
+                                    </span>
+                                  </li>
+                                  <li className='my-2'>
+                                    - Tras cada{' '}
+                                    <span className='font-bold'>acierto</span>,
+                                    el tiempo del turno se{' '}
+                                    <span className='font-bold'>
+                                      reduce acorde al % de tiempo restante
+                                    </span>
+                                  </li>
+                                  <li className='my-2'>
+                                    - <span className='font-bold'>Gana</span> el
+                                    jugador que tras finalizar{' '}
+                                    <span className='font-bold'>2 rondas</span>{' '}
+                                    completas, tenga{' '}
+                                    <span className='font-bold'>
+                                      más puntuación
+                                    </span>
+                                  </li>
+                                </ul>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </li>
