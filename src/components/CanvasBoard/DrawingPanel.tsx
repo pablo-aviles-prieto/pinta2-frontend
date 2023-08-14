@@ -89,12 +89,11 @@ export const DrawingPanel: FC<Props> = ({
           min={tool === 'pen' ? MIN_PEN_WIDTH_STROKE : MIN_ERASER_WIDTH_STROKE}
           max={tool === 'pen' ? MAX_PEN_WIDTH_STROKE : MAX_ERASER_WIDTH_STROKE}
           value={tool === 'pen' ? pencilStroke : eraserStroke}
-          onChange={(e) => {
-            console.log('e', e.target.value);
-            return tool === 'pen'
+          onChange={(e) =>
+            tool === 'pen'
               ? setPencilStroke(Number(e.target.value))
-              : setEraserStroke(Number(e.target.value));
-          }}
+              : setEraserStroke(Number(e.target.value))
+          }
         />
         <div className='text-xs font-bold h-[102px] flex flex-col-reverse items-center'>
           {[
