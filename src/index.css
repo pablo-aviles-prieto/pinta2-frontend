@@ -17,8 +17,8 @@
   scroll-behavior: smooth;
   font-family: 'Poppins', sans-serif;
   list-style: none;
-  scrollbar-color: #34d399;
-  scrollbar-width: auto;
+  scrollbar-color: #34d399 #e0e7ff;
+  scrollbar-width: thin;
 }
 
 ::-webkit-scrollbar-track {
@@ -26,16 +26,23 @@
   border-radius: 10px;
   background-color: #e0e7ff;
 }
+scrollbar,
 ::-webkit-scrollbar {
   border-radius: 10px;
   width: 8px;
-  height: 8px;
   background-color: #e0e7ff;
 }
+scrollbar-thumb,
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
   background-color: #34d399;
+}
+scrollbarbutton {
+  display: none; /* This hides the scrollbar buttons in Firefox */
+}
+scrollbar[orient='vertical'] {
+  width: 8px;
 }
 
 input[type='number']::-webkit-inner-spin-button,

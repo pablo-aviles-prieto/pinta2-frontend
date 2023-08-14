@@ -5,7 +5,6 @@ import { useCustomToast } from '../hooks/useCustomToast';
 import { FC } from 'react';
 
 const INIT_VALUES = {
-  from: 'Pinta2',
   name: '',
   contactType: 'email',
   contactInfo: '',
@@ -73,7 +72,6 @@ export const ContactForm: FC<Props> = ({ closeModal }) => {
           >
             Contáctanos!
           </h1>
-          <input name='from' id='from' hidden />
           <div className='flex flex-col'>
             <label className={LABEL_STYLES} htmlFor='name'>
               Nombre:

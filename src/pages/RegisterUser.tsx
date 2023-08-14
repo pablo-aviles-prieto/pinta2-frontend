@@ -5,6 +5,8 @@ import { useSocket } from '../hooks/useSocket';
 import { LOGO_COLORS_CLASSES } from '../utils/const';
 import { useCustomToast } from '../hooks/useCustomToast';
 
+// TODO: IMPORTANT In case that throws an error the connection (because
+// cors or something else) dont redirect/assign the register prop etc.
 const RegisterUser: FC = () => {
   const [redirectedURL, setRedirectedURL] = useState<string | undefined>(
     undefined
@@ -16,7 +18,6 @@ const RegisterUser: FC = () => {
   const browsingState = location.state;
 
   useEffect(() => {
-    console.log('browsingState', browsingState);
     if (browsingState) {
       if (browsingState.notRegistered) {
         showToast({

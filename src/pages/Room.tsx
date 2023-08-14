@@ -77,7 +77,8 @@ const Room = () => {
     // (even when checking !socket in the if condition)
     // TODO: IMPORTANT Sanitize queryPw (query param) and roomId (param) to not send weird things to back
     if (!socketRef.current && roomId && queryPw) {
-      const newSocket = io('http://localhost:4000');
+      const URL_BACK = import.meta.env.VITE_BACK_URL;
+      const newSocket = io(URL_BACK ?? 'http://localhost:4000');
       socketRef.current = newSocket;
       setSocket(newSocket);
       newSocket.emit('check room credentials', {
