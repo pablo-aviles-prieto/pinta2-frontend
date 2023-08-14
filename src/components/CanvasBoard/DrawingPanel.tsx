@@ -84,23 +84,29 @@ export const DrawingPanel: FC<Props> = ({
       />
       <div className='flex gap-2'>
         <input
-          className='slider-vertical h-[102px] w-[8px] px-2'
+          className='slider-vertical h-[102px] w-[8px] px-2 cursor-pointer'
           type='range'
           min={tool === 'pen' ? MIN_PEN_WIDTH_STROKE : MIN_ERASER_WIDTH_STROKE}
           max={tool === 'pen' ? MAX_PEN_WIDTH_STROKE : MAX_ERASER_WIDTH_STROKE}
           value={tool === 'pen' ? pencilStroke : eraserStroke}
-          onChange={(e) =>
-            tool === 'pen'
+          onChange={(e) => {
+            console.log('e', e.target.value);
+            return tool === 'pen'
               ? setPencilStroke(Number(e.target.value))
-              : setEraserStroke(Number(e.target.value))
-          }
+              : setEraserStroke(Number(e.target.value));
+          }}
         />
         <div className='text-xs font-bold h-[102px] flex flex-col-reverse items-center'>
           {[
             ...Array(MAX_PEN_WIDTH_STROKE - MIN_PEN_WIDTH_STROKE + 1).keys(),
           ].map((i) => (
             <div
-              className='block w-6 my-[6px]'
+              onClick={() =>
+                tool === 'pen'
+                  ? setPencilStroke(Number(MIN_PEN_WIDTH_STROKE + i))
+                  : setEraserStroke(Number(MIN_ERASER_WIDTH_STROKE + i))
+              }
+              className='block w-6 my-[6px] cursor-pointer'
               key={i}
               style={{
                 borderTop: `${i + 3}px solid black`,
