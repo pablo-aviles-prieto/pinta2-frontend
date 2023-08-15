@@ -1,7 +1,10 @@
 import * as Yup from 'yup';
 
 export const ContactFormSchema = Yup.object().shape({
-  name: Yup.string().required('El nombre es obligatorio'),
+  name: Yup.string()
+    .trim()
+    .max(20, 'El nombre no puede tener más de 20 caracteres')
+    .required('El nombre es obligatorio'),
   contactType: Yup.string().required('Contact type is required'),
   contactInfo: Yup.string()
     .test(
@@ -24,5 +27,5 @@ export const ContactFormSchema = Yup.object().shape({
       }
     )
     .required('La información de contacto es obligatoria'),
-  message: Yup.string().required('El mensaje es obligatorio'),
+  message: Yup.string().trim().required('El mensaje es obligatorio'),
 });

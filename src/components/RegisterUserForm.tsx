@@ -10,6 +10,8 @@ type Props = {
   setRedirectedURL?: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
+const MAX_USERNAME_CHAR = 15;
+
 export const RegisterUserForm: FC<Props> = ({
   redirectedURL,
   browsingState,
@@ -26,6 +28,13 @@ export const RegisterUserForm: FC<Props> = ({
     if (!username.trim()) {
       showToast({
         msg: 'Introduzca un nombre válido',
+        options: { type: 'error' },
+      });
+      return;
+    }
+    if (username.length > MAX_USERNAME_CHAR) {
+      showToast({
+        msg: `El nombre no puede tener más de ${MAX_USERNAME_CHAR} caracteres`,
         options: { type: 'error' },
       });
       return;

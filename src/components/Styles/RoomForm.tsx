@@ -18,6 +18,8 @@ type Props = {
   children: JSX.Element;
 };
 
+const MAX_ROOMPASSWORD_CHARS = 10;
+
 export const RoomForm: FC<Props> = ({
   title,
   containerWidth,
@@ -63,6 +65,13 @@ export const RoomForm: FC<Props> = ({
     ) {
       showToast({
         msg: 'Por favor, rellene todos los datos',
+        options: { type: 'error' },
+      });
+      return;
+    }
+    if (roomPassword.length > MAX_ROOMPASSWORD_CHARS) {
+      showToast({
+        msg: `La contraseña no puede tener más de ${MAX_ROOMPASSWORD_CHARS} caracteres`,
         options: { type: 'error' },
       });
       return;
