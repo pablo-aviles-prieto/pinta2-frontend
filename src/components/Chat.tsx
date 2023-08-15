@@ -4,11 +4,14 @@ import { ChatMsgsI } from '../interfaces';
 import { Send } from './Icons';
 import { useGameData } from '../hooks/useGameData';
 import { FALLBACK_USER_COLOR } from '../utils/const';
+import { useCustomToast } from '../hooks/useCustomToast';
 
 interface PropsI {
   joinedRoom: number | undefined;
   turnCount: number | undefined;
 }
+
+const MAX_CHAT_CHARS = 50;
 
 // TODO: Limpiar el chat al empezar una nueva partida (tras enviar la config del game i guess)
 // TODO: Get via props the preTurnCount, so whenever it is a number, it doesnt send it (so the
@@ -19,11 +22,12 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
   const lastMsgRef = useRef<HTMLLIElement | null>(null);
   const { socket } = useSocket();
   const { isPlaying } = useGameData();
+  const { showToast } = useCustomToast();
 
   useEffect(() => {
     if (!socket) return;
 
-    socket?.on('chat msg', onChatMsg);
+    socket.on('chat msg', onChatMsg);
 
     socket.on('guessed word', ({ msg }: { msg: string }) => {
       const {
@@ -45,7 +49,7 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
   }, []);
 
   useEffect(() => {
-    lastMsgRef.current?.scrollIntoView({ behavior: 'smooth' });
+    lastMsgRef.current?.scrollIntoView({ behavior: 'instant' });
   }, [chatMsgs]);
 
   function onChatMsg(msgContent: Omit<ChatMsgsI, 'color'>) {
@@ -62,6 +66,13 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!message.trim()) return;
+    if (message.length > MAX_CHAT_CHARS) {
+      showToast({
+        msg: `Solamente se permiten ${MAX_CHAT_CHARS} caracteres por mensaje`,
+        options: { type: 'error' },
+      });
+      return;
+    }
 
     socket?.emit('chat msg', {
       msg: message.trim(),
@@ -78,7 +89,7 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
           {chatMsgs.map((event, index) => (
             <li
               key={index}
-              className='break-words'
+              className='break-all'
               ref={index === chatMsgs.length - 1 ? lastMsgRef : null}
             >
               {event.id === import.meta.env.VITE_USER_SYSTEM_ID ? (
