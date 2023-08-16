@@ -21,8 +21,13 @@ export const GuessedWord: FC<Props> = ({ msg }) => {
         src='/audios/fireworks.mp3'
         preload='auto'
       ></audio>
-      <div className='fixed inset-0 flex items-center justify-center zoomInOut'>
-        <p className='text-7xl'>{msg || `Felicidades, acertaste`}</p>
+      <div className='fixed inset-0 flex items-center justify-center'>
+        <p
+          className='text-8xl text-emerald-400 stroked-text'
+          style={{ fontFamily: 'Amaranth' }}
+        >
+          {msg || `Felicidades, acertaste`}
+        </p>
       </div>
       <div className='fixed -top-[450px] w-[100%] left-0'>
         <img

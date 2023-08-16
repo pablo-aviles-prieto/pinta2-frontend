@@ -140,3 +140,8 @@ input[type='range'].slider-vertical {
   border-bottom: 1px solid rgb(52, 211, 153);
   background-color: #fed7aa;
 }
+
+.stroked-text {
+  -webkit-text-stroke: 2px black;
+  text-shadow: 14px 14px 35px #00000076, -14px -14px 35px #00000076;
+}

@@ -94,7 +94,7 @@ const RegisterUser: FC = () => {
             <span
               style={{ fontFamily: 'inherit' }}
               className={`text-[290px] absolute -top-[95px] -right-[120px] 
-              transform -rotate-[15deg] ${LOGO_COLORS_CLASSES['2']}`}
+              -rotate-[15deg] ${LOGO_COLORS_CLASSES['2']}`}
             >
               2
             </span>
