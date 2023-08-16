@@ -54,6 +54,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     string | undefined
   >(undefined);
   const isDrawing = useRef(false);
+  const countdownAudioRef = useRef<HTMLAudioElement>(null);
   const { socket, joinedRoom, roomPassword, setIsRegistered, setUsername } =
     useSocket();
   const { showToast } = useCustomToast();
@@ -169,6 +170,12 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
 
   // console.log('gameState', gameState);
   // console.log('userList', userList);
+
+  useEffect(() => {
+    if (preTurnCount === 3) {
+      countdownAudioRef.current?.play();
+    }
+  }, [preTurnCount]);
 
   useEffect(() => {
     const cursorDataURL = getBase64SVGURL(drawColor);
@@ -717,6 +724,11 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     <>
       {/* TODO: Extract into a component IMPORTANT */}
       <div className='flex items-end justify-between gap-2 mb-1'>
+        <audio
+          ref={countdownAudioRef}
+          src='/audios/countdown-3secs.mp3'
+          preload='auto'
+        ></audio>
         {/* Turn&Round/init game btn container */}
         <div className='w-[137px]'>
           {gameState.started && (

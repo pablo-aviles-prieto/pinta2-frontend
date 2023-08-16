@@ -121,7 +121,7 @@ export const Layout: FC<Props> = ({ children }) => {
               </span>
               <span
                 style={{ fontFamily: 'inherit' }}
-                className={`text-[65px] absolute -top-[17px] left-[94px] transform -rotate-[18deg]
+                className={`text-[65px] absolute -top-[17px] left-[94px] -rotate-[18deg]
                  ${LOGO_COLORS_CLASSES['2']}`}
               >
                 2
