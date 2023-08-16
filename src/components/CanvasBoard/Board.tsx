@@ -172,7 +172,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   // console.log('userList', userList);
 
   useEffect(() => {
-    if (preTurnCount === 3) {
+    if (preTurnCount === 3 && countdownAudioRef.current) {
+      countdownAudioRef.current.volume = 0.5;
       countdownAudioRef.current?.play();
     }
   }, [preTurnCount]);
