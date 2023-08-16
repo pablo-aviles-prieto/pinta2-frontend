@@ -713,10 +713,8 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   // navlinks on header
   return (
     // TODO: Remove unnecessary SVGs
-    // TODO: Display a button to start the game (in case is waiting for more players and no one join)
     // TODO: Disable the input when user is in turnScore so he cant keep chatting ???
     // TODO: Add a restart game button for the owner (it should display a modal to confirm the action)!
-    // TODO: Check that the chat behaviour is correct (scroll might fail)
     // TODO: Check that when pressing a link on the header, it doesnt navigate right away, should
     // alert the user
     // TODO: IMPORTANT Check the cursor on the bottom of the canvas, since it disappear if it doesnt have
@@ -749,7 +747,6 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           {!gameState.started && userList[0]?.id === socket?.id && (
             <BtnContainer onClickHandler={handleInitGame}>
               <p>Iniciar juego</p>
-              {/* <p>Empezar juego</p> */}
             </BtnContainer>
           )}
         </div>
@@ -758,17 +755,18 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
         <div>
           {gameState.started && !gameState.preTurn && startTurnCounter && (
             <div className='flex items-center justify-center mb-1'>
-              <div
-                className={`flex items-center justify-center gap-4 px-4 py-2 border-2 rounded-lg 
-          shadow-lg border-emerald-300 m-auto text-2xl
-          bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50`}
-              >
-                <p className='font-bold w-[45px]'>{turnCount}</p>
-                {gameState.currentWord && (
-                  <p>
-                    {isDrawer ? gameState.currentWord : gameState.cryptedWord}
-                  </p>
-                )}
+              <div className='px-4 py-2 m-auto text-2xl border-2 rounded-lg shadow-lg border-emerald-300 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50'>
+                <p className='text-base italic text-center underline'>
+                  {gameState.category}
+                </p>
+                <div className={`flex items-center justify-center gap-4`}>
+                  <p className='font-bold w-[45px]'>{turnCount}</p>
+                  {gameState.currentWord && (
+                    <p>
+                      {isDrawer ? gameState.currentWord : gameState.cryptedWord}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           )}

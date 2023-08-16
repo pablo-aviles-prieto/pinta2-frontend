@@ -337,7 +337,7 @@ export const Layout: FC<Props> = ({ children }) => {
           </div>
         </div>
       </div>
-      <div className='max-w-[1280px] m-auto mt-3'>{children}</div>
+      <div className='max-w-[1280px] m-auto mt-2'>{children}</div>
       <RenderModal
         extraClasses='bg-gradient-to-tl
          from-amber-50 via-orange-50 to-amber-100'
