@@ -21,6 +21,7 @@ import { getBase64SVGURL } from '../../utils';
 import { UserBoard } from '../UserList/UserBoard';
 import { CopyBtnComponent } from '../Styles/CopyBtn';
 import { BtnContainer } from '../Styles/BtnContainer';
+import { Pinta2BoardLogo } from './Pinta2BoardLogo';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -808,6 +809,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
             cursor: isDrawer ? canvasCursorStyle : 'auto',
           }}
         >
+          <Pinta2BoardLogo />
           <Layer>
             {lines.map((line, i) => (
               <Line

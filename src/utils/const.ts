@@ -77,3 +77,12 @@ export const LOGO_COLORS_CLASSES = {
   a: 'text-cyan-600',
   '2': 'text-red-600',
 };
+
+export const LOGO_COLORS_CLASSES_HEX = {
+  p: '#059669',
+  i: '#4f46e5',
+  n: '#d97706',
+  t: '#9333ea',
+  a: '#0891b2',
+  '2': '#dc2626',
+};
