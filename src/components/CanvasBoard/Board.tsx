@@ -588,10 +588,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
   };
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
-    if (
-      !e.target ||
-      (gameState.started && gameState.drawer?.id !== socket?.id)
-    ) {
+    if (!e.target || !isDrawer) {
       return;
     }
     handleStartDrawing(e);
@@ -770,7 +767,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
               </div>
             </div>
           )}
-          {(!gameState.started || isDrawer) && (
+          {isDrawer && (
             <DrawingPanel
               color={drawColor}
               pencilStroke={pencilStroke}
@@ -808,7 +805,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
           onMouseEnter={handleMouseEnter}
           className='bg-white border rounded-lg shadow-lg border-emerald-500'
           style={{
-            cursor: gameState.started && !isDrawer ? 'auto' : canvasCursorStyle,
+            cursor: isDrawer ? canvasCursorStyle : 'auto',
           }}
         >
           <Layer>
