@@ -26,6 +26,7 @@ import { Pinta2BoardLogo } from './Pinta2BoardLogo';
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
   setGameCancelled: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setSelectingWord: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 interface JoinRoomDirectlyResponse {
@@ -37,7 +38,11 @@ interface JoinRoomDirectlyResponse {
 
 // TODO: IMPORTANT There is a bug when hte user join directly to the room, and then press the disconnect button
 // TODO: Print in the chat whenever a new game is started
-export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
+export const Board: FC<Props> = ({
+  setAwaitPlayersMsg,
+  setGameCancelled,
+  setSelectingWord,
+}) => {
   const [tool, setTool] = useState<'pen' | 'eraser'>('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
   const [drawColor, setDrawColor] = useState('#000000');
@@ -123,6 +128,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       // removing possible messages when starting the game
       setAwaitPlayersMsg(undefined);
       setGameCancelled(undefined);
+      setSelectingWord(undefined);
     },
   });
   const {
@@ -273,6 +279,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
       handlePreTurnCounter(true);
       clearBoard();
       setUsersNotPlaying([]);
+      setSelectingWord(undefined);
     });
 
     return () => {
@@ -326,9 +333,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     );
 
     socket.on('pre turn no drawer', ({ message }: { message: string }) => {
-      // TODO: Print the message somewhere in the UI for the no drawers
-      // display it on the WordContainer component, where the word lays
-      console.log('message no drawer', message);
+      setSelectingWord(message);
     });
 
     socket.on(
@@ -421,6 +426,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // Not using the msg property in this component, that comes from this event
     socket.on('game cancelled', () => {
       setTurnStartCounter(false);
+      handleSelectWordCount(false);
     });
 
     // update the EndGameModal content if the owner left during endGame
@@ -717,7 +723,7 @@ export const Board: FC<Props> = ({ setAwaitPlayersMsg, setGameCancelled }) => {
     // alert the user
     // TODO: IMPORTANT Check the cursor on the bottom of the canvas, since it disappear if it doesnt have
     // enought space
-    // TODO: Add a footer with my details and a little explanation??
+    // TODO: Add a footer with my details IMPORTANT
     <>
       {/* TODO: Extract into a component IMPORTANT */}
       <div className='flex items-end justify-between gap-2 mb-1'>

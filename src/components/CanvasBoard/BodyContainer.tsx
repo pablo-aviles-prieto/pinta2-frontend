@@ -10,6 +10,9 @@ export const BodyContainer: FC = () => {
   const [gameCancelled, setGameCancelled] = useState<string | undefined>(
     undefined
   );
+  const [selectingWord, setSelectingWord] = useState<string | undefined>(
+    undefined
+  );
   const { socket } = useSocket();
   const { gameState } = useGameData();
 
@@ -35,14 +38,24 @@ export const BodyContainer: FC = () => {
   return (
     <>
       {!awaitPlayersMsg && gameCancelled && !gameState.started && (
-        <div className='my-4 text-xl font-bold'>{gameCancelled}</div>
+        <div className='my-4 text-2xl font-bold text-center text-emerald-600'>
+          {gameCancelled}
+        </div>
       )}
       {awaitPlayersMsg && !gameState.started && (
-        <div className='my-4 text-xl font-bold'>{awaitPlayersMsg}</div>
+        <div className='my-4 text-2xl font-bold text-center text-emerald-600'>
+          {awaitPlayersMsg}
+        </div>
+      )}
+      {selectingWord && gameState.started && (
+        <div className='my-4 text-2xl font-bold text-center text-emerald-600'>
+          {selectingWord}
+        </div>
       )}
       <Board
         setAwaitPlayersMsg={setAwaitPlayersMsg}
         setGameCancelled={setGameCancelled}
+        setSelectingWord={setSelectingWord}
       />
     </>
   );
