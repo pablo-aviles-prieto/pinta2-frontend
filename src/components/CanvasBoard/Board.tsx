@@ -62,6 +62,7 @@ export const Board: FC<Props> = ({
   const isDrawing = useRef(false);
   const countdownAudioRef = useRef<HTMLAudioElement>(null);
   const lastTenSecondsAudioRef = useRef<HTMLAudioElement>(null);
+  const guessedWordAudioRef = useRef<HTMLAudioElement>(null);
   const { socket, joinedRoom, roomPassword, setIsRegistered, setUsername } =
     useSocket();
   const { showToast } = useCustomToast();
@@ -182,16 +183,52 @@ export const Board: FC<Props> = ({
   useEffect(() => {
     if (preTurnCount === 3 && countdownAudioRef.current) {
       countdownAudioRef.current.volume = 0.5;
-      countdownAudioRef.current?.play();
+      countdownAudioRef.current.play();
     }
   }, [preTurnCount]);
 
   useEffect(() => {
     if (turnCount === 10 && lastTenSecondsAudioRef.current) {
       lastTenSecondsAudioRef.current.volume = 0.5;
-      lastTenSecondsAudioRef.current?.play();
+      lastTenSecondsAudioRef.current.play();
     }
   }, [turnCount]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on(
+      'guessed word',
+      ({
+        totalScores,
+        turnScores,
+        updatedTime,
+      }: {
+        id: string;
+        msg: string;
+        totalScores: GameStateI['totalScores'];
+        turnScores: GameStateI['turnScores'];
+        updatedTime: number;
+      }) => {
+        const currentGameState = useGameData.getState().gameState;
+        setGameState({ ...currentGameState, totalScores, turnScores });
+        resetTurnCounter(updatedTime);
+        // In chrome is not getting sometimes the displayGuessedWord correct value from
+        // useState, but it does from the cb function of the setter
+        setDisplayGuessedWord((displayGuessedWord) => {
+          if (!displayGuessedWord && guessedWordAudioRef.current) {
+            guessedWordAudioRef.current.volume = 0.3;
+            guessedWordAudioRef.current.play();
+          }
+          return displayGuessedWord;
+        });
+      }
+    );
+
+    return () => {
+      socket.off('guessed word');
+    };
+  }, [displayGuessedWord]);
 
   useEffect(() => {
     const cursorDataURL = getBase64SVGURL(drawColor);
@@ -374,25 +411,6 @@ export const Board: FC<Props> = ({
       }
     );
 
-    socket.on(
-      'guessed word',
-      ({
-        totalScores,
-        turnScores,
-        updatedTime,
-      }: {
-        id: string;
-        msg: string;
-        totalScores: GameStateI['totalScores'];
-        turnScores: GameStateI['turnScores'];
-        updatedTime: number;
-      }) => {
-        const currentGameState = useGameData.getState().gameState;
-        setGameState({ ...currentGameState, totalScores, turnScores });
-        resetTurnCounter(updatedTime);
-      }
-    );
-
     socket.on('show scoreboard', () => {
       setTurnStartCounter(false);
       openScoreBoardModal();
@@ -491,14 +509,12 @@ export const Board: FC<Props> = ({
 
     // display the msg in the middle of the screen (msg used on GuessedWord component)
     socket.on('user guessed', ({ msg }: { msg: string }) => {
+      console.log('YOU GUESSED IT');
       setGuessedMsgDisplayed(msg);
       setDisplayGuessedWord(true);
       handleGuessedWordCounter(true);
     });
 
-    // TODO: Maybe has to be moved in a parent/previous route
-    // probably not, since the disconnect option would be in the BoardContainer, and this
-    // component should be mounted
     socket.on('disconnect', () => {
       setIsRegistered(false);
       setUsername('');
@@ -539,9 +555,7 @@ export const Board: FC<Props> = ({
       setLines(lines);
     });
 
-    // TODO: Apply some sound for the preTurnCount (for each of the 3 seconds)
     // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
-    // TODO: Add a button to copy the link to a friend in the Board
 
     return () => {
       socket.off('new segment');
@@ -552,7 +566,6 @@ export const Board: FC<Props> = ({
       socket.off('update game state front');
       socket.off('countdown turn');
       socket.off('set new turn duration');
-      socket.off('guessed word');
       socket.off('show scoreboard');
       socket.off('game ended');
       socket.off('close endgame modal');
@@ -744,8 +757,13 @@ export const Board: FC<Props> = ({
         src='/audios/bell-alert.mp3'
         preload='auto'
       ></audio>
-      {/* TODO: Extract into a component IMPORTANT */}
-      <div className='flex items-end justify-between gap-2 mb-1'>
+      <audio
+        ref={guessedWordAudioRef}
+        src='/audios/bell-guessed-word.mp3'
+        preload='auto'
+      ></audio>
+      {/* TODO: Extract into a component (BoardHeader) IMPORTANT */}
+      <div className='flex items-end justify-between gap-2 mb-1 w-[1280px]'>
         {/* Turn&Round/init game btn container */}
         <div className='w-[137px]'>
           {gameState.started && (
