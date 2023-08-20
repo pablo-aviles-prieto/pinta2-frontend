@@ -64,6 +64,7 @@ export const Board: FC<Props> = ({
   const lastTenSecondsAudioRef = useRef<HTMLAudioElement>(null);
   const guessedWordAudioRef = useRef<HTMLAudioElement>(null);
   const endTurnAudioRef = useRef<HTMLAudioElement>(null);
+  const endGameAudioRef = useRef<HTMLAudioElement>(null);
   const { socket, joinedRoom, roomPassword, setIsRegistered, setUsername } =
     useSocket();
   const { showToast } = useCustomToast();
@@ -239,9 +240,40 @@ export const Board: FC<Props> = ({
       }
     });
 
+    socket.on('game ended', ({ owner }: { owner: string }) => {
+      const currentGameState = useGameData.getState().gameState;
+      const TopMsg =
+        owner === socket.id ? (
+          <button
+            type='button'
+            onClick={() => {
+              socket.emit('restart game', {
+                roomNumber: joinedRoom,
+              });
+            }}
+          >
+            Volver a jugar!
+          </button>
+        ) : (
+          <div>Esperando a que el lider decida...</div>
+        );
+      setGameState({ ...currentGameState, endGame: true });
+      setTurnStartCounter(false);
+      setEndGameContent(TopMsg);
+      openEndGameModal();
+      if (!displayGuessedWord && endGameAudioRef.current) {
+        if (guessedWordAudioRef.current) {
+          guessedWordAudioRef.current.volume = 0;
+        }
+        endGameAudioRef.current.volume = 0.5;
+        endGameAudioRef.current.play();
+      }
+    });
+
     return () => {
       socket.off('guessed word');
       socket.off('show scoreboard');
+      socket.off('game ended');
     };
   }, [displayGuessedWord]);
 
@@ -426,29 +458,6 @@ export const Board: FC<Props> = ({
       }
     );
 
-    socket.on('game ended', ({ owner }: { owner: string }) => {
-      const currentGameState = useGameData.getState().gameState;
-      const TopMsg =
-        owner === socket.id ? (
-          <button
-            type='button'
-            onClick={() => {
-              socket.emit('restart game', {
-                roomNumber: joinedRoom,
-              });
-            }}
-          >
-            Volver a jugar!
-          </button>
-        ) : (
-          <div>Esperando a que el lider decida...</div>
-        );
-      setGameState({ ...currentGameState, endGame: true });
-      setTurnStartCounter(false);
-      setEndGameContent(TopMsg);
-      openEndGameModal();
-    });
-
     socket.on('close endgame modal', () => {
       closeEndGameModal();
     });
@@ -574,7 +583,6 @@ export const Board: FC<Props> = ({
       socket.off('update game state front');
       socket.off('countdown turn');
       socket.off('set new turn duration');
-      socket.off('game ended');
       socket.off('close endgame modal');
       socket.off('update category front');
       socket.off('game cancelled');
@@ -772,6 +780,11 @@ export const Board: FC<Props> = ({
       <audio
         ref={endTurnAudioRef}
         src='/audios/xylophone-turn-end.mp3'
+        preload='auto'
+      ></audio>
+      <audio
+        ref={endGameAudioRef}
+        src='/audios/tada.mp3'
         preload='auto'
       ></audio>
       {/* TODO: Extract into a component (BoardHeader) IMPORTANT */}
