@@ -61,6 +61,7 @@ export const Board: FC<Props> = ({
   >(undefined);
   const isDrawing = useRef(false);
   const countdownAudioRef = useRef<HTMLAudioElement>(null);
+  const lastTenSecondsAudioRef = useRef<HTMLAudioElement>(null);
   const { socket, joinedRoom, roomPassword, setIsRegistered, setUsername } =
     useSocket();
   const { showToast } = useCustomToast();
@@ -184,6 +185,13 @@ export const Board: FC<Props> = ({
       countdownAudioRef.current?.play();
     }
   }, [preTurnCount]);
+
+  useEffect(() => {
+    if (turnCount === 10 && lastTenSecondsAudioRef.current) {
+      lastTenSecondsAudioRef.current.volume = 0.5;
+      lastTenSecondsAudioRef.current?.play();
+    }
+  }, [turnCount]);
 
   useEffect(() => {
     const cursorDataURL = getBase64SVGURL(drawColor);
@@ -725,13 +733,19 @@ export const Board: FC<Props> = ({
     // enought space
     // TODO: Add a footer with my details IMPORTANT
     <>
+      {/* Audio section */}
+      <audio
+        ref={countdownAudioRef}
+        src='/audios/countdown-3secs.mp3'
+        preload='auto'
+      ></audio>
+      <audio
+        ref={lastTenSecondsAudioRef}
+        src='/audios/bell-alert.mp3'
+        preload='auto'
+      ></audio>
       {/* TODO: Extract into a component IMPORTANT */}
       <div className='flex items-end justify-between gap-2 mb-1'>
-        <audio
-          ref={countdownAudioRef}
-          src='/audios/countdown-3secs.mp3'
-          preload='auto'
-        ></audio>
         {/* Turn&Round/init game btn container */}
         <div className='w-[137px]'>
           {gameState.started && (
