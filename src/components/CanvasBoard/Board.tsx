@@ -231,6 +231,8 @@ export const Board: FC<Props> = ({
       setTurnStartCounter(false);
       openScoreBoardModal();
       handleScoreBoardCount(true);
+      // if fireworks sound are playing, dont execute. Else execute the endTurn xylophone
+      // audio, but setting to 0 the bell of guessed Word
       if (!displayGuessedWord && endTurnAudioRef.current) {
         if (guessedWordAudioRef.current) {
           guessedWordAudioRef.current.volume = 0;
@@ -261,6 +263,8 @@ export const Board: FC<Props> = ({
       setTurnStartCounter(false);
       setEndGameContent(TopMsg);
       openEndGameModal();
+      // if fireworks sound are playing, dont execute. Else execute the endGame tada audio,
+      // but setting to 0 the bell of guessed Word
       if (!displayGuessedWord && endGameAudioRef.current) {
         if (guessedWordAudioRef.current) {
           guessedWordAudioRef.current.volume = 0;
