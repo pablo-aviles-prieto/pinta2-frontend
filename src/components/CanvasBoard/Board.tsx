@@ -5,7 +5,12 @@ import { useSocket } from '../../hooks/useSocket';
 import { Chat } from '../Chat';
 import { useModal } from '../../hooks/useModal';
 import { useGameData } from '../../hooks/useGameData';
-import type { GameStateI, UserRoomI, LinesI } from '../../interfaces';
+import type {
+  GameStateI,
+  UserRoomI,
+  LinesI,
+  ChatMsgsI,
+} from '../../interfaces';
 import { useTurnCounter } from '../../hooks/useTurnCounter';
 import { useGenericTimer } from '../../hooks/useGenericTimer';
 import { PreTurnCountDown } from '../PreTurnCountDown';
@@ -59,6 +64,7 @@ export const Board: FC<Props> = ({
   const [guessedMsgDisplayed, setGuessedMsgDisplayed] = useState<
     string | undefined
   >(undefined);
+  const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
   const isDrawing = useRef(false);
   const countdownAudioRef = useRef<HTMLAudioElement>(null);
   const lastTenSecondsAudioRef = useRef<HTMLAudioElement>(null);
@@ -202,6 +208,7 @@ export const Board: FC<Props> = ({
     socket.on(
       'guessed word',
       ({
+        msg,
         totalScores,
         turnScores,
         updatedTime,
@@ -212,9 +219,23 @@ export const Board: FC<Props> = ({
         turnScores: GameStateI['turnScores'];
         updatedTime: number;
       }) => {
+        const {
+          VITE_USER_SYSTEM_NAME: userSystemName,
+          VITE_USER_SYSTEM_ID: userSystemID,
+          VITE_USER_SYSTEM_COLOR: userSystemColor,
+        } = import.meta.env;
         const currentGameState = useGameData.getState().gameState;
         setGameState({ ...currentGameState, totalScores, turnScores });
         resetTurnCounter(updatedTime);
+        setChatMsgs((prevMsgs) => [
+          ...prevMsgs,
+          {
+            id: userSystemID,
+            user: userSystemName,
+            msg,
+            color: userSystemColor,
+          },
+        ]);
         // In chrome is not getting sometimes the displayGuessedWord correct value from
         // useState, but it does from the cb function of the setter
         setDisplayGuessedWord((displayGuessedWord) => {
@@ -861,7 +882,7 @@ export const Board: FC<Props> = ({
           />
         </div>
       </div>
-      <div className='mx-auto flex gap-2 w-[1280px] h-[600px]'>
+      <div className='relative mx-auto flex gap-2 w-[1280px] h-[600px]'>
         <UserBoard extraStyles='w-[144px] h-full' />
         <Stage
           width={858}
@@ -898,8 +919,16 @@ export const Board: FC<Props> = ({
           className='bg-gradient-to-b from-amber-50 via-neutral-50 to-amber-50
            border border-emerald-500 rounded-lg shadow-lg w-[278px] h-full'
         >
-          <Chat joinedRoom={joinedRoom} turnCount={turnCount} />
+          <Chat
+            joinedRoom={joinedRoom}
+            turnCount={turnCount}
+            chatMsgs={chatMsgs}
+            setChatMsgs={setChatMsgs}
+          />
         </div>
+        {preTurnStartCounter && !gameState.preTurn && (
+          <PreTurnCountDown preTurnCount={preTurnCount} />
+        )}
       </div>
       {!gameState.started && (
         <ModalOwnerCategories forbidClose>
@@ -986,9 +1015,6 @@ export const Board: FC<Props> = ({
             </div>
           </div>
         </SelectWordsModal>
-      )}
-      {preTurnStartCounter && !gameState.preTurn && (
-        <PreTurnCountDown preTurnCount={preTurnCount} />
       )}
       {gameState.started && gameState.preTurn && !displayGuessedWord && (
         <ScoreBoardModal forbidClose>

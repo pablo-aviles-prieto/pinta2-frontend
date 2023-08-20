@@ -9,6 +9,8 @@ import { useCustomToast } from '../hooks/useCustomToast';
 interface PropsI {
   joinedRoom: number | undefined;
   turnCount: number | undefined;
+  chatMsgs: ChatMsgsI[];
+  setChatMsgs: React.Dispatch<React.SetStateAction<ChatMsgsI[]>>;
 }
 
 const MAX_CHAT_CHARS = 50;
@@ -16,9 +18,14 @@ const MAX_CHAT_CHARS = 50;
 // TODO: Limpiar el chat al empezar una nueva partida (tras enviar la config del game i guess)
 // TODO: Get via props the preTurnCount, so whenever it is a number, it doesnt send it (so the
 // user cant type while in countdown of preTurn) or disable the input. Check it!
-export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
+export const Chat: FC<PropsI> = ({
+  joinedRoom,
+  turnCount,
+  chatMsgs,
+  setChatMsgs,
+}) => {
   const [message, setMessage] = useState('');
-  const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
+  // const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
   const lastMsgRef = useRef<HTMLLIElement | null>(null);
   const { socket } = useSocket();
   const { isPlaying } = useGameData();
@@ -29,22 +36,8 @@ export const Chat: FC<PropsI> = ({ joinedRoom, turnCount }) => {
 
     socket.on('chat msg', onChatMsg);
 
-    socket.on('guessed word', ({ msg }: { msg: string }) => {
-      const {
-        VITE_USER_SYSTEM_NAME: userSystemName,
-        VITE_USER_SYSTEM_ID: userSystemID,
-        VITE_USER_SYSTEM_COLOR: userSystemColor,
-      } = import.meta.env;
-
-      setChatMsgs((prevMsgs) => [
-        ...prevMsgs,
-        { id: userSystemID, user: userSystemName, msg, color: userSystemColor },
-      ]);
-    });
-
     return () => {
       socket?.off('chat msg', onChatMsg);
-      socket?.off('guessed word');
     };
   }, []);
 

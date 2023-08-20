@@ -6,7 +6,7 @@ interface PropsI {
 
 export const PreTurnCountDown: FC<PropsI> = ({ preTurnCount }) => {
   return (
-    <div className='fixed inset-0 flex items-center justify-center'>
+    <div className='absolute -top-[10px] left-[470px]'>
       <span
         style={{ fontFamily: 'Finger Paint' }}
         className={`${
