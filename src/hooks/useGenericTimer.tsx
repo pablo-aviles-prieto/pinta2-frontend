@@ -21,7 +21,7 @@ export const useGenericTimer = ({
   };
 
   // TODO: IMPORTANT change the logic and use a useRef to avoid re-downloads
-  // of the worker
+  // of the worker!
   useEffect(() => {
     let worker: Worker;
 

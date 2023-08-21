@@ -25,7 +25,6 @@ export const Chat: FC<PropsI> = ({
   setChatMsgs,
 }) => {
   const [message, setMessage] = useState('');
-  // const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
   const lastMsgRef = useRef<HTMLLIElement | null>(null);
   const { socket } = useSocket();
   const { isPlaying } = useGameData();

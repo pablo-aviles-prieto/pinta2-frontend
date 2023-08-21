@@ -333,11 +333,6 @@ export const Board: FC<Props> = ({
   }, [displayGuessedWord]);
 
   useEffect(() => {
-    const cursorDataURL = getBase64SVGURL(drawColor);
-    setCanvasCursorStyle(`url(${cursorDataURL}) 5 5,  auto`);
-  }, []);
-
-  useEffect(() => {
     setIsDrawer(socket?.id === gameState.drawer?.id);
   }, [socket?.id, gameState.drawer?.id]);
 
@@ -435,6 +430,8 @@ export const Board: FC<Props> = ({
   }, [socket, isPlaying]);
 
   useEffect(() => {
+    const cursorDataURL = getBase64SVGURL(drawColor);
+    setCanvasCursorStyle(`url(${cursorDataURL}) 5 5,  auto`);
     if (!socket) return;
 
     socket.on('new segment', (lineNumber: number, lineSegment: LinesI) => {
