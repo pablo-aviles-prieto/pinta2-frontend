@@ -188,6 +188,14 @@ export const Board: FC<Props> = ({
   // console.log('gameState', gameState);
   // console.log('userList', userList);
 
+  const getPercentage = ({
+    num,
+    percentage,
+  }: {
+    num: number;
+    percentage: number;
+  }) => (num * percentage) / 100;
+
   useEffect(() => {
     if (preTurnCount === 3 && countdownAudioRef.current) {
       countdownAudioRef.current.volume = 0.5;
@@ -199,6 +207,27 @@ export const Board: FC<Props> = ({
     if (turnCount === 10 && lastTenSecondsAudioRef.current) {
       lastTenSecondsAudioRef.current.volume = 0.5;
       lastTenSecondsAudioRef.current.play();
+    }
+
+    const currentGameState = useGameData.getState().gameState;
+    if (!currentGameState.turnDuration || !isDrawer) return;
+    const turnDuration = currentGameState.turnDuration / 1000;
+
+    const sendCheckForCluesEvent = (percentage: number) => {
+      socket?.emit('check for clues', {
+        roomNumber: joinedRoom,
+        percentageRemaining: percentage,
+      });
+    };
+
+    if (turnCount === getPercentage({ num: turnDuration, percentage: 75 })) {
+      sendCheckForCluesEvent(75);
+    }
+    if (turnCount === getPercentage({ num: turnDuration, percentage: 50 })) {
+      sendCheckForCluesEvent(50);
+    }
+    if (turnCount === getPercentage({ num: turnDuration, percentage: 25 })) {
+      sendCheckForCluesEvent(25);
     }
   }, [turnCount]);
 
@@ -597,8 +626,6 @@ export const Board: FC<Props> = ({
       setLines(lines);
     });
 
-    // TODO: Send an event in some concrete timers, so the backend gives back hints for the word
-
     return () => {
       socket.off('new segment');
       socket.off('clear board');
@@ -837,7 +864,10 @@ export const Board: FC<Props> = ({
           )}
         </div>
         {/* Word container & DrawingPanel */}
-        {/* TODO: Change the * for _ (for no drawers) IMPORTANT */}
+        {/* TODO: IMPORTANT extract the word container, changing the * for _
+        also when a user guessed the word, has to see the currentWord,
+        last it should be converted in an array, flexed with a little gap and displaying
+        in green every letter in the cryptedWord (not the _) */}
         <div>
           {gameState.started && !gameState.preTurn && startTurnCounter && (
             <div className='flex items-center justify-center mb-1'>
