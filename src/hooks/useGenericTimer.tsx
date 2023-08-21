@@ -20,6 +20,8 @@ export const useGenericTimer = ({
     setCount(timerValue ?? 120); // turnDuration is already in seconds
   };
 
+  // TODO: IMPORTANT change the logic and use a useRef to avoid re-downloads
+  // of the worker
   useEffect(() => {
     let worker: Worker;
 
