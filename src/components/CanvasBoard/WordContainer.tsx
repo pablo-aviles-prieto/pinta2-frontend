@@ -6,11 +6,6 @@ interface Props {
   turnCount: number | undefined;
 }
 
-{
-  /* TODO: IMPORTANT when a user guessed the word, has to see the currentWord,
-        last it should be converted in an array, flexed with a little gap and displaying
-        in green every letter in the cryptedWord (not the _) ! */
-}
 export const WordContainer: FC<Props> = ({ turnCount }) => {
   const { gameState, isDrawer } = useGameData();
   const { socket } = useSocket();
@@ -19,7 +14,7 @@ export const WordContainer: FC<Props> = ({ turnCount }) => {
     return Object.keys(gameState.turnScores ?? {}).includes(socket?.id ?? '');
   };
 
-  const convertStringToArray = (word: string) => {
+  const convertWordToArray = (word: string) => {
     return word.split('').map((char) => {
       if (char === ' ') return '\u00A0';
       if (char === '*') return '_';
@@ -38,10 +33,10 @@ export const WordContainer: FC<Props> = ({ turnCount }) => {
           {gameState.currentWord && gameState.cryptedWord && (
             <p className='flex gap-[1px]'>
               {isDrawer || userAlreadyScored()
-                ? convertStringToArray(gameState.currentWord).map((char, i) => (
+                ? convertWordToArray(gameState.currentWord).map((char, i) => (
                     <span key={char + i}>{char}</span>
                   ))
-                : convertStringToArray(gameState.cryptedWord).map((char, i) => (
+                : convertWordToArray(gameState.cryptedWord).map((char, i) => (
                     <span
                       className={`${char !== '_' && 'text-emerald-600'}`}
                       key={char + i}
