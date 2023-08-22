@@ -557,12 +557,16 @@ export const Board: FC<Props> = ({
         draw: LinesI[];
         usersNotPlaying: string[];
       }) => {
-        if (turnCount) {
+        const currentGameState = useGameData.getState().gameState;
+        if (
+          turnCount &&
+          currentGameState.started &&
+          !currentGameState.preTurn
+        ) {
           resetTurnCounter(turnCount);
           setTurnStartCounter(true);
         }
 
-        const currentGameState = useGameData.getState().gameState;
         // Storing the new user in the array state
         if (
           currentGameState.started &&

@@ -27,6 +27,7 @@ export const BodyContainer: FC = () => {
     );
     socket.on('game cancelled', ({ msg }: { msg: string }) => {
       setGameCancelled(msg);
+      setAwaitPlayersMsg(undefined);
     });
 
     return () => {
