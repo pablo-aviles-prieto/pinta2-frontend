@@ -130,7 +130,7 @@ export const Board: FC<Props> = ({
     count: configGameCounter,
     handleCounterState: handleConfigGameCounter,
   } = useGenericTimer({
-    initTimerValue: 30, // ?TODO: Change the number? for the config game modal
+    initTimerValue: 30,
     onCountDownComplete: () => {
       socket?.emit('init game', {
         roomNumber: joinedRoom,
@@ -950,19 +950,25 @@ export const Board: FC<Props> = ({
       {!gameState.started && (
         <ModalOwnerCategories forbidClose>
           <>
-            {/* TODO: Restyle the counter of config game */}
-            <div className='absolute top-2 right-2'>{configGameCounter}</div>
+            <div className='absolute text-teal-600 top-2 right-2'>
+              {configGameCounter}
+            </div>
             <h1 className='text-xl font-bold text-center text-teal-800'>
               Configura la partida!
             </h1>
-            <div className='my-4'>
-              <h3 className='text-lg'>Selecciona una categoría!</h3>
+            <div className='my-6'>
+              <h3 className='mb-1 text-lg underline underline-offset-2 decoration-2 decoration-teal-500'>
+                Selecciona una categoría!
+              </h3>
               <div className='flex gap-2'>
                 {possibleCategories.map((cat) => (
                   <p
                     key={cat}
-                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
-                      categorySelected === cat && 'bg-teal-200'
+                    className={`border-teal-600 border cursor-pointer px-2 py-1 rounded-3xl
+                    hover:bg-teal-400 hover:border-teal-800
+                    ${
+                      categorySelected === cat &&
+                      'bg-teal-300 border-teal-800 hover:bg-teal-300'
                     }`}
                     onClick={() => handleCategoryChoice(cat)}
                   >
@@ -971,17 +977,20 @@ export const Board: FC<Props> = ({
                 ))}
               </div>
             </div>
-            <div className='my-4'>
-              <h3 className='text-lg'>
-                Elige cuantos segundos tendreis por turno! (120s por defecto)
+            <div className='my-6'>
+              <h3 className='mb-1 text-lg underline decoration-2 underline-offset-2 decoration-teal-500'>
+                Elige cuantos segundos tendréis por turno!
               </h3>
               <div className='flex gap-2'>
                 {Object.entries(possibleTurnDuration).map(([key, value]) => (
                   <p
                     key={key}
-                    className={`border-teal-600 border-2 cursor-pointer px-2 py-1 ${
-                      turnDuration === value / 1000 && 'bg-teal-200'
-                    }`}
+                    className={`border-teal-600 border cursor-pointer px-2 py-1 rounded-3xl
+                    hover:bg-teal-400 hover:border-teal-800
+                     ${
+                       turnDuration === value / 1000 &&
+                       'bg-teal-300 border-teal-800 hover:bg-teal-300'
+                     }`}
                     onClick={() => handleTurnDuration(value)}
                   >
                     {value / 1000}s
@@ -989,19 +998,34 @@ export const Board: FC<Props> = ({
                 ))}
               </div>
             </div>
-            <div className='my-4'>
-              <h3 className='text-lg'>Usuarios conectados:</h3>
-              <ul>
-                {userList.map((user) => (
-                  <li key={user.id}>{user.name}</li>
+            <div className='my-6'>
+              <h3 className='text-lg underline decoration-2 underline-offset-2 decoration-teal-500'>
+                Usuarios conectados:
+              </h3>
+              <ul className='flex gap-2'>
+                {userList.map((user, i) => (
+                  <li key={user.id}>
+                    <span className='text-lg text-emerald-500 '>
+                      {user.name}
+                    </span>
+                    {i !== userList.length - 1 && ','}
+                  </li>
                 ))}
               </ul>
             </div>
-            <div className='flex items-center justify-between'>
-              <button onClick={handleAwaitMorePlayers}>
-                Esperar + jugadores
-              </button>
-              <button onClick={handleStartGame}>Empezar la partida</button>
+            <div className='flex items-center justify-between gap-24'>
+              <BtnContainer
+                onClickHandler={handleAwaitMorePlayers}
+                extraStyles='!py-[6px]'
+              >
+                <p>Esperar más jugadores</p>
+              </BtnContainer>
+              <BtnContainer
+                onClickHandler={handleStartGame}
+                extraStyles='!py-[6px]'
+              >
+                <p>Empezar la partida</p>
+              </BtnContainer>
             </div>
           </>
         </ModalOwnerCategories>

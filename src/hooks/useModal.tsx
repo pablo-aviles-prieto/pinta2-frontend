@@ -31,7 +31,8 @@ const Modal: FC<ModalI> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-[600px] bg-white p-5 rounded-lg ${extraClasses}`}
+        className={`relative w-[600px] bg-gradient-to-tl from-amber-50 
+        via-orange-50 to-amber-100 p-5 rounded-lg ${extraClasses}`}
       >
         <>
           {content && content}
