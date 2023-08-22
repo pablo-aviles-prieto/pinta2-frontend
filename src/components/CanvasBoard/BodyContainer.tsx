@@ -13,6 +13,9 @@ export const BodyContainer: FC = () => {
   const [selectingWord, setSelectingWord] = useState<string | undefined>(
     undefined
   );
+  const [configuringGame, setConfiguringGame] = useState<string | undefined>(
+    undefined
+  );
   const { socket } = useSocket();
   const { gameState } = useGameData();
 
@@ -22,17 +25,27 @@ export const BodyContainer: FC = () => {
     socket.on(
       'await more players response',
       ({ message }: { message: string }) => {
+        setConfiguringGame(undefined);
         setAwaitPlayersMsg(message);
       }
     );
+
     socket.on('game cancelled', ({ msg }: { msg: string }) => {
-      setGameCancelled(msg);
       setAwaitPlayersMsg(undefined);
+      setConfiguringGame(undefined);
+      setGameCancelled(msg);
+    });
+
+    socket.on('pre game no owner', ({ message }: { message: string }) => {
+      setAwaitPlayersMsg(undefined);
+      setGameCancelled(undefined);
+      setConfiguringGame(message);
     });
 
     return () => {
       socket.off('await more players response');
       socket.off('game cancelled');
+      socket.off('pre game no owner');
     };
   }, []);
 
@@ -41,6 +54,11 @@ export const BodyContainer: FC = () => {
       {!awaitPlayersMsg && gameCancelled && !gameState.started && (
         <div className='my-4 text-2xl font-bold text-center text-emerald-600'>
           {gameCancelled}
+        </div>
+      )}
+      {configuringGame && !gameState.started && (
+        <div className='my-4 text-2xl font-bold text-center text-emerald-600'>
+          {configuringGame}
         </div>
       )}
       {awaitPlayersMsg && !gameState.started && (
@@ -57,6 +75,7 @@ export const BodyContainer: FC = () => {
         setAwaitPlayersMsg={setAwaitPlayersMsg}
         setGameCancelled={setGameCancelled}
         setSelectingWord={setSelectingWord}
+        setConfiguringGame={setConfiguringGame}
       />
     </>
   );

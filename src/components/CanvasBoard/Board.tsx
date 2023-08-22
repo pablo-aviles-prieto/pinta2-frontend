@@ -33,6 +33,7 @@ interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
   setGameCancelled: React.Dispatch<React.SetStateAction<string | undefined>>;
   setSelectingWord: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setConfiguringGame: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 interface JoinRoomDirectlyResponse {
@@ -48,6 +49,7 @@ export const Board: FC<Props> = ({
   setAwaitPlayersMsg,
   setGameCancelled,
   setSelectingWord,
+  setConfiguringGame,
 }) => {
   const [tool, setTool] = useState<'pen' | 'eraser'>('pen');
   const [lines, setLines] = useState<LinesI[]>([]);
@@ -140,6 +142,7 @@ export const Board: FC<Props> = ({
       setAwaitPlayersMsg(undefined);
       setGameCancelled(undefined);
       setSelectingWord(undefined);
+      setConfiguringGame(undefined);
     },
   });
   const {
