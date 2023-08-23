@@ -28,7 +28,7 @@ export const UserList = () => {
                       ${
                         i ===
                           Object.keys(gameState.totalScores ?? {}).length - 1 &&
-                        'border-b-0'
+                        '!border-b-0'
                       }`}
                     >
                       <td

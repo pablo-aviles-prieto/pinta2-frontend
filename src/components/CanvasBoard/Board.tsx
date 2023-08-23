@@ -301,18 +301,38 @@ export const Board: FC<Props> = ({
       const currentGameState = useGameData.getState().gameState;
       const TopMsg =
         owner === socket.id ? (
-          <button
-            type='button'
-            onClick={() => {
-              socket.emit('restart game', {
-                roomNumber: joinedRoom,
-              });
-            }}
-          >
-            Volver a jugar!
-          </button>
+          <div className='mb-4'>
+            <div className='w-[170px] mb-2'>
+              <BtnContainer
+                extraStyles='!py-1'
+                onClickHandler={() => {
+                  socket?.emit('restart game', {
+                    roomNumber: joinedRoom,
+                  });
+                }}
+              >
+                <p>Volver a jugar</p>
+              </BtnContainer>
+            </div>
+            <h1 className='text-lg font-bold text-teal-900'>
+              Partida terminada! La palabra era{' '}
+              <span className='text-xl text-teal-600'>
+                {currentGameState.currentWord}
+              </span>
+            </h1>
+          </div>
         ) : (
-          <div>Esperando a que el lider decida...</div>
+          <>
+            <h1 className='mb-2 text-lg font-bold text-teal-900'>
+              Partida terminada! La palabra era{' '}
+              <span className='text-xl text-teal-600'>
+                {currentGameState.currentWord}
+              </span>
+            </h1>
+            <h1 className='mb-6 text-lg font-bold text-teal-900'>
+              Esperando a que el lider decida...
+            </h1>
+          </>
         );
       setGameState({ ...currentGameState, endGame: true });
       setTurnStartCounter(false);
@@ -531,20 +551,41 @@ export const Board: FC<Props> = ({
 
     // update the EndGameModal content if the owner left during endGame
     socket.on('resend game ended', ({ owner }: { owner: string }) => {
+      const currentGameState = useGameData.getState().gameState;
       const UpdateMsg =
         owner === socket.id ? (
-          <button
-            type='button'
-            onClick={() => {
-              socket.emit('restart game', {
-                roomNumber: joinedRoom,
-              });
-            }}
-          >
-            Volver a jugar!
-          </button>
+          <div className='mb-4'>
+            <div className='w-[170px] mb-2'>
+              <BtnContainer
+                extraStyles='!py-1'
+                onClickHandler={() => {
+                  socket?.emit('restart game', {
+                    roomNumber: joinedRoom,
+                  });
+                }}
+              >
+                <p>Volver a jugar</p>
+              </BtnContainer>
+            </div>
+            <h1 className='text-lg font-bold text-teal-900'>
+              Partida terminada! La palabra era{' '}
+              <span className='text-xl text-teal-600'>
+                {currentGameState.currentWord}
+              </span>
+            </h1>
+          </div>
         ) : (
-          <div>Esperando a que el lider decida...</div>
+          <>
+            <h1 className='mb-2 text-lg font-bold text-teal-900'>
+              Partida terminada! La palabra era{' '}
+              <span className='text-xl text-teal-600'>
+                {currentGameState.currentWord}
+              </span>
+            </h1>
+            <h1 className='mb-6 text-lg font-bold text-teal-900'>
+              Esperando a que el lider decida...
+            </h1>
+          </>
         );
       setEndGameContent(UpdateMsg);
     });
