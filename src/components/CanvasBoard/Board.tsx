@@ -28,6 +28,7 @@ import { CopyBtnComponent } from '../Styles/CopyBtn';
 import { BtnContainer } from '../Styles/BtnContainer';
 import { Pinta2BoardLogo } from './Pinta2BoardLogo';
 import { WordContainer } from './WordContainer';
+import { ChipContainer } from '../Styles/ChipContainer';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -962,18 +963,13 @@ export const Board: FC<Props> = ({
               </h3>
               <div className='flex gap-2'>
                 {possibleCategories.map((cat) => (
-                  <p
+                  <ChipContainer
                     key={cat}
-                    className={`border-teal-600 border cursor-pointer px-2 py-1 rounded-3xl
-                    hover:bg-teal-400 hover:border-teal-800
-                    ${
-                      categorySelected === cat &&
-                      'bg-teal-300 border-teal-800 hover:bg-teal-300'
-                    }`}
+                    selectedCondition={categorySelected === cat}
                     onClick={() => handleCategoryChoice(cat)}
                   >
-                    {cat}
-                  </p>
+                    <>{cat}</>
+                  </ChipContainer>
                 ))}
               </div>
             </div>
@@ -983,18 +979,13 @@ export const Board: FC<Props> = ({
               </h3>
               <div className='flex gap-2'>
                 {Object.entries(possibleTurnDuration).map(([key, value]) => (
-                  <p
+                  <ChipContainer
                     key={key}
-                    className={`border-teal-600 border cursor-pointer px-2 py-1 rounded-3xl
-                    hover:bg-teal-400 hover:border-teal-800
-                     ${
-                       turnDuration === value / 1000 &&
-                       'bg-teal-300 border-teal-800 hover:bg-teal-300'
-                     }`}
+                    selectedCondition={turnDuration === value / 1000}
                     onClick={() => handleTurnDuration(value)}
                   >
-                    {value / 1000}s
-                  </p>
+                    <>{value / 1000}s</>
+                  </ChipContainer>
                 ))}
               </div>
             </div>
@@ -1005,7 +996,7 @@ export const Board: FC<Props> = ({
               <ul className='flex gap-2'>
                 {userList.map((user, i) => (
                   <li key={user.id}>
-                    <span className='text-lg text-emerald-500 '>
+                    <span className='text-lg text-emerald-500'>
                       {user.name}
                     </span>
                     {i !== userList.length - 1 && ','}
@@ -1033,14 +1024,16 @@ export const Board: FC<Props> = ({
       {gameState.started && gameState.preTurn && (
         <SelectWordsModal forbidClose>
           <div>
-            {/* TODO: Restyle the counter of words modal choice */}
-            <div className='absolute top-2 right-2'>{selectWordCounter}</div>
-            Selecciona una palabra:{' '}
-            <div className='flex gap-2'>
+            <div className='absolute font-bold text-teal-600 top-2 right-4'>
+              {selectWordCounter}
+            </div>
+            <h1 className='mb-4 text-xl font-bold text-teal-800'>
+              Selecciona una palabra:
+            </h1>
+            <div className='flex gap-4'>
               {possibleWords.map((word) => (
-                <p
+                <ChipContainer
                   key={word}
-                  className={`border-teal-600 border-2 cursor-pointer px-2 py-1 hover:bg-teal-200`}
                   onClick={() => {
                     socket?.emit('set drawer word', {
                       roomNumber: joinedRoom,
@@ -1049,9 +1042,10 @@ export const Board: FC<Props> = ({
                     closeWordsModal();
                     handleSelectWordCount(false);
                   }}
+                  extraClasses='!px-3'
                 >
-                  {word}
-                </p>
+                  <>{word}</>
+                </ChipContainer>
               ))}
             </div>
           </div>
