@@ -951,12 +951,13 @@ export const Board: FC<Props> = ({
       {!gameState.started && (
         <ModalOwnerCategories forbidClose>
           <>
-            <div className='absolute text-teal-600 top-2 right-2'>
-              {configGameCounter}
+            <div className='flex justify-between'>
+              <div className='w-[18px]' />
+              <h1 className='text-xl font-bold text-center text-teal-800'>
+                Configura la partida!
+              </h1>
+              <div className='font-bold text-teal-600'>{configGameCounter}</div>
             </div>
-            <h1 className='text-xl font-bold text-center text-teal-800'>
-              Configura la partida!
-            </h1>
             <div className='my-6'>
               <h3 className='mb-1 text-lg underline underline-offset-2 decoration-2 decoration-teal-500'>
                 Selecciona una categoría!
@@ -1024,12 +1025,12 @@ export const Board: FC<Props> = ({
       {gameState.started && gameState.preTurn && (
         <SelectWordsModal forbidClose>
           <div>
-            <div className='absolute font-bold text-teal-600 top-2 right-4'>
-              {selectWordCounter}
+            <div className='flex justify-between'>
+              <h1 className='mb-4 text-xl font-bold text-teal-800'>
+                Selecciona una palabra:
+              </h1>
+              <div className='font-bold text-teal-600'>{selectWordCounter}</div>
             </div>
-            <h1 className='mb-4 text-xl font-bold text-teal-800'>
-              Selecciona una palabra:
-            </h1>
             <div className='flex gap-4'>
               {possibleWords.map((word) => (
                 <ChipContainer
@@ -1054,9 +1055,22 @@ export const Board: FC<Props> = ({
       {gameState.started && gameState.preTurn && !displayGuessedWord && (
         <ScoreBoardModal forbidClose>
           <div>
-            <div className='absolute top-2 right-2'>{scoreBoardCounter}</div>
-            <h1>Puntuaciones:</h1>
-            {/* TODO: Refactor UserList to not show Jugadores: */}
+            <div>
+              <div className='flex items-center justify-between mb-6 '>
+                <h1 className='text-lg font-bold text-teal-900'>
+                  Ronda terminada! La palabra era{' '}
+                  <span className='text-xl text-teal-600'>
+                    {gameState.currentWord}
+                  </span>
+                </h1>
+                <div className='font-bold text-teal-600'>
+                  {scoreBoardCounter}
+                </div>
+              </div>
+            </div>
+            <h1 className='mb-4 text-xl font-bold text-teal-900 underline underline-offset-2 decoration-teal-700'>
+              Puntuaciones:
+            </h1>
             <UserList />
           </div>
         </ScoreBoardModal>
@@ -1064,8 +1078,9 @@ export const Board: FC<Props> = ({
       {gameState.started && gameState.preTurn && !displayGuessedWord && (
         <EndGameModal forbidClose>
           <div>
-            <h1>Puntuación final:</h1>
-            {/* TODO: Refactor UserList to not show Jugadores: */}
+            <h1 className='mb-4 text-xl font-bold text-teal-800'>
+              Puntuación final:
+            </h1>
             <UserList />
           </div>
         </EndGameModal>
