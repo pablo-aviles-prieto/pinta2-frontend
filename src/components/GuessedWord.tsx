@@ -1,24 +1,49 @@
 import { FC, useEffect, useRef } from 'react';
+import confetti from 'canvas-confetti';
 
 interface Props {
   msg: string | undefined;
 }
 
 export const GuessedWord: FC<Props> = ({ msg }) => {
-  const fireworksAudioRef = useRef<HTMLAudioElement>(null);
+  const partyTrumpetAudioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (fireworksAudioRef.current) {
-      fireworksAudioRef.current.volume = 0.5;
-      fireworksAudioRef.current.play();
+    let trumpetAudioTimeout: number;
+    if (partyTrumpetAudioRef.current) {
+      partyTrumpetAudioRef.current.volume = 0.4;
+      trumpetAudioTimeout = setTimeout(
+        () => partyTrumpetAudioRef.current?.play(),
+        200
+      );
     }
+    const displayLeftConfetti = (side: 'left' | 'right') => {
+      confetti({
+        particleCount: 100,
+        angle: side === 'left' ? 60 : 120,
+        spread: 70,
+        origin: { x: side === 'left' ? 0.1 : 0.9, y: 0.8 },
+      });
+    };
+    const timeoutLeft1 = setTimeout(() => displayLeftConfetti('left'), 200);
+    const timeoutRight1 = setTimeout(() => displayLeftConfetti('right'), 200);
+    const timeoutLeft2 = setTimeout(() => displayLeftConfetti('left'), 1300);
+    const timeoutRight2 = setTimeout(() => displayLeftConfetti('right'), 1300);
+
+    return () => {
+      clearTimeout(trumpetAudioTimeout);
+      clearTimeout(timeoutLeft1);
+      clearTimeout(timeoutRight1);
+      clearTimeout(timeoutLeft2);
+      clearTimeout(timeoutRight2);
+    };
   }, []);
 
   return (
     <>
       <audio
-        ref={fireworksAudioRef}
-        src='/audios/fireworks.mp3'
+        ref={partyTrumpetAudioRef}
+        src='/audios/trumpet-party.mp3'
         preload='auto'
       ></audio>
       <div className='fixed inset-0 flex items-center justify-center zoomInOut'>
@@ -28,13 +53,6 @@ export const GuessedWord: FC<Props> = ({ msg }) => {
         >
           {msg || `Felicidades, acertaste`}
         </p>
-      </div>
-      <div className='fixed -top-[450px] w-[100%] left-0'>
-        <img
-          className='w-[100%] opacity-30'
-          src='/gifs/fireworks1.gif'
-          alt='Fireworks gif'
-        />
       </div>
     </>
   );

@@ -885,17 +885,12 @@ export const Board: FC<Props> = ({
     socket?.emit('send pre game', { roomNumber: joinedRoom });
   };
 
-  // TODO: block navigation (refresh or close the browser
-  // should display an alert like chats) or even when pressing the
-  // navlinks on header
   return (
     // TODO: Remove unnecessary SVGs
     // TODO: Disable the input when user is in turnScore so he cant keep chatting ???
     // TODO: Add a restart game button for the owner (it should display a modal to confirm the action)!
     // TODO: Check that when pressing a link on the header, it doesnt navigate right away, should
     // alert the user
-    // TODO: IMPORTANT Check the cursor on the bottom of the canvas, since it disappear if it doesnt have
-    // enought space
     // TODO: Add a footer with my details IMPORTANT
     <>
       {/* Audio section */}
