@@ -16,6 +16,7 @@ import { useGenericTimer } from '../../hooks/useGenericTimer';
 import { PreTurnCountDown } from '../PreTurnCountDown';
 import { UserList } from '../UserList/UserList';
 import {
+  DEFAULT_CATEGORY_SELECTED,
   DEFAULT_TURN_DURATION,
   MAX_POINTS_IN_SINGLE_ARRAY,
 } from '../../utils/const';
@@ -256,6 +257,10 @@ export const Board: FC<Props> = ({
         setPossibleCategories(categories);
         setPosibleTurnDuration(possibleTurnDurations);
         openModalOwner();
+        const gameStateCategory = useGameData.getState().categorySelected;
+        if (gameStateCategory === 'Personalizada' || !gameStateCategory) {
+          setCategorySelected(DEFAULT_CATEGORY_SELECTED);
+        }
         if (!haveCustomWords) {
           handleConfigGameCounter(true);
         }
@@ -1032,22 +1037,24 @@ export const Board: FC<Props> = ({
               </h1>
               <div className='font-bold text-teal-600'>{configGameCounter}</div>
             </div>
-            <div className='my-6'>
-              <h3 className='mb-1 text-lg underline underline-offset-2 decoration-2 decoration-teal-500'>
-                Selecciona una categoría!
-              </h3>
-              <div className='flex gap-2'>
-                {possibleCategories.map((cat) => (
-                  <ChipContainer
-                    key={cat}
-                    selectedCondition={categorySelected === cat}
-                    onClick={() => handleCategoryChoice(cat)}
-                  >
-                    <>{cat}</>
-                  </ChipContainer>
-                ))}
+            {!haveCustomWords && (
+              <div className='my-6'>
+                <h3 className='mb-1 text-lg underline underline-offset-2 decoration-2 decoration-teal-500'>
+                  Selecciona una categoría!
+                </h3>
+                <div className='flex gap-2'>
+                  {possibleCategories.map((cat) => (
+                    <ChipContainer
+                      key={cat}
+                      selectedCondition={categorySelected === cat}
+                      onClick={() => handleCategoryChoice(cat)}
+                    >
+                      <>{cat}</>
+                    </ChipContainer>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
             <div className='my-6'>
               <h3 className='mb-1 text-lg underline decoration-2 underline-offset-2 decoration-teal-500'>
                 Elige cuantos segundos tendréis por turno!
