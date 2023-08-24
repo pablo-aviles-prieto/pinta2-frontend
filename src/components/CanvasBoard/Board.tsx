@@ -29,6 +29,7 @@ import { BtnContainer } from '../Styles/BtnContainer';
 import { Pinta2BoardLogo } from './Pinta2BoardLogo';
 import { WordContainer } from './WordContainer';
 import { ChipContainer } from '../Styles/ChipContainer';
+import { TextAreaChips } from '../TextAreaChips';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -69,6 +70,8 @@ export const Board: FC<Props> = ({
     string | undefined
   >(undefined);
   const [chatMsgs, setChatMsgs] = useState<ChatMsgsI[]>([]);
+  const [introducedWords, setIntroducedWords] = useState<string[]>([]);
+  const [haveCustomWords, setHaveCustomWords] = useState<boolean>(false);
   const isDrawing = useRef(false);
   const countdownAudioRef = useRef<HTMLAudioElement>(null);
   const lastTenSecondsAudioRef = useRef<HTMLAudioElement>(null);
@@ -144,6 +147,7 @@ export const Board: FC<Props> = ({
       setGameCancelled(undefined);
       setSelectingWord(undefined);
       setConfiguringGame(undefined);
+      setHaveCustomWords(false);
     },
   });
   const {
@@ -235,6 +239,33 @@ export const Board: FC<Props> = ({
       sendCheckForCluesEvent(25);
     }
   }, [turnCount]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on(
+      'pre game owner',
+      ({
+        categories,
+        possibleTurnDurations,
+      }: {
+        categories: string[];
+        possibleTurnDurations: Record<string, number>;
+      }) => {
+        closeEndGameModal(); // in case it is opened from a restart game
+        setPossibleCategories(categories);
+        setPosibleTurnDuration(possibleTurnDurations);
+        openModalOwner();
+        if (!haveCustomWords) {
+          handleConfigGameCounter(true);
+        }
+      }
+    );
+
+    return () => {
+      socket.off('pre game owner');
+    };
+  }, [haveCustomWords]);
 
   useEffect(() => {
     if (!socket) return;
@@ -475,23 +506,6 @@ export const Board: FC<Props> = ({
     });
 
     socket.on(
-      'pre game owner',
-      ({
-        categories,
-        possibleTurnDurations,
-      }: {
-        categories: string[];
-        possibleTurnDurations: Record<string, number>;
-      }) => {
-        closeEndGameModal(); // in case it is opened from a restart game
-        setPossibleCategories(categories);
-        setPosibleTurnDuration(possibleTurnDurations);
-        openModalOwner();
-        handleConfigGameCounter(true);
-      }
-    );
-
-    socket.on(
       'pre turn drawer',
       ({ possibleWords }: { possibleWords: string[] }) => {
         setPossibleWords(possibleWords);
@@ -676,7 +690,6 @@ export const Board: FC<Props> = ({
     return () => {
       socket.off('new segment');
       socket.off('clear board');
-      socket.off('pre game owner');
       socket.off('pre turn drawer');
       socket.off('pre turn no drawer');
       socket.off('update game state front');
@@ -802,7 +815,25 @@ export const Board: FC<Props> = ({
 
   const handleStartGame = () => {
     if (!categorySelected || userList.length < 3) {
-      showToast({ msg: 'Se necesitan al menos 3 jugadores' });
+      showToast({
+        msg: 'Se necesitan al menos 3 jugadores',
+        options: { type: 'error' },
+      });
+      return;
+    }
+    if (haveCustomWords && introducedWords.length < userList.length * 3 * 2) {
+      showToast({
+        content: (
+          <p>
+            Con la cantidad de usuarios conectados, se necesitan al menos{' '}
+            <span className='font-bold text-red-500'>
+              {userList.length * 3 * 2}
+            </span>{' '}
+            palabras.
+          </p>
+        ),
+        options: { type: 'error', autoClose: 4000 },
+      });
       return;
     }
 
@@ -810,12 +841,14 @@ export const Board: FC<Props> = ({
       roomNumber: joinedRoom,
       turnDuration: (turnDuration ?? 120) * 1000,
       categorySelected,
+      customWords: haveCustomWords ? introducedWords : undefined,
     });
     closeModalOwner();
     handleConfigGameCounter(false);
     // removing possible messages when starting the game
     setAwaitPlayersMsg(undefined);
     setGameCancelled(undefined);
+    setHaveCustomWords(false);
   };
 
   const handleAwaitMorePlayers = () => {
@@ -1030,6 +1063,61 @@ export const Board: FC<Props> = ({
                   </ChipContainer>
                 ))}
               </div>
+            </div>
+            <div className='my-6'>
+              <h3 className='mb-1 text-lg underline decoration-2 underline-offset-2 decoration-teal-500'>
+                ¿Quieres usar palabras personalizadas?
+              </h3>
+              <div className='flex items-center gap-2 mb-3'>
+                <input
+                  className='w-4 h-4 cursor-pointer'
+                  type='checkbox'
+                  value='customWords'
+                  id='customWords'
+                  checked={haveCustomWords}
+                  onChange={() => {
+                    setHaveCustomWords((prevState) => {
+                      if (prevState) {
+                        handleConfigGameCounter(true);
+                      } else {
+                        handleConfigGameCounter(false);
+                      }
+                      return !prevState;
+                    });
+                  }}
+                />
+                <div className='flex items-center justify-between w-full'>
+                  <label htmlFor='customWords' className='cursor-pointer'>
+                    Usar palabras personalizadas
+                  </label>
+                  <>
+                    {haveCustomWords && (
+                      <span
+                        className={`text-xs ${
+                          introducedWords.length < userList.length * 3 * 2
+                            ? 'text-red-600'
+                            : 'text-teal-500'
+                        }`}
+                      >
+                        {introducedWords.length}/{userList.length * 3 * 2}{' '}
+                        Palabras
+                      </span>
+                    )}
+                  </>
+                </div>
+              </div>
+              {haveCustomWords && (
+                <>
+                  <TextAreaChips
+                    introducedWords={introducedWords}
+                    setIntroducedWords={setIntroducedWords}
+                    hasError={introducedWords.length < userList.length * 3 * 2}
+                  />
+                  <p className='text-xs italic opacity-60'>
+                    Puedes eliminar o editar (haciendo doble click) las palabras
+                  </p>
+                </>
+              )}
             </div>
             <div className='my-6'>
               <h3 className='text-lg underline decoration-2 underline-offset-2 decoration-teal-500'>

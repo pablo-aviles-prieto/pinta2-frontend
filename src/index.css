@@ -145,3 +145,13 @@ input[type='range'].slider-vertical {
   -webkit-text-stroke: 2px black;
   text-shadow: 14px 14px 35px #00000076, -14px -14px 35px #00000076;
 }
+
+.MuiChipsInput-Chip {
+  background-color: #5eead4 !important;
+  border: 1px solid #115e59 !important;
+}
+
+.MuiChipsInput-Chip-Editing {
+  background-color: #2fb9a5 !important;
+  color: '#000' !important;
+}
