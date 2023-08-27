@@ -31,7 +31,7 @@ export const maxWidthClasses = {
 };
 
 export const MAX_POINTS_IN_SINGLE_ARRAY = 2500;
-export const DEFAULT_TURN_DURATION = 120; // in miliseconds
+export const DEFAULT_TURN_DURATION = 120;
 export const DEFAULT_CATEGORY_SELECTED = 'Aleatorio';
 export const DEFAULT_INIT_GAME_STATE = { started: false };
 export const FALLBACK_USER_COLOR = '#7d7d7d';

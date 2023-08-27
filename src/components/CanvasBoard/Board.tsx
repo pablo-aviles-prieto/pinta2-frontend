@@ -178,7 +178,7 @@ export const Board: FC<Props> = ({
   }: {
     num: number;
     percentage: number;
-  }) => (num * percentage) / 100;
+  }) => Math.floor((num * percentage) / 100);
 
   useEffect(() => {
     if (preTurnCount === 3 && countdownAudioRef.current) {
