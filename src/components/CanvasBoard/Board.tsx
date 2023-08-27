@@ -31,6 +31,7 @@ import { Pinta2BoardLogo } from './Pinta2BoardLogo';
 import { WordContainer } from './WordContainer';
 import { ChipContainer } from '../Styles/ChipContainer';
 import { TextAreaChips } from '../TextAreaChips';
+import { WordCountDown } from '../WordCountDown';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -151,20 +152,9 @@ export const Board: FC<Props> = ({
       setHaveCustomWords(false);
     },
   });
-  const {
-    count: selectWordCounter,
-    handleCounterState: handleSelectWordCount,
-  } = useGenericTimer({
-    initTimerValue: 10,
-    onCountDownComplete: () => {
-      const randomIndex = Math.floor(Math.random() * 3); // random number [0-2]
-      socket?.emit('set drawer word', {
-        roomNumber: joinedRoom,
-        word: possibleWords[randomIndex],
-      });
-      closeWordsModal();
-    },
-  });
+  const handleSelectWordCountRef = useRef<((boolean: boolean) => void) | null>(
+    null
+  );
   const {
     RenderModal: ScoreBoardModal,
     closeModal: closeScoreBoardModal,
@@ -240,6 +230,31 @@ export const Board: FC<Props> = ({
       sendCheckForCluesEvent(25);
     }
   }, [turnCount]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on(
+      'pre turn drawer',
+      ({ possibleWords }: { possibleWords: string[] }) => {
+        setPossibleWords(possibleWords);
+        openWordsModal();
+      }
+    );
+
+    // Not using the msg property in this component, that comes from this event
+    socket.on('game cancelled', () => {
+      setTurnStartCounter(false);
+      if (handleSelectWordCountRef.current) {
+        handleSelectWordCountRef.current(false);
+      }
+    });
+
+    return () => {
+      socket.off('pre turn drawer');
+      socket.off('game cancelled');
+    };
+  }, [handleSelectWordCountRef]);
 
   useEffect(() => {
     if (!socket) return;
@@ -510,15 +525,6 @@ export const Board: FC<Props> = ({
       setLines([]);
     });
 
-    socket.on(
-      'pre turn drawer',
-      ({ possibleWords }: { possibleWords: string[] }) => {
-        setPossibleWords(possibleWords);
-        openWordsModal();
-        handleSelectWordCount(true);
-      }
-    );
-
     socket.on('pre turn no drawer', ({ message }: { message: string }) => {
       setSelectingWord(message);
     });
@@ -560,12 +566,6 @@ export const Board: FC<Props> = ({
     // Set the category to all users in the room except for the leader
     socket.on('update category front', ({ category }: { category: string }) => {
       setCategorySelected(category);
-    });
-
-    // Not using the msg property in this component, that comes from this event
-    socket.on('game cancelled', () => {
-      setTurnStartCounter(false);
-      handleSelectWordCount(false);
     });
 
     // update the EndGameModal content if the owner left during endGame
@@ -695,14 +695,12 @@ export const Board: FC<Props> = ({
     return () => {
       socket.off('new segment');
       socket.off('clear board');
-      socket.off('pre turn drawer');
       socket.off('pre turn no drawer');
       socket.off('update game state front');
       socket.off('countdown turn');
       socket.off('set new turn duration');
       socket.off('close endgame modal');
       socket.off('update category front');
-      socket.off('game cancelled');
       socket.off('resend game ended');
       socket.off('current game data');
       socket.off('user guessed');
@@ -1160,7 +1158,15 @@ export const Board: FC<Props> = ({
               <h1 className='mb-4 text-xl font-bold text-teal-800'>
                 Selecciona una palabra:
               </h1>
-              <div className='font-bold text-teal-600'>{selectWordCounter}</div>
+              <div className='font-bold text-teal-600'>
+                <WordCountDown
+                  possibleWords={possibleWords}
+                  closeWordsModal={closeWordsModal}
+                  setHandleSelectWordCount={(handle) => {
+                    handleSelectWordCountRef.current = handle;
+                  }}
+                />
+              </div>
             </div>
             <div className='flex gap-4'>
               {possibleWords.map((word) => (
@@ -1172,7 +1178,9 @@ export const Board: FC<Props> = ({
                       word,
                     });
                     closeWordsModal();
-                    handleSelectWordCount(false);
+                    if (handleSelectWordCountRef.current) {
+                      handleSelectWordCountRef.current(false);
+                    }
                   }}
                   extraClasses='!px-3'
                 >
