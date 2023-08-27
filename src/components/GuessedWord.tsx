@@ -11,7 +11,7 @@ export const GuessedWord: FC<Props> = ({ msg }) => {
   useEffect(() => {
     let trumpetAudioTimeout: number;
     if (partyTrumpetAudioRef.current) {
-      partyTrumpetAudioRef.current.volume = 0.4;
+      partyTrumpetAudioRef.current.volume = 0.1;
       trumpetAudioTimeout = setTimeout(
         () => partyTrumpetAudioRef.current?.play(),
         200

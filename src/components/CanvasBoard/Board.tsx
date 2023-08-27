@@ -32,6 +32,7 @@ import { WordContainer } from './WordContainer';
 import { ChipContainer } from '../Styles/ChipContainer';
 import { TextAreaChips } from '../TextAreaChips';
 import { WordCountDown } from '../WordCountDown';
+import { GameConfigCountDown } from '../GameConfigCountDown';
 
 interface Props {
   setAwaitPlayersMsg: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -80,6 +81,12 @@ export const Board: FC<Props> = ({
   const guessedWordAudioRef = useRef<HTMLAudioElement>(null);
   const endTurnAudioRef = useRef<HTMLAudioElement>(null);
   const endGameAudioRef = useRef<HTMLAudioElement>(null);
+  const handleSelectWordCountRef = useRef<((boolean: boolean) => void) | null>(
+    null
+  );
+  const handleConfigGameCounterRef = useRef<
+    ((boolean: boolean) => void) | null
+  >(null);
   const { socket, joinedRoom, roomPassword, setIsRegistered, setUsername } =
     useSocket();
   const { showToast } = useCustomToast();
@@ -133,29 +140,6 @@ export const Board: FC<Props> = ({
     },
   });
   const {
-    count: configGameCounter,
-    handleCounterState: handleConfigGameCounter,
-  } = useGenericTimer({
-    initTimerValue: 30,
-    onCountDownComplete: () => {
-      socket?.emit('init game', {
-        roomNumber: joinedRoom,
-        turnDuration: (turnDuration ?? 120) * 1000,
-        categorySelected,
-      });
-      closeModalOwner();
-      // removing possible messages when starting the game
-      setAwaitPlayersMsg(undefined);
-      setGameCancelled(undefined);
-      setSelectingWord(undefined);
-      setConfiguringGame(undefined);
-      setHaveCustomWords(false);
-    },
-  });
-  const handleSelectWordCountRef = useRef<((boolean: boolean) => void) | null>(
-    null
-  );
-  const {
     RenderModal: ScoreBoardModal,
     closeModal: closeScoreBoardModal,
     openModal: openScoreBoardModal,
@@ -198,14 +182,14 @@ export const Board: FC<Props> = ({
 
   useEffect(() => {
     if (preTurnCount === 3 && countdownAudioRef.current) {
-      countdownAudioRef.current.volume = 0.5;
+      countdownAudioRef.current.volume = 0.3;
       countdownAudioRef.current.play();
     }
   }, [preTurnCount]);
 
   useEffect(() => {
     if (turnCount === 10 && lastTenSecondsAudioRef.current) {
-      lastTenSecondsAudioRef.current.volume = 0.5;
+      lastTenSecondsAudioRef.current.volume = 0.2;
       lastTenSecondsAudioRef.current.play();
     }
 
@@ -276,9 +260,6 @@ export const Board: FC<Props> = ({
         if (gameStateCategory === 'Personalizada' || !gameStateCategory) {
           setCategorySelected(DEFAULT_CATEGORY_SELECTED);
         }
-        if (!haveCustomWords) {
-          handleConfigGameCounter(true);
-        }
       }
     );
 
@@ -325,7 +306,7 @@ export const Board: FC<Props> = ({
         // useState, but it does from the cb function of the setter
         setDisplayGuessedWord((displayGuessedWord) => {
           if (!displayGuessedWord && guessedWordAudioRef.current) {
-            guessedWordAudioRef.current.volume = 0.3;
+            guessedWordAudioRef.current.volume = 0.1;
             guessedWordAudioRef.current.play();
           }
           return displayGuessedWord;
@@ -343,7 +324,7 @@ export const Board: FC<Props> = ({
         if (guessedWordAudioRef.current) {
           guessedWordAudioRef.current.volume = 0;
         }
-        endTurnAudioRef.current.volume = 0.5;
+        endTurnAudioRef.current.volume = 0.4;
         endTurnAudioRef.current.play();
       }
     });
@@ -395,7 +376,7 @@ export const Board: FC<Props> = ({
         if (guessedWordAudioRef.current) {
           guessedWordAudioRef.current.volume = 0;
         }
-        endGameAudioRef.current.volume = 0.5;
+        endGameAudioRef.current.volume = 0.2;
         endGameAudioRef.current.play();
       }
     });
@@ -847,7 +828,9 @@ export const Board: FC<Props> = ({
       customWords: haveCustomWords ? introducedWords : undefined,
     });
     closeModalOwner();
-    handleConfigGameCounter(false);
+    if (handleConfigGameCounterRef.current) {
+      handleConfigGameCounterRef.current(false);
+    }
     // removing possible messages when starting the game
     setAwaitPlayersMsg(undefined);
     setGameCancelled(undefined);
@@ -857,7 +840,9 @@ export const Board: FC<Props> = ({
   const handleAwaitMorePlayers = () => {
     socket?.emit('await more players', { roomNumber: joinedRoom });
     closeModalOwner();
-    handleConfigGameCounter(false);
+    if (handleConfigGameCounterRef.current) {
+      handleConfigGameCounterRef.current(false);
+    }
   };
 
   const handleUndo = () => {
@@ -1028,7 +1013,20 @@ export const Board: FC<Props> = ({
               <h1 className='text-xl font-bold text-center text-teal-800'>
                 Configura la partida!
               </h1>
-              <div className='font-bold text-teal-600'>{configGameCounter}</div>
+              <div className='font-bold text-teal-600'>
+                <GameConfigCountDown
+                  haveCustomWords={haveCustomWords}
+                  closeModalOwner={closeModalOwner}
+                  setAwaitPlayersMsg={setAwaitPlayersMsg}
+                  setGameCancelled={setGameCancelled}
+                  setSelectingWord={setSelectingWord}
+                  setConfiguringGame={setConfiguringGame}
+                  setHaveCustomWords={setHaveCustomWords}
+                  setHandleConfigGameCounter={(handle) => {
+                    handleConfigGameCounterRef.current = handle;
+                  }}
+                />
+              </div>
             </div>
             {!haveCustomWords && (
               <div className='my-6'>
@@ -1077,10 +1075,13 @@ export const Board: FC<Props> = ({
                   checked={haveCustomWords}
                   onChange={() => {
                     setHaveCustomWords((prevState) => {
+                      if (!handleConfigGameCounterRef.current) {
+                        return !prevState;
+                      }
                       if (prevState) {
-                        handleConfigGameCounter(true);
+                        handleConfigGameCounterRef.current(true);
                       } else {
-                        handleConfigGameCounter(false);
+                        handleConfigGameCounterRef.current(true);
                       }
                       return !prevState;
                     });
