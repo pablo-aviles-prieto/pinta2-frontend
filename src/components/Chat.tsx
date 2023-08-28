@@ -41,7 +41,7 @@ export const Chat: FC<PropsI> = ({
   }, []);
 
   useEffect(() => {
-    lastMsgRef.current?.scrollIntoView({ behavior: 'instant' });
+    lastMsgRef.current?.scrollIntoView({ behavior: 'instant' as any });
   }, [chatMsgs]);
 
   function onChatMsg(msgContent: Omit<ChatMsgsI, 'color'>) {

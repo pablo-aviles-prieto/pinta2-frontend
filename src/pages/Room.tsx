@@ -181,13 +181,13 @@ const Room = () => {
                   autoFocus
                 />
                 <button
-                  className='flex-shrink-0 px-2 py-1 text-sm text-white bg-teal-500 border-4 border-teal-500 rounded hover:bg-teal-700 hover:border-teal-700'
+                  className='flex-shrink-0 px-2 py-1 text-sm text-black bg-teal-400 border-4 border-teal-400 rounded hover:bg-teal-300 hover:border-teal-300'
                   type='submit'
                 >
                   Acceder
                 </button>
                 <button
-                  className='flex-shrink-0 px-2 py-1 ml-2 text-sm text-white bg-teal-500 border-4 border-teal-500 rounded hover:bg-teal-700 hover:border-teal-700'
+                  className='flex-shrink-0 px-2 py-1 ml-2 text-sm text-black bg-teal-400 border-4 border-teal-400 rounded hover:bg-teal-300 hover:border-teal-300'
                   type='button'
                   onClick={() => navigate('/')}
                 >

@@ -64,7 +64,7 @@ export const ContactForm: FC<Props> = ({ closeModal }) => {
       validationSchema={ContactFormSchema}
       onSubmit={onSubmit}
     >
-      {({ isSubmitting, errors }) => (
+      {({ isSubmitting }) => (
         <Form className='px-24 py-8'>
           <h1
             className='pb-4 text-4xl font-bold text-emerald-600'
@@ -119,13 +119,11 @@ export const ContactForm: FC<Props> = ({ closeModal }) => {
           </div>
           <div className='flex justify-center text-center'>
             <button
-              className={`${INPUT_STYLES} h-[50px] w-[40%] ${
-                Object.keys(errors).length > 0
-                  ? 'bg-neutral-300'
-                  : '!bg-orange-100 hover:!bg-orange-200'
-              } ${isSubmitting && 'hover:!bg-orange-100'}`}
+              className={`${INPUT_STYLES} h-[50px] w-[40%] !bg-orange-100 hover:!bg-orange-200 ${
+                isSubmitting && 'hover:!bg-orange-100 bg-neutral-300'
+              }`}
               type='submit'
-              disabled={Object.keys(errors).length > 0 || isSubmitting}
+              disabled={isSubmitting}
             >
               <div className='flex items-center justify-center gap-2'>
                 {isSubmitting && (
