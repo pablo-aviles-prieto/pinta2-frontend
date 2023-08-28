@@ -169,9 +169,6 @@ export const Board: FC<Props> = ({
     },
   });
 
-  // console.log('gameState', gameState);
-  // console.log('userList', userList);
-
   const getPercentage = ({
     num,
     percentage,

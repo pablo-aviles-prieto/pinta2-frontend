@@ -52,7 +52,6 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
     );
   };
 
-  // TODO: IMPORTANT change the color of the circle of the own user from red to emerald/teal
   return (
     <div
       className={`bg-gradient-to-b from-amber-50 via-neutral-50 to-amber-50
