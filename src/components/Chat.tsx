@@ -15,9 +15,6 @@ interface PropsI {
 
 const MAX_CHAT_CHARS = 50;
 
-// TODO: Limpiar el chat al empezar una nueva partida (tras enviar la config del game i guess)
-// TODO: Get via props the preTurnCount, so whenever it is a number, it doesnt send it (so the
-// user cant type while in countdown of preTurn) or disable the input. Check it!
 export const Chat: FC<PropsI> = ({
   joinedRoom,
   turnCount,

@@ -41,7 +41,6 @@ const JoinRoom: FC = () => {
 
     const handleJoinRoomResponse = (response: JoinRoomResponse) => {
       if (response.success) {
-        // if the game started, set the turnDuration for future turns
         if (response.gameState && response.gameState.started) {
           setTurnDuration(
             response.gameState.turnDuration

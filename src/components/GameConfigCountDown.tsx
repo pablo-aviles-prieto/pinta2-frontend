@@ -38,7 +38,6 @@ export const GameConfigCountDown: FC<PropsI> = ({
         categorySelected,
       });
       closeModalOwner();
-      // removing possible messages when starting the game
       setAwaitPlayersMsg(undefined);
       setGameCancelled(undefined);
       setSelectingWord(undefined);

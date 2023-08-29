@@ -13,7 +13,6 @@ const Divider = () => {
   return <hr className='h-[2px] bg-emerald-400 w-[80%] m-auto rounded-full' />;
 };
 
-// User list displayed in the container board
 export const UserBoard: FC<Props> = ({ extraStyles }) => {
   const { userList, gameState, usersNotPlaying } = useGameData();
   const { socket } = useSocket();
@@ -27,7 +26,6 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
     usersNotPlaying: string[];
     user: UserRoomI | undefined;
   }) => {
-    // In case that a user is in the usersNotPlaying array, displaying a forbidden img
     if (user && usersNotPlaying.includes(user.id)) {
       return (
         <img
@@ -91,8 +89,6 @@ export const UserBoard: FC<Props> = ({ extraStyles }) => {
                             user,
                           })}
                           {gameState.turnScores && (
-                            // TODO: The class names for the transition could be returned by a function
-                            // that delays a bit the return, so it always renders the arrow with the transition
                             <div
                               className={`absolute -bottom-5 -right-5 transition-all duration-1000 ${
                                 gameState.turnScores[key]?.value

@@ -25,7 +25,7 @@ const routes: RouteObject[] = [
     ),
   },
   {
-    path: '/home', // Only accesible if the user is registered
+    path: '/home',
     element: (
       <ProtectRegisteredRoute>
         <Homepage />
@@ -33,7 +33,7 @@ const routes: RouteObject[] = [
     ),
   },
   {
-    path: '/create-room', // Only accesible if the user is registered
+    path: '/create-room',
     element: (
       <ProtectRegisteredRoute>
         <CreateNewRoom />
@@ -41,7 +41,7 @@ const routes: RouteObject[] = [
     ),
   },
   {
-    path: '/join-room', // Only accesible if the user is registered
+    path: '/join-room',
     element: (
       <ProtectRegisteredRoute>
         <JoinRoom />

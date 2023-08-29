@@ -55,7 +55,6 @@ const Modal: FC<ModalI> = ({
   );
 };
 
-// Create another function that handles the JSX and set as children ??
 export function useModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState<JSX.Element | undefined>(undefined);

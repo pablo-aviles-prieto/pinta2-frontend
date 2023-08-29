@@ -51,13 +51,11 @@ export const SocketProvider: FC<PropsI> = ({ children }) => {
 
   const resetSocketAndGameData = () => {
     socket?.disconnect();
-    // socket setters
     setUsername('');
     setRoomPassword('');
     setJoinedRoom(undefined);
     setSocket(null);
     setIsRegistered(false);
-    // useGameData setters
     setUserList([]);
     setGameState(DEFAULT_INIT_GAME_STATE);
     setCategorySelected(DEFAULT_CATEGORY_SELECTED);

@@ -19,9 +19,6 @@ interface CreateRoomResponse {
 
 const TOOLTIP_WIDTH = 'w-[150px]';
 
-// TODO: IMPORTANT sanitize the data of the password (max characts (10?) and some regex to not use any white space
-// and dont use any special character, just normal chars???)
-// TODO: IMPORTANT Test if the users should and can use special characters on the password field
 const CreateNewRoom: FC = () => {
   const [roomDigits, setRoomDigits] = useState<(number | '')[]>(
     Array(4).fill('')
@@ -78,7 +75,6 @@ const CreateNewRoom: FC = () => {
    transition ease-in-out duration-200`;
 
   return (
-    // TODO: Create button to auto generate the room number
     <div className='flex items-center justify-center h-[75vh]'>
       <div className='absolute top-7'>
         <img

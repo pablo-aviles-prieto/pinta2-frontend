@@ -47,7 +47,6 @@ const Room = () => {
     }
   };
 
-  // Avoid back and forward mouse buttons. Also F5 reload
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F5') {
@@ -73,9 +72,6 @@ const Room = () => {
   }, []);
 
   useEffect(() => {
-    // using a ref to avoid re-renders that would bug and create a second newSocket
-    // (even when checking !socket in the if condition)
-    // TODO: IMPORTANT Sanitize queryPw (query param) and roomId (param) to not send weird things to back
     if (!socketRef.current && roomId && queryPw) {
       const URL_BACK = import.meta.env.VITE_BACK_URL;
       const newSocket = io(URL_BACK ?? 'http://localhost:4000');
@@ -152,7 +148,6 @@ const Room = () => {
     setJoinedRoom(roomId ? Number(roomId) : 9999);
     setRoomPassword(queryPw ?? '');
     closeUsernameModal();
-    // No need to display in here a toast, since its displayed from the update user event
     socket?.emit('join room directly', {
       roomNumber: roomId,
       username: username.trim(),
@@ -162,7 +157,6 @@ const Room = () => {
   if (!socket || !roomId || (!queryPw && !hasInternalPw) || !joinedRoom) {
     return (
       <>
-        {/* TODO: Change the loading with a skeleton of the finished game board */}
         <div>Loading...</div>
         <UsernameModal forbidClose>
           <>

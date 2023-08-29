@@ -14,7 +14,7 @@ type Props = {
   digitsInputRef: React.MutableRefObject<(HTMLInputElement | null)[]>;
   setRoomDigits: React.Dispatch<React.SetStateAction<(number | '')[]>>;
   passwordInputRef: React.MutableRefObject<HTMLInputElement | null>;
-  isCreating: boolean; // creating or joining a room
+  isCreating: boolean;
   children: JSX.Element;
 };
 
@@ -44,7 +44,6 @@ export const RoomForm: FC<Props> = ({
         digitsInputRef.current[index + 1]?.focus();
       }
 
-      // Focusing the password input when typed in the last digit input
       if (
         digitsInputRef.current.length - 1 === index &&
         passwordInputRef.current
@@ -106,7 +105,7 @@ export const RoomForm: FC<Props> = ({
           <div className='flex justify-between'>
             {roomDigits.map((digit, index) => (
               <input
-                ref={(el) => (digitsInputRef.current[index] = el)} // add ref to each input
+                ref={(el) => (digitsInputRef.current[index] = el)}
                 aria-label='Room number'
                 key={index}
                 autoComplete='off'

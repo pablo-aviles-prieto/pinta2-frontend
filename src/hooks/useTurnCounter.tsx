@@ -22,7 +22,6 @@ export const useTurnCounter = ({ onCountDownComplete }: PropsI) => {
     }
 
     return () => {
-      // Clean up the worker when the component is unmounted
       if (workerRef.current) {
         workerRef.current.terminate();
       }
@@ -41,7 +40,6 @@ export const useTurnCounter = ({ onCountDownComplete }: PropsI) => {
     if (workerRef.current) {
       workerRef.current.terminate();
     }
-    // Initialize the worker with the current count
     workerRef.current = new Worker('/timer-worker.js');
     workerRef.current.postMessage({ startCounter, count });
 
@@ -49,7 +47,6 @@ export const useTurnCounter = ({ onCountDownComplete }: PropsI) => {
       const remainingTime = e.data;
 
       if (remainingTime <= 0) {
-        // Countdown has completed
         onCountDownComplete && onCountDownComplete();
         setStartCounter(false);
       }

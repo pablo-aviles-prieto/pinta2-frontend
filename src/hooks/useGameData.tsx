@@ -10,7 +10,7 @@ interface GameDataStore {
   userList: UserRoomI[];
   gameState: GameStateI;
   categorySelected: string | null;
-  turnDuration: number | null; // stored in seconds
+  turnDuration: number | null;
   isDrawer: boolean;
   isPlaying: boolean;
   usersNotPlaying: string[];

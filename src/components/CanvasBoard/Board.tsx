@@ -48,8 +48,6 @@ interface JoinRoomDirectlyResponse {
   gameState?: GameStateI;
 }
 
-// TODO: IMPORTANT There is a bug when hte user join directly to the room, and then press the disconnect button
-// TODO: Print in the chat whenever a new game is started
 export const Board: FC<Props> = ({
   setAwaitPlayersMsg,
   setGameCancelled,
@@ -223,7 +221,6 @@ export const Board: FC<Props> = ({
       }
     );
 
-    // Not using the msg property in this component, that comes from this event
     socket.on('game cancelled', () => {
       setTurnStartCounter(false);
       if (handleSelectWordCountRef.current) {
@@ -249,7 +246,7 @@ export const Board: FC<Props> = ({
         categories: string[];
         possibleTurnDurations: Record<string, number>;
       }) => {
-        closeEndGameModal(); // in case it is opened from a restart game
+        closeEndGameModal();
         setPossibleCategories(categories);
         setPosibleTurnDuration(possibleTurnDurations);
         openModalOwner();
@@ -299,8 +296,6 @@ export const Board: FC<Props> = ({
             color: userSystemColor,
           },
         ]);
-        // In chrome is not getting sometimes the displayGuessedWord correct value from
-        // useState, but it does from the cb function of the setter
         setDisplayGuessedWord((displayGuessedWord) => {
           if (!displayGuessedWord && guessedWordAudioRef.current) {
             guessedWordAudioRef.current.volume = 0.1;
@@ -315,8 +310,6 @@ export const Board: FC<Props> = ({
       setTurnStartCounter(false);
       openScoreBoardModal();
       handleScoreBoardCount(true);
-      // if fireworks sound are playing, dont execute. Else execute the endTurn xylophone
-      // audio, but setting to 0 the bell of guessed Word
       if (!displayGuessedWord && endTurnAudioRef.current) {
         if (guessedWordAudioRef.current) {
           guessedWordAudioRef.current.volume = 0;
@@ -367,8 +360,6 @@ export const Board: FC<Props> = ({
       setTurnStartCounter(false);
       setEndGameContent(TopMsg);
       openEndGameModal();
-      // if fireworks sound are playing, dont execute. Else execute the endGame tada audio,
-      // but setting to 0 the bell of guessed Word
       if (!displayGuessedWord && endGameAudioRef.current) {
         if (guessedWordAudioRef.current) {
           guessedWordAudioRef.current.volume = 0;
@@ -419,7 +410,6 @@ export const Board: FC<Props> = ({
           const currentUserList = useGameData.getState().userList;
           const currentusersNotPlaying = useGameData.getState().usersNotPlaying;
 
-          // Storing the new user in the array state
           if (
             newUser &&
             currentGameState.started &&
@@ -429,9 +419,6 @@ export const Board: FC<Props> = ({
             setUsersNotPlaying([...currentusersNotPlaying, newUser.id]);
           }
 
-          // if there is newUser joining, we check if there is drawer, in that case the drawer
-          // will hydrate the new user, if it doesnt exist, it will get the 1st user in the array
-          // (should be the owner), and hydrate the new user
           if (
             newUser &&
             ((currentGameState.drawer?.id &&
@@ -462,7 +449,6 @@ export const Board: FC<Props> = ({
   useEffect(() => {
     if (!socket) return;
 
-    // Separate the useEffect, to listen to isPlaying changes
     socket.on('countdown preDraw start', () => {
       const currentGameState = useGameData.getState().gameState;
       if (currentGameState.preTurn) {
@@ -519,7 +505,6 @@ export const Board: FC<Props> = ({
       ({ usersGuessing }: { usersGuessing: number }) => {
         const currentGameState = useGameData.getState().gameState;
         const currentTurnDuration = useGameData.getState().turnDuration;
-        // update the usersGuessing
         setGameState({
           ...currentGameState,
           usersGuessing,
@@ -529,7 +514,6 @@ export const Board: FC<Props> = ({
       }
     );
 
-    // Set the turn duration to all users in the room except for the leader
     socket.on(
       'set new turn duration',
       ({ turnDuration }: { turnDuration: number }) => {
@@ -541,12 +525,10 @@ export const Board: FC<Props> = ({
       closeEndGameModal();
     });
 
-    // Set the category to all users in the room except for the leader
     socket.on('update category front', ({ category }: { category: string }) => {
       setCategorySelected(category);
     });
 
-    // update the EndGameModal content if the owner left during endGame
     socket.on('resend game ended', ({ owner }: { owner: string }) => {
       const currentGameState = useGameData.getState().gameState;
       const UpdateMsg =
@@ -587,7 +569,6 @@ export const Board: FC<Props> = ({
       setEndGameContent(UpdateMsg);
     });
 
-    // update the counter and the lines for a user who joined in the middle of the turn
     socket.on(
       'current game data',
       ({
@@ -609,21 +590,17 @@ export const Board: FC<Props> = ({
           setTurnStartCounter(true);
         }
 
-        // Storing the new user in the array state
         if (
           currentGameState.started &&
           !currentGameState.endGame &&
           !currentGameState.preTurn
         ) {
-          // For new users, this is the latest event recieved when joining a room
-          // since has a timeout of 300ms on the back, so has the usersNotPlaying up to date
           setUsersNotPlaying([...usersNotPlaying, socket.id]);
         }
         setLines(draw);
       }
     );
 
-    // display the msg in the middle of the screen (msg & fireworks used on GuessedWord component)
     socket.on('user guessed', ({ msg }: { msg: string }) => {
       setGuessedMsgDisplayed(msg);
       setDisplayGuessedWord(true);
@@ -633,8 +610,6 @@ export const Board: FC<Props> = ({
     socket.on('disconnect', () => {
       setIsRegistered(false);
       setUsername('');
-      // TODO: navigate to path '/' with a state prop 'notRegistered' in the navigate
-      // should be already re-directed with that states changeds
     });
 
     socket.on(
@@ -646,7 +621,6 @@ export const Board: FC<Props> = ({
         newUsers,
       }: JoinRoomDirectlyResponse) => {
         if (success) {
-          // if the game started, set the turnDuration for future turns
           if (gameState && gameState.started) {
             setTurnDuration(
               gameState.turnDuration
@@ -689,7 +663,7 @@ export const Board: FC<Props> = ({
   }, []);
 
   const handleTurnDuration = (turnDuration: number) => {
-    setTurnDuration(turnDuration / 1000); // parsing it to seconds
+    setTurnDuration(turnDuration / 1000);
   };
 
   const handleCategoryChoice = (category: string) => {
@@ -730,13 +704,6 @@ export const Board: FC<Props> = ({
     handleStartDrawing(e);
   };
 
-  // TODO: Have to improve performance, since if the user wnat to fill an area drawing a lot of lines
-  // in the same section, it creates a lot of data in the lines array, specially if the user does it
-  // on a canvas edge, creating tons of new arrays
-  // IMPORTANT 1 possible solution is to expand the canvas, but the drawing area (visible area where the lines
-  // are going to be displayed) is a bit less than the whole canvas, so if the user try to fill an area
-  // near corners, i could manage it as a single line, since theorically the user didnt leave the canvas
-  // only left the drawing/visible area, so it doesnt create hundred of unnecessary new lines
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
     // no drawing - skipping
     if (
@@ -751,16 +718,13 @@ export const Board: FC<Props> = ({
     const point = stage?.getPointerPosition();
     if (!point) return;
 
-    // Logic under the setter setLines, to get the updated prevLines
     setLines((prevLines) => {
       const newLines = [...prevLines];
       const lastLine = newLines[newLines.length - 1];
 
-      // If lastLine has reached the limit, start a new line
       if (lastLine.points.length >= MAX_POINTS_IN_SINGLE_ARRAY) {
         const newLine = {
           ...lastLine,
-          // Add the last point of the old line as the first point of the new line to avoid a gap
           points: [...lastLine.points.slice(-2), point.x, point.y],
         };
         newLines.push(newLine);
@@ -770,9 +734,7 @@ export const Board: FC<Props> = ({
           roomNumber: joinedRoom,
         });
       } else {
-        // add point to the existing line
         lastLine.points = lastLine.points.concat([point.x, point.y]);
-        // replace the last line in newLines with the updated lastLine
         newLines[newLines.length - 1] = lastLine;
         socket?.emit('new segment', {
           lineLength: newLines.length - 1,
@@ -828,7 +790,6 @@ export const Board: FC<Props> = ({
     if (handleConfigGameCounterRef.current) {
       handleConfigGameCounterRef.current(false);
     }
-    // removing possible messages when starting the game
     setAwaitPlayersMsg(undefined);
     setGameCancelled(undefined);
     setHaveCustomWords(false);
@@ -866,14 +827,7 @@ export const Board: FC<Props> = ({
   };
 
   return (
-    // TODO: Remove unnecessary SVGs
-    // TODO: Disable the input when user is in turnScore so he cant keep chatting ???
-    // TODO: Add a restart game button for the owner (it should display a modal to confirm the action)!
-    // TODO: Check that when pressing a link on the header, it doesnt navigate right away, should
-    // alert the user
-    // TODO: Add a footer with my details IMPORTANT
     <>
-      {/* Audio section */}
       <audio
         ref={countdownAudioRef}
         src='/audios/countdown-3secs.mp3'
@@ -899,9 +853,7 @@ export const Board: FC<Props> = ({
         src='/audios/tada.mp3'
         preload='auto'
       ></audio>
-      {/* TODO: Extract into a component (BoardHeader) IMPORTANT */}
       <div className='flex items-end justify-between gap-2 mb-1 w-[1280px]'>
-        {/* Turn&Round/init game btn container */}
         <div className='w-[137px]'>
           {gameState.started && (
             <div className='p-3 px-0 text-sm text-center border rounded-lg border-emerald-500 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50'>
@@ -923,7 +875,6 @@ export const Board: FC<Props> = ({
             </BtnContainer>
           )}
         </div>
-        {/* Word container & DrawingPanel */}
         <div>
           {gameState.started && !gameState.preTurn && startTurnCounter && (
             <WordContainer turnCount={turnCount} />
@@ -944,7 +895,6 @@ export const Board: FC<Props> = ({
             />
           )}
         </div>
-        {/* CopyBtn container */}
         <div className='w-[266px]'>
           <CopyBtnComponent
             copied={copied}

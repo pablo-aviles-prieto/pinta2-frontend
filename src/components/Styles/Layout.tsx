@@ -16,21 +16,21 @@ const NAV_OPTIONS = [
     path: '/',
     altPath: '/home',
     protectWhilePlaying: true,
-  }, // Visible when user not playing
+  },
   {
     id: 'create',
     label: 'Crear sala',
     path: '/create-room',
     protectRegistered: true,
     protectWhilePlaying: true,
-  }, // Visible when user registered and not playing
+  },
   {
     id: 'join',
     label: 'Unirse',
     path: '/join-room',
     protectRegistered: true,
     protectWhilePlaying: true,
-  }, // Visible when user registered and not playing
+  },
   {
     id: 'disconnect',
     label: 'Desconectar',
@@ -40,14 +40,14 @@ const NAV_OPTIONS = [
       from: location.pathname,
     },
     showOnPlaying: true,
-  }, // Only visible while playing
+  },
   {
     id: 'contact',
     label: 'Contactar',
     path: '/contact',
     displayModal: true,
     needSocket: true,
-  }, // Visible when user has a socket connection stablished (only displays modal)
+  },
   { id: 'help', label: 'Ayuda', path: '/help', displayTooltip: true },
 ];
 

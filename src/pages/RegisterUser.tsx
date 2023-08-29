@@ -5,8 +5,6 @@ import { useSocket } from '../hooks/useSocket';
 import { LOGO_COLORS_CLASSES } from '../utils/const';
 import { useCustomToast } from '../hooks/useCustomToast';
 
-// TODO: IMPORTANT In case that throws an error the connection (because
-// cors or something else) dont redirect/assign the register prop etc.
 const RegisterUser: FC = () => {
   const [redirectedURL, setRedirectedURL] = useState<string | undefined>(
     undefined
@@ -33,7 +31,6 @@ const RegisterUser: FC = () => {
           msg: 'Sigue los pasos para unirte/crear una sala y empezar a jugar!',
           options: { type: 'warning' },
         });
-        // Resetting the disconnectUser prop on the location.state
         navigate(location.pathname, {
           state: { ...browsingState, disconnectUser: undefined },
           replace: true,

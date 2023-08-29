@@ -12,7 +12,6 @@ export const useGenericTimer = ({
   const [count, setCount] = useState<number | undefined>(undefined);
   const [startCounter, setStartCounter] = useState(false);
   const workerRef = useRef<Worker | null>(null);
-  // callbackRef stores the latest callback variable values
   const callbackRef = useRef<typeof onCountDownComplete>();
 
   useEffect(() => {
