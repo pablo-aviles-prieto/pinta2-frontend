@@ -23,8 +23,8 @@ export const WordContainer: FC<Props> = ({ turnCount }) => {
   };
 
   return (
-    <div className='flex items-center justify-center mb-1'>
-      <div className='px-4 py-2 m-auto text-2xl border-2 rounded-lg shadow-lg border-emerald-300 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50'>
+    <div className='flex items-center justify-center'>
+      <div className='px-4 py-1 m-auto text-2xl border-2 rounded-lg shadow-lg border-emerald-300 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-50'>
         <p className='text-base italic text-center underline'>
           {gameState.category}
         </p>

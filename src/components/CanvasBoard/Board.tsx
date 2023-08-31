@@ -48,7 +48,7 @@ interface JoinRoomDirectlyResponse {
   gameState?: GameStateI;
 }
 
-// TODO: IMPORTANT There is a bug when hte user join directly to the room, and then press the disconnect button
+// TODO: IMPORTANT There is a bug when the user join directly to the room, and then press the disconnect button
 // TODO: Print in the chat whenever a new game is started
 export const Board: FC<Props> = ({
   setAwaitPlayersMsg,
@@ -924,24 +924,9 @@ export const Board: FC<Props> = ({
           )}
         </div>
         {/* Word container & DrawingPanel */}
-        <div>
+        <div className='min-h-[68px]'>
           {gameState.started && !gameState.preTurn && startTurnCounter && (
             <WordContainer turnCount={turnCount} />
-          )}
-          {isDrawer && (
-            <DrawingPanel
-              color={drawColor}
-              pencilStroke={pencilStroke}
-              eraserStroke={eraserStroke}
-              setColor={setDrawColor}
-              setPencilStroke={setPencilStroke}
-              setEraserStroke={setEraserStroke}
-              tool={tool}
-              setTool={setTool}
-              setCanvasCursorStyle={setCanvasCursorStyle}
-              clearBoard={clearBoard}
-              handleUndo={handleUndo}
-            />
           )}
         </div>
         {/* CopyBtn container */}
@@ -1002,6 +987,25 @@ export const Board: FC<Props> = ({
           <PreTurnCountDown preTurnCount={preTurnCount} />
         )}
       </div>
+      {isDrawer && (
+        <div className='flex items-end justify-between gap-2 mt-1 w-[1280px]'>
+          <div className='w-[137px]' />
+          <DrawingPanel
+            color={drawColor}
+            pencilStroke={pencilStroke}
+            eraserStroke={eraserStroke}
+            setColor={setDrawColor}
+            setPencilStroke={setPencilStroke}
+            setEraserStroke={setEraserStroke}
+            tool={tool}
+            setTool={setTool}
+            setCanvasCursorStyle={setCanvasCursorStyle}
+            clearBoard={clearBoard}
+            handleUndo={handleUndo}
+          />
+          <div className='w-[266px]' />
+        </div>
+      )}
       {!gameState.started && (
         <ModalOwnerCategories forbidClose>
           <>

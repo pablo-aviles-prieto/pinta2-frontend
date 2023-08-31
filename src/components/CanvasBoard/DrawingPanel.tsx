@@ -59,16 +59,16 @@ export const DrawingPanel: FC<Props> = ({
   const getTooltipClass = (position: 'top' | 'bottom') => {
     const tooltipPosition =
       position === 'top'
-        ? '-top-12 -left-14 tooltip-top'
+        ? '-top-14 -left-14 tooltip-top'
         : 'top-14 -left-14 tooltip';
     return `z-[2] absolute ${TOOLTIP_WIDTH} ${tooltipPosition} py-2 bg-orange-100 text-emerald-600 text-center 
      rounded-md shadow-md hidden border border-emerald-400 transform group-hover:block
-      transition ease-in-out duration-200`;
+      transition ease-in-out duration-100`;
   };
 
   return (
     <div
-      className='flex p-2 w-[480px] border-2 rounded-lg gap-7 shadow-m 
+      className='flex mx-auto p-2 w-[480px] border-2 rounded-lg gap-7 shadow-md 
     border-emerald-300 bg-gradient-to-tl from-amber-50 via-orange-50 to-amber-100'
     >
       <CirclePicker
@@ -131,7 +131,7 @@ export const DrawingPanel: FC<Props> = ({
         <div
           className={`group flex justify-center rounded-md shadow-lg hover:shadow-inner`}
         >
-          <button className='relative' onClick={() => handleUndo()}>
+          <button className='relative' onClick={handleUndo}>
             <Undo width={35} height={35} />
             <span className={getTooltipClass('top')}>Deshacer</span>
           </button>
@@ -146,15 +146,15 @@ export const DrawingPanel: FC<Props> = ({
             onClick={() => onToolChange({ tool: 'eraser', color })}
           >
             <DrawEraser width={40} height={40} />
-            <span className={getTooltipClass('bottom')}>Goma</span>
+            <span className={getTooltipClass('top')}>Goma</span>
           </button>
         </div>
         <div
           className={`group flex justify-center rounded-md shadow-lg hover:shadow-inner`}
         >
-          <button className='relative' onClick={() => clearBoard()}>
+          <button className='relative' onClick={clearBoard}>
             <Canvas width={40} height={40} />
-            <span className={getTooltipClass('bottom')}>Limpiar lienzo</span>
+            <span className={getTooltipClass('top')}>Limpiar lienzo</span>
           </button>
         </div>
       </div>

@@ -51,26 +51,18 @@ export const BodyContainer: FC = () => {
 
   return (
     <>
-      {!awaitPlayersMsg && gameCancelled && !gameState.started && (
-        <div className='my-4 text-2xl font-bold text-center text-emerald-600'>
-          {gameCancelled}
-        </div>
-      )}
-      {configuringGame && !gameState.started && (
-        <div className='my-4 text-2xl font-bold text-center text-emerald-600'>
-          {configuringGame}
-        </div>
-      )}
-      {awaitPlayersMsg && !gameState.started && (
-        <div className='my-4 text-2xl font-bold text-center text-emerald-600'>
-          {awaitPlayersMsg}
-        </div>
-      )}
-      {selectingWord && gameState.started && (
-        <div className='my-4 text-2xl font-bold text-center text-emerald-600'>
-          {selectingWord}
-        </div>
-      )}
+      <div className='min-h-[28px] my-1 text-xl font-bold text-center text-emerald-600'>
+        {!awaitPlayersMsg && gameCancelled && !gameState.started && (
+          <span>{gameCancelled}</span>
+        )}
+        {configuringGame && !gameState.started && (
+          <span>{configuringGame}</span>
+        )}
+        {awaitPlayersMsg && !gameState.started && (
+          <span>{awaitPlayersMsg}</span>
+        )}
+        {selectingWord && gameState.started && <span>{selectingWord}</span>}
+      </div>
       <Board
         setAwaitPlayersMsg={setAwaitPlayersMsg}
         setGameCancelled={setGameCancelled}
