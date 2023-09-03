@@ -20,6 +20,7 @@ type Props = {
   closeModal: () => void;
 };
 
+// TODO: Save the form data into zustand
 export const ContactForm: FC<Props> = ({ closeModal }) => {
   const { socket } = useSocket();
   const { showLoadingToast, updateToast } = useCustomToast();
