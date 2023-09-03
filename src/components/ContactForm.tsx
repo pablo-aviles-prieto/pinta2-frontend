@@ -3,13 +3,9 @@ import { useSocket } from '../hooks/useSocket';
 import { ContactFormSchema } from '../schemas';
 import { useCustomToast } from '../hooks/useCustomToast';
 import { FC } from 'react';
-
-const INIT_VALUES = {
-  name: '',
-  contactType: 'email',
-  contactInfo: '',
-  message: '',
-};
+import { useContactFormData } from '../hooks/useContactFormData';
+import { ContactFormI } from '../interfaces/ContactForm';
+import { INIT_FORM_VALUES } from '../hooks/useContactFormData';
 
 const CONTACT_OPTIONS = [
   { id: 'email', name: 'Email' },
@@ -20,14 +16,18 @@ type Props = {
   closeModal: () => void;
 };
 
-// TODO: Save the form data into zustand
 export const ContactForm: FC<Props> = ({ closeModal }) => {
+  const {
+    formState: formValues,
+    setFormState,
+    resetFormState,
+  } = useContactFormData();
   const { socket } = useSocket();
   const { showLoadingToast, updateToast } = useCustomToast();
 
   const onSubmit = (
-    values: typeof INIT_VALUES,
-    { setSubmitting }: FormikHelpers<typeof INIT_VALUES>
+    values: ContactFormI,
+    { setSubmitting }: FormikHelpers<ContactFormI>
   ) => {
     setSubmitting(true);
     const submitFormToast = showLoadingToast({ msg: 'Enviando mensaje... 📩' });
@@ -42,6 +42,7 @@ export const ContactForm: FC<Props> = ({ closeModal }) => {
             type: 'success',
           });
           closeModal();
+          resetFormState();
         } else {
           updateToast({
             toastId: submitFormToast,
@@ -61,11 +62,11 @@ export const ContactForm: FC<Props> = ({ closeModal }) => {
 
   return (
     <Formik
-      initialValues={INIT_VALUES}
+      initialValues={formValues}
       validationSchema={ContactFormSchema}
       onSubmit={onSubmit}
     >
-      {({ isSubmitting }) => (
+      {({ setFieldValue, isSubmitting, setValues }) => (
         <Form className='px-24 py-8'>
           <h1
             className='pb-4 text-4xl font-bold text-emerald-600'
@@ -77,7 +78,15 @@ export const ContactForm: FC<Props> = ({ closeModal }) => {
             <label className={LABEL_STYLES} htmlFor='name'>
               Nombre:
             </label>
-            <Field type='text' name='name' className={INPUT_STYLES} />
+            <Field
+              type='text'
+              name='name'
+              className={INPUT_STYLES}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setFieldValue('name', e.target.value);
+                setFormState({ name: e.target.value });
+              }}
+            />
             <ErrorMessage
               name='name'
               component='div'
@@ -88,7 +97,15 @@ export const ContactForm: FC<Props> = ({ closeModal }) => {
             <label className={LABEL_STYLES} htmlFor='contactType'>
               Método de contacto:
             </label>
-            <Field as='select' name='contactType' className={INPUT_STYLES}>
+            <Field
+              as='select'
+              name='contactType'
+              className={INPUT_STYLES}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                setFieldValue('contactType', e.target.value);
+                setFormState({ contactType: e.target.value });
+              }}
+            >
               {CONTACT_OPTIONS.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.name}
@@ -100,7 +117,15 @@ export const ContactForm: FC<Props> = ({ closeModal }) => {
             <label className={LABEL_STYLES} htmlFor='contactInfo'>
               Información de contacto:
             </label>
-            <Field type='text' name='contactInfo' className={INPUT_STYLES} />
+            <Field
+              type='text'
+              name='contactInfo'
+              className={INPUT_STYLES}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setFieldValue('contactInfo', e.target.value);
+                setFormState({ contactInfo: e.target.value });
+              }}
+            />
             <ErrorMessage
               name='contactInfo'
               component='div'
@@ -111,14 +136,35 @@ export const ContactForm: FC<Props> = ({ closeModal }) => {
             <label className={LABEL_STYLES} htmlFor='message'>
               Mensaje:
             </label>
-            <Field as='textarea' name='message' className={INPUT_STYLES} />
+            <Field
+              as='textarea'
+              name='message'
+              className={INPUT_STYLES}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setFieldValue('message', e.target.value);
+                setFormState({ message: e.target.value });
+              }}
+            />
             <ErrorMessage
               name='message'
               component='div'
               className={ERROR_MSG_STYLES}
             />
           </div>
-          <div className='flex justify-center text-center'>
+          <div className='flex justify-center gap-6 text-center'>
+            <button
+              className={`${INPUT_STYLES} h-[50px] w-[40%] !bg-orange-100 hover:!bg-orange-200 ${
+                isSubmitting && 'hover:!bg-orange-100 bg-neutral-300'
+              }`}
+              onClick={() => {
+                resetFormState();
+                setValues(INIT_FORM_VALUES);
+              }}
+              type='button'
+              disabled={isSubmitting}
+            >
+              Limpiar
+            </button>
             <button
               className={`${INPUT_STYLES} h-[50px] w-[40%] !bg-orange-100 hover:!bg-orange-200 ${
                 isSubmitting && 'hover:!bg-orange-100 bg-neutral-300'
