@@ -32,29 +32,29 @@ A fun multiplayer game where players take turns drawing a word while others try 
 
 1. Clone the repository:
 
-\```bash
+```bash
 
 git clone https://github.com/YourUsername/pinta2.git
 
-\```
+```
 
 2. Navigate to the project directory and install the dependencies:
 
-\```bash
+```bash
 
 cd pinta2
 
 npm install
 
-\```
+```
 
 3. Start the development server:
 
-\```bash
+```bash
 
 npm run dev
 
-\```
+```
 
 ## 📃 License
 
