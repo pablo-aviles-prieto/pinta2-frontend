@@ -24,7 +24,7 @@ A fun multiplayer game where players take turns drawing a word while others try 
 
 ## 💌 Contact Me
 
-Found a bug or have some suggestions? Or maybe you just want to say hi? Feel free to fill out the contact form available on the website. I'd love to hear from you!
+Found a bug or have some suggestions? Or maybe you just want to say hi? Feel free to fill out the contact form available on the website header, once you provide a username. I'd love to hear from you!
 
 ## 🚀 Getting Started
 
