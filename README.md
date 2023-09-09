@@ -56,7 +56,7 @@ npm install
 npm run dev
 ```
 
-> 📝 **Note**: 📝 Note: This frontend is meant to run alongside the backend app. Make sure to [set up and run the backend app](https://github.com/Pablo-Aviles-Prieto/pinta2-backend#-getting-started) concurrently.
+> 📝 **Note**: This frontend is meant to run alongside the backend app. Make sure to [set up and run the backend app](https://github.com/Pablo-Aviles-Prieto/pinta2-backend#-getting-started) concurrently.
 
 ## 📃 License
 
