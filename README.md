@@ -39,13 +39,13 @@ Found a bug or have some suggestions? Or maybe you just want to say hi? Feel fre
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/YourUsername/pinta2.git
+git clone https://github.com/YourUsername/pinta2-frontend.git
 ```
 
 2. Navigate to the project directory and install the dependencies:
 
 ```bash
-cd pinta2
+cd pinta2-frontend
 
 npm install
 ```
@@ -55,6 +55,8 @@ npm install
 ```bash
 npm run dev
 ```
+
+> 📝 **Note**: 📝 Note: This frontend is meant to run alongside the backend app. Make sure to [set up and run the backend app](https://github.com/Pablo-Aviles-Prieto/pinta2-backend#-getting-started) concurrently.
 
 ## 📃 License
 
