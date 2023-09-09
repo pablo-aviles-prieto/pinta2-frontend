@@ -1,4 +1,4 @@
-# 🎨 Pinta2 - Draw and Guess Game
+# 🎨 Pinta2 Frontend - Draw and Guess Game
 
 A fun multiplayer game where players take turns drawing a word while others try to guess it. Inspired by games like Pictionary, Pinta2 offers a smooth and engaging online experience for those looking to test their drawing and guessing skills.
 
