@@ -48,7 +48,6 @@ interface JoinRoomDirectlyResponse {
   gameState?: GameStateI;
 }
 
-// TODO: IMPORTANT There is a bug when the user join directly to the room, and then press the disconnect button
 // TODO: Print in the chat whenever a new game is started
 export const Board: FC<Props> = ({
   setAwaitPlayersMsg,
@@ -315,8 +314,6 @@ export const Board: FC<Props> = ({
       setTurnStartCounter(false);
       openScoreBoardModal();
       handleScoreBoardCount(true);
-      // if fireworks sound are playing, dont execute. Else execute the endTurn xylophone
-      // audio, but setting to 0 the bell of guessed Word
       if (!displayGuessedWord && endTurnAudioRef.current) {
         if (guessedWordAudioRef.current) {
           guessedWordAudioRef.current.volume = 0;
@@ -367,8 +364,6 @@ export const Board: FC<Props> = ({
       setTurnStartCounter(false);
       setEndGameContent(TopMsg);
       openEndGameModal();
-      // if fireworks sound are playing, dont execute. Else execute the endGame tada audio,
-      // but setting to 0 the bell of guessed Word
       if (!displayGuessedWord && endGameAudioRef.current) {
         if (guessedWordAudioRef.current) {
           guessedWordAudioRef.current.volume = 0;
@@ -730,7 +725,7 @@ export const Board: FC<Props> = ({
     handleStartDrawing(e);
   };
 
-  // TODO: Have to improve performance, since if the user wnat to fill an area drawing a lot of lines
+  // TODO: Can improve performance, since if the user wnat to fill an area drawing a lot of lines
   // in the same section, it creates a lot of data in the lines array, specially if the user does it
   // on a canvas edge, creating tons of new arrays
   // IMPORTANT 1 possible solution is to expand the canvas, but the drawing area (visible area where the lines
@@ -866,7 +861,6 @@ export const Board: FC<Props> = ({
   };
 
   return (
-    // TODO: Remove unnecessary SVGs
     // TODO: Disable the input when user is in turnScore so he cant keep chatting ???
     // TODO: Add a restart game button for the owner (it should display a modal to confirm the action)!
     // TODO: Check that when pressing a link on the header, it doesnt navigate right away, should

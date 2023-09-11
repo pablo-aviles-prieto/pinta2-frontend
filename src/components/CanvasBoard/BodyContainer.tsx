@@ -17,7 +17,7 @@ export const BodyContainer: FC = () => {
     undefined
   );
   const { socket } = useSocket();
-  const { gameState } = useGameData();
+  const { gameState, userList } = useGameData();
 
   useEffect(() => {
     if (!socket) return;
@@ -62,6 +62,15 @@ export const BodyContainer: FC = () => {
           <span>{awaitPlayersMsg}</span>
         )}
         {selectingWord && gameState.started && <span>{selectingWord}</span>}
+        {!awaitPlayersMsg &&
+          !gameState.started &&
+          !gameCancelled &&
+          !configuringGame &&
+          userList.length < 3 && (
+            <span>
+              Se necesitan al menos 3 jugadores para comenzar la partida
+            </span>
+          )}
       </div>
       <Board
         setAwaitPlayersMsg={setAwaitPlayersMsg}
