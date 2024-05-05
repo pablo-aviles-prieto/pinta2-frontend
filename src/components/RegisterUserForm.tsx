@@ -46,7 +46,9 @@ export const RegisterUserForm: FC<Props> = ({
 
     if (!socket) {
       const URL_BACK = import.meta.env.VITE_BACK_URL;
-      const newSocket = io(URL_BACK ?? 'http://localhost:4000');
+      const newSocket = io(URL_BACK ?? 'http://localhost:4000', {
+        transports: ['websocket', 'polling'],
+      });
       newSocket.emit('register', username);
       setSocket(newSocket);
       setIsRegistered(true);
