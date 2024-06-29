@@ -39,7 +39,7 @@ Found a bug or have some suggestions? Or maybe you just want to say hi? Feel fre
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/YourUsername/pinta2-frontend.git
+git clone https://github.com/pablo-aviles-prieto/pinta2-frontend.git
 ```
 
 2. Navigate to the project directory and install the dependencies:
