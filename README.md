@@ -4,7 +4,7 @@ A fun multiplayer game where players take turns drawing a word while others try 
 
 ## 🔗 Live Demo
 
-[Play Pinta2 now!](https://www.pinta2.pabloaviles.es)
+[Play Pinta2 now!](https://www.pinta2.pabloaviles.dev)
 
 > 📝 **Note**: The game and website are currently available only in Spanish.
 
